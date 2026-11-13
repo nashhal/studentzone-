@@ -8,7 +8,7 @@ import { Link, NavLink, Route, Routes, useNavigate, useParams, useSearchParams }
 import { useAuth } from "./lib/auth";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, curriculumSource, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
-import { bookLibraryNotes, directPdfLinks, hadramoutCatalogue, lessonSummaryFormat, legacyReferences, ministryBookPortal, thirdSecondaryCatalogue } from "./data/books";
+import { bookLibraryNotes, official1448Updates, grade12Archive1447, officialPhysicsPractice, hadramoutCatalogue, lessonSummaryFormat, ministryBookPortal, ministryBooksChannel, ministry1448Announcement } from "./data/books";
 
 function Header() {
   const { user, role, signOut } = useAuth();
@@ -131,17 +131,19 @@ function BooksPage() {
   const [query, setQuery] = useState("");
   const matches = grades.filter((grade) => (!gradeFilter || grade.number === gradeFilter) &&
     (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim())))));
+  const latestMatches = official1448Updates.filter((item) => !gradeFilter || item.grade === gradeFilter);
+  const archiveMatches = grade12Archive1447.filter((item) => !gradeFilter || item.grade === gradeFilter);
   return <main className="page container books-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>مكتبة الكتب PDF</b></div>
     <div className="page-intro">
       <span className="kicker">مكتبة المصادر</span>
       <h1>كتبك الدراسية من مصدرها.</h1>
-      <p>روابط وصول منظمة إلى ملفات الكتب المنشورة من الجهات التعليمية. افتح المصدر الأصلي لاختيار كتابك وتنزيله، ثم استخدم Yemen Study للملاحظات التعليمية الأصلية والتدريب.</p>
+      <p>نبدأ بطبعة 1448هـ / 2026–2027م من بوابة الوزارة، ونفصل الكتب الأقدم في أرشيف مستقل. افتح منشور المصدر لتنزيل ملف PDF مباشرة منه، ثم استخدم ملخصات Yemen Study الأصلية للمراجعة.</p>
     </div>
     <div className="book-source-grid">
       <article className="book-source-card featured">
         <span className="book-source-icon"><Library size={23}/></span>
-        <span className="source-label official">مصدر الوزارة</span>
+        <span className="source-label official">المرجع الأساسي · 1448هـ</span>
         <h2>{ministryBookPortal.title}</h2>
         <p>{ministryBookPortal.description}</p>
         <a className="button primary" href={ministryBookPortal.url} target="_blank" rel="noreferrer">فتح مكتبة الوزارة <ExternalLink size={16}/></a>
@@ -149,50 +151,57 @@ function BooksPage() {
       </article>
       <article className="book-source-card">
         <span className="book-source-icon"><BookOpen size={23}/></span>
-        <span className="source-label regional">فهرس إقليمي</span>
-        <h2>{hadramoutCatalogue.title}</h2>
-        <p>{hadramoutCatalogue.description}</p>
-        <a className="button secondary" href={hadramoutCatalogue.url} target="_blank" rel="noreferrer">فتح فهرس حضرموت <ExternalLink size={16}/></a>
-        <small>{hadramoutCatalogue.rightsNote}</small>
+        <span className="source-label official">إعلان وزارة التعليم</span>
+        <h2>{ministry1448Announcement.title}</h2>
+        <p>{ministry1448Announcement.description}</p>
+        <a className="button secondary" href={ministry1448Announcement.url} target="_blank" rel="noreferrer">فتح إعلان 1448 <ExternalLink size={16}/></a>
+        <small>{ministry1448Announcement.rightsNote}</small>
       </article>
       <article className="book-source-card">
-        <span className="book-source-icon"><GraduationCap size={23}/></span>
-        <span className="source-label third-party">مصدر مساعد غير حكومي</span>
-        <h2>{thirdSecondaryCatalogue.title}</h2>
-        <p>{thirdSecondaryCatalogue.description}</p>
-        <a className="button secondary" href={thirdSecondaryCatalogue.url} target="_blank" rel="noreferrer">فتح مكتبة الثالث الثانوي <ExternalLink size={16}/></a>
-        <small>{thirdSecondaryCatalogue.rightsNote}</small>
+        <span className="book-source-icon"><FileText size={23}/></span>
+        <span className="source-label official">قناة الكتب الرسمية</span>
+        <h2>{ministryBooksChannel.title}</h2>
+        <p>{ministryBooksChannel.description}</p>
+        <a className="button secondary" href={ministryBooksChannel.url} target="_blank" rel="noreferrer">فتح قناة الكتب <ExternalLink size={16}/></a>
+        <small>{ministryBooksChannel.rightsNote}</small>
       </article>
     </div>
     <section className="direct-pdfs-section">
-      <div className="section-head compact"><div><span className="kicker">ملفات PDF مباشرة</span><h2>روابط ملفات أمكن التحقق من عنوانها.</h2></div><span className="subtle-label">الصف السادس الأساسي</span></div>
-      <div className="direct-pdf-list">{directPdfLinks.map((book) => <article key={book.id} className="direct-pdf-card">
-        <span className="pdf-icon"><FileDown size={20}/></span>
-        <div><b>{book.title}</b><small>{book.publisher}{book.edition ? " · " + book.edition : ""}</small><p>{book.rightsNote}</p></div>
-        <a href={book.url} target="_blank" rel="noreferrer" aria-label={"فتح " + book.title}><ExternalLink size={18}/></a>
+      <div className="section-head compact"><div><span className="kicker">تحديثات 1448 الموثقة</span><h2>كتب حديثة ظهرت لها روابط فردية.</h2></div><span className="subtle-label">قائمة جزئية من الوزارة</span></div>
+      <div className="official-updates-grid">{latestMatches.map((book) => <article key={book.id} className="official-update-card">
+        <span className="grade-number">{String(book.grade).padStart(2, "0")}</span>
+        <div><b>{book.title}</b><small>{book.edition} · {book.publisher}</small><p>{book.description}</p></div>
+        <a href={book.url} target="_blank" rel="noreferrer">فتح مرفق PDF <ExternalLink size={14}/></a>
       </article>)}</div>
+      <p className="list-note">هذه الروابط الفردية التي أمكن التحقق منها حتى الآن، وليست دليلاً على اكتمال قائمة جميع مواد 1448. بقية الكتب تُفتح من مكتبة الوزارة الرئيسية.</p>
     </section>
     <section className="grade-book-section">
-      <div className="section-head compact"><div><span className="kicker">حسب الصف الدراسي</span><h2>اختر صفك للوصول إلى الكتب.</h2></div></div>
+      <div className="section-head compact"><div><span className="kicker">حسب الصف الدراسي</span><h2>اختر صفك للوصول إلى مكتبة الوزارة.</h2></div></div>
       <label className="catalog-search book-search"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن صف أو مادة..."/><span>{matches.length} صفوف</span></label>
       <div className="catalog-grid book-grade-grid">{matches.map((grade) => <article key={grade.slug} className="book-grade-card">
         <span className="grade-number">{String(grade.number).padStart(2, "0")}</span>
         <div><b>{grade.name}</b><small>{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"} · {getSubjectCount(grade)} مقررات/مسارات</small></div>
-        <a href={ministryBookPortal.url} target="_blank" rel="noreferrer" className="book-grade-link">كتب PDF <ExternalLink size={14}/></a>
-        {grade.number === 12 && <a href={thirdSecondaryCatalogue.url} target="_blank" rel="noreferrer" className="book-grade-secondary">مكتبة إضافية للثالث الثانوي</a>}
+        <a href={ministryBookPortal.url} target="_blank" rel="noreferrer" className="book-grade-link">كتب الوزارة <ExternalLink size={14}/></a>
+        {grade.number === 12 && <a href="https://t.me/YemenEducationTV2025/854" target="_blank" rel="noreferrer" className="book-grade-secondary">أرشيف مواد العلمي 1447هـ</a>}
+      </article>)}</div>
+    </section>
+    <section className="grade-book-section grade12-archive">
+      <div className="section-head compact"><div><span className="kicker">أرشيف الثالث الثانوي</span><h2>ملفات 1447هـ / 2025–2026م للمقارنة.</h2></div><span className="subtle-label">ليست طبعة 1448 الحالية</span></div>
+      <div className="direct-pdf-list">{archiveMatches.map((book) => <article key={book.id} className="direct-pdf-card">
+        <span className="pdf-icon"><FileDown size={20}/></span>
+        <div><b>{book.title}</b><small>{book.edition} · {book.publisher}</small><p>{book.description} {book.rightsNote}</p></div>
+        <a href={book.url} target="_blank" rel="noreferrer" aria-label={"فتح " + book.title}><ExternalLink size={18}/></a>
       </article>)}</div>
     </section>
     <section className="legacy-reference-section">
-      <div className="section-head compact"><div><span className="kicker">تنبيه حول الطبعات</span><h2>مراجع قديمة لا تعتمدها كمنهج حالي.</h2></div></div>
-      <div className="legacy-reference-grid">{legacyReferences.map((source) => <article key={source.id}>
-        <span className="source-label legacy">طبعة تاريخية · 1435هـ / 2014م</span>
-        <h3>{source.title}</h3><p>{source.description}</p>
-        <a href={source.url} target="_blank" rel="noreferrer">عرض الفهرس التاريخي <ExternalLink size={14}/></a>
-        <small>{source.rightsNote}</small>
+      <div className="section-head compact"><div><span className="kicker">مواد مراجعة خارجية</span><h2>روابط تدريب منشورة للفيزياء.</h2></div><span className="subtle-label">طابقها مع طبعتك أولاً</span></div>
+      <div className="legacy-reference-grid">{officialPhysicsPractice.map((book) => <article key={book.id}>
+        <span className="source-label legacy">مورد مراجعة خارجي</span><h3>{book.title}</h3><p>{book.description}</p>
+        <a href={book.url} target="_blank" rel="noreferrer">فتح المورد <ExternalLink size={14}/></a><small>{book.rightsNote}</small>
       </article>)}</div>
     </section>
     <section className="summary-method">
-      <div><span className="kicker">أسلوب ملخصات Yemen Study</span><h2>ملخص يساعدك على الفهم والمراجعة، لا مجرد اختصار صفحات.</h2><p>هذا هو القالب التحريري الذي سنستخدمه في كل درس بعد مطابقة الكتاب وطبعة المنهج.</p></div>
+      <div><span className="kicker">أسلوب ملخصات Yemen Study</span><h2>ملخص يساعدك على الفهم والمراجعة، لا مجرد اختصار صفحات.</h2><p>سنكتب شروحات وملخصات أصلية على نمط منصات المراجعة: أهداف، شرح، مصطلحات، أمثلة محلولة، ملخص سريع، ثم تدريب متدرج.</p></div>
       <div className="summary-method-grid">{lessonSummaryFormat.map((item) => <article key={item.number}><span>{item.number}</span><b>{item.title}</b><small>{item.description}</small></article>)}</div>
     </section>
     <div className="source-note"><ShieldCheck size={18}/><p>{bookLibraryNotes.join(" ")}</p></div>
