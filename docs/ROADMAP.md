@@ -1,47 +1,47 @@
 # Yemen Study — roadmap
 
-## Product direction
-A free-first Arabic learning platform for the Yemeni curriculum. The first complete pilot is Grade 12 (third secondary), scientific track. The content model is designed to support all basic and secondary grades.
+## Direction
+A free-first Arabic learning platform for the Yemeni curriculum, RTL and mobile-first. Editorial visual system with navy, blue, white, restrained surfaces and clear hierarchy.
 
-## Release 0.1 — foundation
+## Release 0.1 — platform foundation
 - [x] React + TypeScript + Vite application shell.
-- [x] Arabic-first RTL layout and responsive mobile navigation.
-- [x] Initial routes: home, curriculum, student dashboard, sign-in, content admin.
-- [x] Supabase browser client configured through public environment variables.
-- [x] Initial PostgreSQL schema and row-level security policies.
-- [ ] Verify the official curriculum edition and the exact Grade 12 subject list.
-- [ ] Create the Supabase project and apply the migration.
-- [ ] Configure GitHub Actions variables and verify the build/deployment.
+- [x] Arabic-first RTL responsive layout.
+- [x] Home, curriculum, grade, subject, dashboard, sign-in, and editor/admin routes.
+- [x] Supabase client configured through public environment variables.
+- [x] Initial PostgreSQL schema and RLS policies.
+- [x] First curriculum index for grades 1–12 based on the available Hadramout education office catalogue.
+- [ ] Confirm regional applicability, edition and year for each textbook.
+- [ ] Create Supabase project and apply migrations.
+- [ ] Configure GitHub Actions variables and production auth.
 
-## Release 0.2 — content operations
-- Admin CRUD for stages, grades, tracks, subjects, syllabus versions, units and lessons.
-- Draft → review → published editorial workflow.
-- Source register with edition, year, reuse rights and reviewer details.
-- Supabase Storage buckets and guarded upload paths.
+## Release 0.2 — verified syllabus structure
+- Read each approved textbook's contents page.
+- Add units, lessons and topic objectives with source/page references.
+- Record the edition, school year, authority and region for every syllabus.
+- Editorial status flow: draft → review → published.
 
-## Release 0.3 — learning experience
-- Lesson reader with objectives, explanations, definitions, formulas, examples, diagrams and references.
+## Release 0.3 — learning content
+- Original lesson explanations, definitions, formula sheets, examples and diagrams.
+- Topic questions with difficulty labels and explanatory solutions.
+- Rights-checked links to official PDFs or videos.
 - Bookmarks and lesson progress.
-- Topic-based question bank with difficulty filters and worked explanations.
-- Original practice questions and reviewed past-paper references.
 
 ## Release 0.4 — assessments
-- Timed practice tests and mock exams.
-- Server-side grading through Supabase Edge Functions.
+- Timed tests and mock exams.
+- Server-side grading.
 - Results, attempt history, weak-topic review and progress analytics.
-- Keep answer keys and grading results off the public browser API.
+- Keep answer keys off the student-facing browser API.
 
 ## Release 0.5 — expansion
-- Complete the Grade 12 scientific pilot after curriculum verification.
-- Add remaining Grade 12 tracks and then expand to all Yemeni grades.
+- Complete the Grade 12 scientific pilot.
+- Complete other Grade 12 track.
+- Review and complete remaining secondary grades.
+- Review and complete basic education grades 1–9.
 
 ## Definition of done
-- Mobile responsive, RTL, accessible by keyboard and free of horizontal scrolling on common phone widths.
-- RLS is enabled and tested for every exposed table.
-- Student/editor/admin permissions are verified.
-- Answer keys remain server-side.
-- Every published item has a checked source and reuse-rights status.
-- Typecheck/build pass and deployed URL is verified before launch.
-
-## Content integrity
-Do not reproduce Save My Exams content or republish protected textbook scans/PDFs without permission. Prefer original explanations and questions. Link to source material when redistribution rights are unclear.
+- Responsive with no horizontal scrolling at common phone widths.
+- Keyboard accessible, visible focus states and reduced-motion support.
+- RLS policies verified for every exposed table.
+- Student/editor/admin roles tested.
+- Every published item has an edition-specific checked source and reuse-rights status.
+- Typecheck/build pass and deployed URL smoke-tested.
