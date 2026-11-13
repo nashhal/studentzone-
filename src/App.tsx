@@ -2,12 +2,13 @@ import { useMemo, useState, type FormEvent } from "react";
 import {
   ArrowLeft, ArrowUpLeft, BookOpen, BookOpenCheck, Bookmark, CheckCircle2,
   ChevronLeft, Clock3, FileText, GraduationCap, Layers3, Menu, Search,
-  ShieldCheck, Sparkles, Target, X
+  ShieldCheck, Sparkles, Target, X, ExternalLink, FileDown, Library
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, curriculumSource, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
+import { bookLibraryNotes, directPdfLinks, hadramoutCatalogue, lessonSummaryFormat, legacyReferences, ministryBookPortal, thirdSecondaryCatalogue } from "./data/books";
 
 function Header() {
   const { user, role, signOut } = useAuth();
@@ -23,6 +24,7 @@ function Header() {
     <nav className={open ? "main-nav open" : "main-nav"}>
       <NavLink to="/" end onClick={() => setOpen(false)}>الرئيسية</NavLink>
       <NavLink to="/curriculum" onClick={() => setOpen(false)}>المراحل والصفوف</NavLink>
+      <NavLink to="/books" onClick={() => setOpen(false)}>مكتبة الكتب PDF</NavLink>
       {user && <NavLink to="/dashboard" onClick={() => setOpen(false)}>مساحة الطالب</NavLink>}
       {user && (role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setOpen(false)}>إدارة المحتوى</NavLink>}
       {user ? <button className="nav-login" onClick={logout}>تسجيل الخروج</button> : <Link className="nav-login" to="/login" onClick={() => setOpen(false)}>دخول الحساب <ArrowUpLeft size={15}/></Link>}
@@ -122,6 +124,81 @@ function CurriculumPage() {
   </main>;
 }
 
+
+function BooksPage() {
+  const [searchParams] = useSearchParams();
+  const gradeFilter = Number(searchParams.get("grade")?.replace("grade-", "") || 0);
+  const [query, setQuery] = useState("");
+  const matches = grades.filter((grade) => (!gradeFilter || grade.number === gradeFilter) &&
+    (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim())))));
+  return <main className="page container books-page">
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>مكتبة الكتب PDF</b></div>
+    <div className="page-intro">
+      <span className="kicker">مكتبة المصادر</span>
+      <h1>كتبك الدراسية من مصدرها.</h1>
+      <p>روابط وصول منظمة إلى ملفات الكتب المنشورة من الجهات التعليمية. افتح المصدر الأصلي لاختيار كتابك وتنزيله، ثم استخدم Yemen Study للملاحظات التعليمية الأصلية والتدريب.</p>
+    </div>
+    <div className="book-source-grid">
+      <article className="book-source-card featured">
+        <span className="book-source-icon"><Library size={23}/></span>
+        <span className="source-label official">مصدر الوزارة</span>
+        <h2>{ministryBookPortal.title}</h2>
+        <p>{ministryBookPortal.description}</p>
+        <a className="button primary" href={ministryBookPortal.url} target="_blank" rel="noreferrer">فتح مكتبة الوزارة <ExternalLink size={16}/></a>
+        <small>{ministryBookPortal.rightsNote}</small>
+      </article>
+      <article className="book-source-card">
+        <span className="book-source-icon"><BookOpen size={23}/></span>
+        <span className="source-label regional">فهرس إقليمي</span>
+        <h2>{hadramoutCatalogue.title}</h2>
+        <p>{hadramoutCatalogue.description}</p>
+        <a className="button secondary" href={hadramoutCatalogue.url} target="_blank" rel="noreferrer">فتح فهرس حضرموت <ExternalLink size={16}/></a>
+        <small>{hadramoutCatalogue.rightsNote}</small>
+      </article>
+      <article className="book-source-card">
+        <span className="book-source-icon"><GraduationCap size={23}/></span>
+        <span className="source-label third-party">مصدر مساعد غير حكومي</span>
+        <h2>{thirdSecondaryCatalogue.title}</h2>
+        <p>{thirdSecondaryCatalogue.description}</p>
+        <a className="button secondary" href={thirdSecondaryCatalogue.url} target="_blank" rel="noreferrer">فتح مكتبة الثالث الثانوي <ExternalLink size={16}/></a>
+        <small>{thirdSecondaryCatalogue.rightsNote}</small>
+      </article>
+    </div>
+    <section className="direct-pdfs-section">
+      <div className="section-head compact"><div><span className="kicker">ملفات PDF مباشرة</span><h2>روابط ملفات أمكن التحقق من عنوانها.</h2></div><span className="subtle-label">الصف السادس الأساسي</span></div>
+      <div className="direct-pdf-list">{directPdfLinks.map((book) => <article key={book.id} className="direct-pdf-card">
+        <span className="pdf-icon"><FileDown size={20}/></span>
+        <div><b>{book.title}</b><small>{book.publisher}{book.edition ? " · " + book.edition : ""}</small><p>{book.rightsNote}</p></div>
+        <a href={book.url} target="_blank" rel="noreferrer" aria-label={"فتح " + book.title}><ExternalLink size={18}/></a>
+      </article>)}</div>
+    </section>
+    <section className="grade-book-section">
+      <div className="section-head compact"><div><span className="kicker">حسب الصف الدراسي</span><h2>اختر صفك للوصول إلى الكتب.</h2></div></div>
+      <label className="catalog-search book-search"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن صف أو مادة..."/><span>{matches.length} صفوف</span></label>
+      <div className="catalog-grid book-grade-grid">{matches.map((grade) => <article key={grade.slug} className="book-grade-card">
+        <span className="grade-number">{String(grade.number).padStart(2, "0")}</span>
+        <div><b>{grade.name}</b><small>{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"} · {getSubjectCount(grade)} مقررات/مسارات</small></div>
+        <a href={ministryBookPortal.url} target="_blank" rel="noreferrer" className="book-grade-link">كتب PDF <ExternalLink size={14}/></a>
+        {grade.number === 12 && <a href={thirdSecondaryCatalogue.url} target="_blank" rel="noreferrer" className="book-grade-secondary">مكتبة إضافية للثالث الثانوي</a>}
+      </article>)}</div>
+    </section>
+    <section className="legacy-reference-section">
+      <div className="section-head compact"><div><span className="kicker">تنبيه حول الطبعات</span><h2>مراجع قديمة لا تعتمدها كمنهج حالي.</h2></div></div>
+      <div className="legacy-reference-grid">{legacyReferences.map((source) => <article key={source.id}>
+        <span className="source-label legacy">طبعة تاريخية · 1435هـ / 2014م</span>
+        <h3>{source.title}</h3><p>{source.description}</p>
+        <a href={source.url} target="_blank" rel="noreferrer">عرض الفهرس التاريخي <ExternalLink size={14}/></a>
+        <small>{source.rightsNote}</small>
+      </article>)}</div>
+    </section>
+    <section className="summary-method">
+      <div><span className="kicker">أسلوب ملخصات Yemen Study</span><h2>ملخص يساعدك على الفهم والمراجعة، لا مجرد اختصار صفحات.</h2><p>هذا هو القالب التحريري الذي سنستخدمه في كل درس بعد مطابقة الكتاب وطبعة المنهج.</p></div>
+      <div className="summary-method-grid">{lessonSummaryFormat.map((item) => <article key={item.number}><span>{item.number}</span><b>{item.title}</b><small>{item.description}</small></article>)}</div>
+    </section>
+    <div className="source-note"><ShieldCheck size={18}/><p>{bookLibraryNotes.join(" ")}</p></div>
+  </main>;
+}
+
 function GradePage() {
   const { gradeSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
@@ -134,6 +211,7 @@ function GradePage() {
     {grade.tracks.length > 1 && <div className="track-tabs" role="tablist" aria-label="المسار الدراسي">{grade.tracks.map((item) =>
       <button key={item.slug} role="tab" aria-selected={selectedTrack.slug === item.slug} className={selectedTrack.slug === item.slug ? "track-tab active" : "track-tab"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="section-head compact"><div><span className="kicker">المواد الدراسية</span><h2>{selectedTrack.name}</h2></div><span className="subtle-label">فهرس أولي · راجع الطبعة المعتمدة</span></div>
+    <div className="grade-book-shortcut"><FileDown size={18}/><span>هل تبحث عن ملفات الكتاب؟</span><Link to={"/books?grade=" + grade.slug}>افتح مصادر PDF لهذا الصف <ArrowLeft size={15}/></Link></div>
     <div className="subject-grid">{selectedTrack.subjects.map((subject, index) =>
       <Link className="subject-card" key={subject.slug} to={"/subject/" + grade.slug + "/" + selectedTrack.slug + "/" + subject.slug}>
         <div className="subject-card-top"><span className="subject-symbol">{String(index + 1).padStart(2, "0")}</span><span className="subject-state">افتح المادة <ChevronLeft size={14}/></span></div>
@@ -170,7 +248,8 @@ function SubjectPage() {
       {active === "practice" && <ResourceEmpty icon="practice" title="التدريب حسب الموضوع" text="سيُبنى بنك أسئلة أصلي ومتدرج: اختيار من متعدد، وصواب وخطأ، وإجابة قصيرة، ومسائل رقمية. تظهر الإجابة التفسيرية بعد إرسال المحاولة."/>}
       {active === "exams" && <ResourceEmpty icon="exams" title="الاختبارات التجريبية" text="اختبارات قصيرة وموقّتة واختبارات شاملة، مع سجل المحاولات وتقرير يوضح الموضوعات التي تحتاج إلى مراجعة إضافية."/>}
     </section>
-    <aside className="lesson-format"><span className="kicker">قالب الدرس المعتمد</span><div className="lesson-format-grid"><span>أهداف التعلّم</span><span>شرح مركز</span><span>مصطلحات وقوانين</span><span>أمثلة محلولة</span><span>ملخص سريع</span><span>اختبر فهمك</span></div></aside>
+    <aside className="lesson-format"><span className="kicker">قالب الدرس المعتمد</span><div className="lesson-format-grid"><span>أهداف التعلّم</span><span>شرح مركز</span><span>مصطلحات وقوانين</span><span>أمثلة محلولة</span><span>ملخص سريع</span><span>اختبر فهمك</span><span>أخطاء شائعة</span><span>مراجعة سريعة</span><span>تدريب حسب الصعوبة</span></div><p>نكتب هذه الملاحظات بصياغة أصلية بعد مراجعة فهرس الكتاب والطبعة؛ ولا ننقل صفحات أو إجابات من منصات أخرى.</p></aside>
+    <div className="grade-book-shortcut subject-book-shortcut"><FileDown size={18}/><span>الكتاب الدراسي PDF</span><Link to={"/books?grade=" + grade.slug}>افتح روابط الكتاب من المصدر الأصلي <ArrowLeft size={15}/></Link></div>
     <div className="source-note"><ShieldCheck size={18}/><p>فهرس المقررات مصدر للأسماء والكتب فقط. لا تُرفع ملفات أو تُنسخ ملاحظات محمية دون التحقق من حقوقها؛ سنفضّل كتابة شرح أصلي وربط الطالب بالمصدر عند الحاجة.</p><a href={curriculumSource.videoUrl} target="_blank" rel="noreferrer">الدروس التعليمية الرسمية <ArrowUpLeft size={14}/></a></div>
   </main>;
 }
@@ -258,6 +337,7 @@ export default function App() {
   return <div className="app-shell"><Header/><Routes>
     <Route path="/" element={<HomePage/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
+    <Route path="/books" element={<BooksPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage/>}/>
     <Route path="/dashboard" element={<DashboardPage/>}/>
@@ -268,6 +348,7 @@ export default function App() {
   <footer className="footer"><div className="container footer-inner">
     <Link to="/" className="footer-brand"><span className="footer-mark">YS</span><b>Yemen Study</b></Link>
     <span>مساحة تعلّم منظمة للمناهج اليمنية</span>
+    <Link to="/books">مكتبة الكتب PDF</Link>
     <a href={curriculumSource.url} target="_blank" rel="noreferrer">مرجع فهرس المقررات</a>
     <span>© {new Date().getFullYear()} Yemen Study</span>
   </div></footer></div>;
