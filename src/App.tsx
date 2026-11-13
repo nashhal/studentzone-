@@ -3,7 +3,7 @@ import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
   CircleHelp, Clock3, FileText, GraduationCap, Layers3,
-  ListChecks, LogOut, Menu, Play, Search, ShieldCheck, Sparkles,
+  LogOut, Menu, Play, Search, ShieldCheck, Sparkles,
   Target, Timer, Trophy, X, Zap
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
