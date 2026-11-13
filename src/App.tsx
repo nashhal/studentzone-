@@ -8,7 +8,7 @@ import { Link, NavLink, Route, Routes, useNavigate, useParams, useSearchParams }
 import { useAuth } from "./lib/auth";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, curriculumSource, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
-import { bookLibraryNotes, official1448Updates, grade12Archive1447, officialPhysicsPractice, hadramoutCatalogue, lessonSummaryFormat, ministryBookPortal, ministryBooksChannel, ministry1448Announcement } from "./data/books";
+import { bookLibraryNotes, official1448Updates, grade12Archive1447, officialPhysicsPractice, lessonSummaryFormat, ministryBookPortal, ministryBooksChannel, ministry1448Announcement } from "./data/books";
 
 function Header() {
   const { user, role, signOut } = useAuth();
