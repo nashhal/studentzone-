@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  ArrowLeft, ArrowRight, Award, Bookmark, BookOpen, BookOpenCheck,
+  ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
-  CircleHelp, Clock3, Download, FileText, GraduationCap, Layers3,
+  CircleHelp, Clock3, FileText, GraduationCap, Layers3,
   ListChecks, LogOut, Menu, Play, Search, ShieldCheck, Sparkles,
   Target, Timer, Trophy, X, Zap
 } from "lucide-react";
@@ -205,7 +205,7 @@ const tabs: { id: StudyTab; label: string; icon: typeof BookOpen }[] = [
   { id: "papers", label: "أوراق الامتحانات", icon: FileText },
 ];
 
-function SubjectPage({ progress, complete, toggleSaved }: { progress: Progress; complete: (id: string) => void; toggleSaved: (id: string) => void }) {
+function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSaved: (id: string) => void }) {
   const { gradeSlug = "", trackSlug = "", subjectSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
   const track = grade?.tracks.find((item) => item.slug === trackSlug);
@@ -294,7 +294,7 @@ function LessonPage({ progress, complete, toggleSaved }: { progress: Progress; c
         <div className="lesson-meta"><span><Clock3 size={15}/>{demoLesson.duration} دقيقة</span><span><FileText size={15}/>{demoLesson.sections.length} أقسام</span><span><Target size={15}/>3 أهداف تعلم</span></div>
         <div className="lesson-warning"><ShieldCheck size={16}/> هذا محتوى تجريبي لشرح طريقة عمل المنصة، ويحتاج مراجعة ومطابقة مع كتاب الوزارة قبل اعتماده للطلاب.</div>
         <section className="lesson-objectives"><h2><Target size={19}/> أهداف التعلّم</h2><ul>{demoLesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>
-        {demoLesson.sections.map((section, index) => <section className="note-section" key={section.heading}><span className="note-section-number">{String(index + 1).padStart(2, "0")}</span><div><h2>{section.heading}</h2><p>{section.body}</p>{section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}</div></section>)}
+        {demoLesson.sections.map((section, index) => <section className="note-section" id={"section-" + index} key={section.heading}><span className="note-section-number">{String(index + 1).padStart(2, "0")}</span><div><h2>{section.heading}</h2><p>{section.body}</p>{section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}</div></section>)}
         <section className="worked-example"><span className="eyebrow">مثال محلول</span><h2>{demoLesson.example.title}</h2><ol>{demoLesson.example.steps.map((step) => <li key={step}>{step}</li>)}</ol><div className="example-answer"><CheckCircle2 size={18}/><b>{demoLesson.example.answer}</b></div></section>
         <section className="lesson-recap"><h2><Zap size={19}/> ملخص سريع</h2><ul>{demoLesson.recap.map((line) => <li key={line}>{line}</li>)}</ul></section>
         <section className="lesson-next"><div><span className="eyebrow">الخطوة التالية</span><h2>هل فهمت الموضوع؟ اختبر نفسك.</h2><p>انتقل إلى الأسئلة لتطبيق ما تعلمته.</p></div><Link className="btn btn-primary" to="/subject/grade-12/scientific/physics">افتح أسئلة الموضوع <ArrowLeft size={16}/></Link></section>
@@ -332,7 +332,7 @@ function MockExamPage({ addScore }: { addScore: (score: number) => void }) {
 }
 
 function DashboardPage({ progress }: { progress: Progress }) {
-  const latestScore = progress.quizScores.at(-1);
+  const latestScore = progress.quizScores.length ? progress.quizScores[progress.quizScores.length - 1] : undefined;
   return <main className="container page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>مساحة الطالب</b></div>
     <div className="page-title-row"><div><span className="eyebrow">مساحة الطالب</span><h1>تقدّمك الدراسي.</h1><p>مكان واحد لمتابعة الدروس المحفوظة والمكتملة ونتائج الاختبارات.</p></div><Link className="btn btn-primary" to="/curriculum">واصل التعلّم <ArrowLeft size={16}/></Link></div>
@@ -403,7 +403,7 @@ export default function App() {
     <Route path="/" element={<HomePage/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
-    <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
+    <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
     <Route path="/past-papers" element={<PastPapersPage/>}/>
