@@ -112,3 +112,23 @@
   .g12-print-key p{font-size:10px;line-height:1.8}
   .g12-print-sheet footer{border-top:1px solid #aaa;margin-top:25px;padding-top:8px;text-align:center;font-size:9px}
 }
+/* Print-only summary export for the supplementary Physics revision page */
+.g12-summary-print-sheet{display:none}
+@media print{
+  body[data-g12-print-mode="summary"] .g12-print-sheet{display:none!important}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet,
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet *{visibility:visible!important}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet{display:block!important;position:absolute!important;inset:0 auto auto 0!important;width:100%!important;padding:0!important;color:#111!important;background:#fff!important;font-family:Arial,Tahoma,sans-serif!important;direction:rtl!important}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet header{text-align:center;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:15px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet header>b{font-size:13px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet header>span{display:block;margin-top:5px;font-size:10px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet h1{font-size:19px;margin:12px 0 5px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet h2{font-size:14px;margin:17px 0 7px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet p,
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet li{font-size:10px;line-height:1.85}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet ul,
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet ol{padding-right:22px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet footer{border-top:1px solid #aaa;margin-top:22px;padding-top:8px;text-align:center;font-size:9px}
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet,
+  body[data-g12-print-mode="summary"] .g12-summary-print-sheet *{break-inside:avoid}
+}
