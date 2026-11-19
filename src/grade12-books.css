@@ -47,3 +47,29 @@
 .g12-books-provenance small{flex-basis:100%;color:#929eaa;font-size:9px;line-height:1.7}
 @media(max-width:900px){.g12-books-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.g12-books-heading{align-items:flex-start;flex-direction:column}.g12-books-total{display:flex;align-items:center;gap:8px;min-width:auto}.g12-books-toolbar{align-items:stretch;flex-direction:column}.g12-books-search{min-width:0}.g12-books-grid{grid-template-columns:1fr}.g12-books-bottom{align-items:flex-start;flex-direction:column}.g12-books-bottom .btn{width:100%}.g12-book-card{min-height:0}}
+
+
+/* Edition and region filters for the Grade 12 book index */
+.g12-books-filters-row{display:grid;gap:12px;margin-bottom:14px}
+.g12-books-selects{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.g12-books-selects label{display:grid;gap:5px;min-width:190px}
+.g12-books-selects label>span{color:#718599;font-size:9px}
+.g12-books-selects select{min-height:38px;padding:0 10px;border:1px solid #dce5ec;background:#fff;color:#526a80;font-family:inherit;font-size:10px}
+.g12-books-selects select:focus{outline:2px solid #b9cede;outline-offset:1px}
+.g12-books-results{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-3px 0 12px;color:#8291a0;font-size:9px}
+.g12-books-results button{border:0;background:transparent;color:#386d97;font:inherit;cursor:pointer}
+.g12-book-meta{margin:0 0 9px!important;color:#8795a3;font-size:9px;line-height:1.6}
+.g12-book-source-label{margin:0 0 12px}
+.g12-book-source-label span{display:inline-flex;align-items:center;padding:5px 7px;font-size:9px}
+.g12-book-source-label .source-2026{background:#f0f5f8;color:#55768f;border:1px solid #dce7ef}
+.g12-book-source-label .source-regional{background:#f8f7f3;color:#8b7958;border:1px solid #ebe5d7}
+.g12-book-card{min-height:255px}
+.g12-book-card-actions a{min-height:22px}
+@media(max-width:650px){
+  .g12-books-selects{display:grid;grid-template-columns:1fr 1fr}
+  .g12-books-selects label{min-width:0}
+  .g12-books-selects select{width:100%;min-width:0}
+}
+@media(max-width:420px){
+  .g12-books-selects{grid-template-columns:1fr}
+}
