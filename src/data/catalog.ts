@@ -87,7 +87,7 @@ export const grades: GradeEntry[] = [
     makeTrack("scientific", "القسم العلمي", [...secondaryCommon, ["mathematics-scientific", "الرياضيات — علمي"]]),
     makeTrack("literary", "القسم الأدبي", [...secondaryCommon.filter(([id]) => !["physics", "chemistry", "biology"].includes(id)), ["mathematics-literary", "الرياضيات — أدبي"], ["economics", "الاقتصاد"], ["sociology", "علم الاجتماع"]]),
   ] },
-  { slug: "grade-12", number: 12, name: "الصف الثالث الثانوي", stage: "secondary", description: "الصف المستهدف للنسخة التجريبية الأولى، مع فهرسة مستقلة للقسم العلمي والقسم الأدبي.", tracks: [
+  { slug: "grade-12", number: 12, name: "الصف الثالث الثانوي", stage: "secondary", description: "فهرس أولي للقسمين العلمي والأدبي، مع مكتبة كتب مفهرسة بحسب مصدر النسخة والمنطقة. تُضاف الشروحات بعد مطابقة الطبعة.", tracks: [
     makeTrack("scientific", "القسم العلمي", [
       ["biology", "الأحياء"], ["english", "اللغة الإنجليزية"], ["faith", "الإيمان"],
       ["history", "التاريخ"], ["geography", "الجغرافيا"], ["hadith-fiqh", "الحديث والفقه"],
@@ -96,7 +96,7 @@ export const grades: GradeEntry[] = [
       ["reading", "القراءة"], ["grammar", "النحو والصرف"], ["texts", "النصوص"],
     ]),
     makeTrack("literary", "القسم الأدبي", [
-      ["biology", "الأحياء"], ["english", "اللغة الإنجليزية"], ["faith", "الإيمان"],
+      ["english", "اللغة الإنجليزية"], ["faith", "الإيمان"],
       ["history", "التاريخ"], ["geography", "الجغرافيا"], ["hadith-fiqh", "الحديث والفقه"],
       ["mathematics-literary", "الرياضيات — أدبي"], ["prophetic-biography", "السيرة النبوية"],
       ["philosophy", "الفلسفة"], ["quran", "القرآن الكريم"], ["logic", "المنطق"],
