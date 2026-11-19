@@ -2452,9 +2452,7 @@ const revisionGuides: Record<string, RevisionGuide> = {
     rules:["ⁿPᵣ = n!/(n−r)! and ⁿCᵣ = n!/[r!(n−r)!].","∫xⁿ dx = xⁿ⁺¹/(n+1)+C for n ≠ −1.","∫ₐᵇ f(x)dx = F(b)−F(a).","A definite integral is signed; geometric area may require splitting intervals."],
     method:["Decide whether order matters before choosing permutations or combinations.","Write the integration rule before substituting.","For a definite integral, find an antiderivative and evaluate the two limits.","Interpret the result with units and context."],
     pitfalls:["Do not confuse permutations and combinations.","Do not omit the constant C in an indefinite integral.","Do not confuse signed integral with total geometric area."]
-  }
-
-
+  },
   "physics-ac": {
     terms:["الدور T: الزمن اللازم لدورة كاملة.","التردد f: عدد الدورات في الثانية.","القيمة الفعالة: قيمة مكافئة في الأثر الحراري لتيار مستمر.","المفاعلة: معارضة المكثف أو الملف للتيار المتردد."],
     rules:["f = 1/T وω = 2πf.","للموجة الجيبية Iᵣₘₛ = Iₘ/√2 وVᵣₘₛ = Vₘ/√2.","X꜀ = 1/(ωC) وXₗ = ωL.","في رنين دائرة RLC على التوالي Xₗ = X꜀."],
@@ -2619,6 +2617,8 @@ export default function Grade12LearningHubPage() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [moduleTrackFilter, setModuleTrackFilter] = useState("الكل");
+  const [moduleQuery, setModuleQuery] = useState("");
   
   const questions = useMemo(() => current.questions[tier], [current, tier]);
   const answered = questions.filter((question) => answers[question.id] !== undefined).length;
@@ -2659,13 +2659,17 @@ export default function Grade12LearningHubPage() {
     // Some mobile browsers do not dispatch afterprint. The dataset only affects print media.
   };
 
-  const lessonCards = modules.map((module) => ({ slug: module.slug, name: module.name, detail: module.coverage + " · " + module.title, status: "متاح", href: "/grade-12-learning?subject=" + module.slug }));
-  lessonCards.unshift({ slug: "physics-demo", name: "درس فيزياء إضافي", detail: "الكميات القياسية والمتجهة", status: "تجريبي", href: "/grade-12-study" });
+  const lessonCards = modules.map((module) => ({ slug: module.slug, name: module.name, track: module.track, detail: module.coverage + " · " + module.title, status: "متاح", href: "/grade-12-learning?subject=" + module.slug }));
+  lessonCards.unshift({ slug: "physics-demo", name: "درس فيزياء إضافي", track: "القسم العلمي", detail: "الكميات القياسية والمتجهة · مراجعة إضافية", status: "إضافي", href: "/grade-12-study" });
+  const visibleLessonCards = lessonCards.filter((card) =>
+    (moduleTrackFilter === "الكل" || card.track === moduleTrackFilter) &&
+    (moduleQuery.trim() === "" || (card.name + " " + card.detail).toLocaleLowerCase("ar").includes(moduleQuery.trim().toLocaleLowerCase("ar")))
+  );
 
   return <main className="container page g12-learning-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><span>›</span><Link to="/grade/grade-12">الصف الثالث الثانوي</Link><span>›</span><b>المنهج العدني 2026 · الشرح والملخصات والاختبارات</b></div>
     <header className="g12-learning-header">
-      <div><span className="eyebrow">منهج عدن · الصف الثالث الثانوي 2026</span><h1>افهم الدرس، لخّصه، ثم اختبر نفسك.</h1><p>دفعة تعليمية مرتبة حسب فهارس كتب عدن: شرح أصلي، أمثلة محلولة، ملخص قابل للحفظ PDF، واختبارات متدرجة لكل محور منشور.</p></div>
+      <div><span className="eyebrow">منهج عدن · الصف الثالث الثانوي 2026</span><h1>مركز شرح ومراجعة مواد الصف الثالث الثانوي.</h1><p>محاور أكاديمية داخل الموقع تشمل الشرح والأمثلة المحلولة ومذكرات المراجعة المفصلة القابلة للحفظ PDF، مع اختبارات منفصلة حسب مستوى الصعوبة.</p></div>
       <div className="g12-learning-header-meta"><BookOpen size={20}/><span>{modules.length} محوراً · الشرح والاختبارات داخل الموقع</span></div>
     </header>
 
@@ -2674,12 +2678,18 @@ export default function Grade12LearningHubPage() {
     <div className="g12-learning-layout">
       <aside className="g12-learning-nav">
         <h2>مواد الصف الثالث الثانوي · منهج عدن</h2>
-        {lessonCards.map((card) => <Link key={card.slug} to={card.href} className={card.slug === current.slug || (card.slug === "physics" && false) ? "g12-learning-nav-card active" : "g12-learning-nav-card"} onClick={(event) => { if (modules.some((module) => module.slug === card.slug)) { event.preventDefault(); chooseModule(card.slug); } }}>
-          <span className="g12-learning-nav-icon">{card.slug === "chemistry" ? <FlaskConical size={18}/> : card.slug === "mathematics" ? <Calculator size={18}/> : <BookOpen size={18}/>}</span>
+        <input className="g12-learning-search" type="search" value={moduleQuery} onChange={(event) => setModuleQuery(event.target.value)} placeholder="ابحث عن مادة أو وحدة..." aria-label="ابحث عن مادة أو وحدة"/>
+        <div className="g12-learning-track-filters" aria-label="تصفية حسب المسار">
+          {["الكل", "القسم العلمي", "القسم الأدبي", "المواد المشتركة"].map((track) => <button key={track} type="button" onClick={() => setModuleTrackFilter(track)} className={moduleTrackFilter === track ? "active" : ""}>{track}</button>)}
+        </div>
+        <p className="g12-learning-nav-count">عرض {visibleLessonCards.length} من {lessonCards.length} محوراً</p>
+        {visibleLessonCards.map((card) => <Link key={card.slug} to={card.href} className={card.slug === current.slug ? "g12-learning-nav-card active" : "g12-learning-nav-card"} onClick={(event) => { if (modules.some((module) => module.slug === card.slug)) { event.preventDefault(); chooseModule(card.slug); } }}>
+          <span className="g12-learning-nav-icon">{card.name.includes("الكيمياء") ? <FlaskConical size={18}/> : card.name.includes("الرياضيات") ? <Calculator size={18}/> : <BookOpen size={18}/>}</span>
           <span><b>{card.name}</b><small>{card.detail}</small></span>
           <span className="g12-learning-nav-status">{card.status}</span>
         </Link>)}
-        <div className="g12-learning-pending"><b>الوحدات المتبقية قيد الاستكمال</b><p>تم تمثيل جميع المواد الأساسية في القسمين العلمي والأدبي بمحاور شرح. تستكمل الوحدات اللاحقة بعد مطابقة صفحات الكتاب المدرسي.</p><div>{pendingSubjects.map((subject) => <span key={subject}>{subject}</span>)}</div></div>
+        {visibleLessonCards.length === 0 && <p className="g12-learning-empty">لا توجد نتائج مطابقة. جرّب كلمة بحث أخرى.</p>}
+        <div className="g12-learning-pending"><b>الوحدات المتبقية قيد المراجعة النهائية</b><p>تظهر هنا المحاور المنشورة في المواد العلمية والأدبية والمشتركة. يُستكمل التدقيق النهائي مع النسخة المدرسية المطبوعة، كما تضاف تفاصيل النصوص الأدبية دون إعادة نشر نصوص محمية.</p><div>{pendingSubjects.map((subject) => <span key={subject}>{subject}</span>)}</div></div>
       </aside>
 
       <div className="g12-learning-main">
@@ -2761,6 +2771,6 @@ export default function Grade12LearningHubPage() {
       <footer>اختبار تدريبي أصلي داخل Yemen Study، وليس امتحاناً وزارياً رسمياً.</footer>
     </section>
 
-    <p className="g12-learning-final-note"><ShieldCheck size={15}/> المتاح في هذه الدفعة: {modules.length} محوراً تعليمياً داخل الموقع في الفيزياء والكيمياء والأحياء والرياضيات العلمية والأدبية والنحو والأدب والجغرافيا والإنجليزية والقراءة والإيمان والسيرة والحديث والفقه. صفحة التاريخ الحالية إثرائية وليست درساً مثبت الترتيب في كتاب عدن. ما زالت وحدات ومواد أخرى قيد الإعداد والمراجعة.</p>
+    <p className="g12-learning-final-note"><ShieldCheck size={15}/> يضم المركز حالياً {modules.length} محوراً تعليمياً في مواد العلمي والأدبي والمشتركة، تغطي وحدات من الكتب في الفيزياء والكيمياء والأحياء والرياضيات والجغرافيا والتاريخ واللغة العربية والإنجليزية والقرآن والإيمان والحديث والفقه والسيرة والفلسفة والمنطق وعلم النفس والخرائط. هذه تغطية واسعة للوحدات وليست ادعاءً بأن كل درس في كل كتاب قد اكتمل؛ راجع فهرس الكتاب المدرسي للموضوعات المتبقية.</p>
   </main>;
 }
