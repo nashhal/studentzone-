@@ -299,3 +299,46 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+.admin-page{max-width:1240px}
+.admin-page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:24px}
+.admin-page-heading h1{margin:8px 0;color:var(--navy);font-size:clamp(28px,4vw,40px);letter-spacing:-.7px}
+.admin-page-heading p{margin:0;color:#75879a;font-size:12px;line-height:1.9}
+.admin-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:18px}
+.admin-overview article{display:grid;gap:5px;padding:16px 18px;border:1px solid #e1e8ee;border-radius:8px;background:#fff}
+.admin-overview span{color:#7e8fa0;font-size:10px}
+.admin-overview b{color:#173b5d;font-size:25px;font-weight:700}
+.admin-overview small{color:#96a2ad;font-size:9px}
+.admin-tabs{display:flex;gap:4px;padding:5px;border:1px solid #e1e8ee;border-radius:8px;background:#f0f4f7;margin-bottom:15px;overflow:auto}
+.admin-tabs button{flex:1;min-height:40px;padding:0 14px;border:0;border-radius:6px;background:transparent;color:#6e8092;font-size:11px;white-space:nowrap}
+.admin-tabs button.active{background:#fff;color:#183e60;box-shadow:0 2px 8px rgba(17,48,74,.07);font-weight:700}
+.admin-setup-warning{display:flex;gap:13px;align-items:flex-start;padding:17px 19px;border:1px solid #e8dcbf;border-radius:8px;background:#fffcf5;color:#8a6e3d}
+.admin-setup-warning>svg{flex:0 0 auto;margin-top:2px}
+.admin-setup-warning b{display:block;font-size:12px;color:#775d31}
+.admin-setup-warning p{margin:6px 0 0;font-size:10px;line-height:1.9}
+.admin-editor{padding:18px;border:1px solid #e1e8ee;border-radius:9px;background:#f9fbfc}
+.admin-editor-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.85fr);gap:17px;align-items:start}
+.admin-form{display:grid;gap:13px;padding:21px;border:1px solid #e2e8ee;border-radius:8px;background:#fff}
+.admin-form h2{margin:7px 0 5px;color:#1a3b59;font-size:19px}
+.admin-form p{margin:0;color:#8190a0;font-size:10px;line-height:1.9}
+.admin-form label{display:grid;gap:6px;color:#526b83;font-size:10px}
+.admin-form input,.admin-form select,.admin-form textarea{width:100%;min-width:0;min-height:42px;padding:10px 11px;border:1px solid #dce5ec;border-radius:6px;background:#fff;color:#2e4a64;font:inherit;font-size:11px}
+.admin-form textarea{resize:vertical;line-height:1.9}
+.admin-form input:focus,.admin-form select:focus,.admin-form textarea:focus{outline:2px solid #e3eef6;border-color:#8aafca}
+.admin-options-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-form-wide{max-width:850px;margin-inline:auto}
+.admin-form-wide form{display:grid;gap:13px}
+.admin-list{padding:18px;border:1px solid #e2e8ee;border-radius:8px;background:#fff}
+.admin-list h3{margin:0 0 12px;color:#264662;font-size:13px}
+.admin-list>article{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf1f4}
+.admin-list>article:last-child{border-bottom:0}
+.admin-list>article>span{display:grid;gap:4px;min-width:0}
+.admin-list b{color:#34536e;font-size:10px;line-height:1.7}
+.admin-list small{color:#8b98a5;font-size:9px}
+.admin-list p{margin:0;color:#929eaa;font-size:10px}
+.admin-list select{max-width:145px;min-height:34px;padding:0 7px;border:1px solid #dfe7ed;border-radius:5px;background:#fff;color:#61788e;font-size:9px}
+.admin-status{min-height:22px;margin-top:12px;color:#3d7157;font-size:10px}
+.admin-footnote{display:flex;gap:9px;align-items:flex-start;margin:9px 0;padding:13px 15px;border:1px solid #e2e9ef;border-radius:7px;background:#f4f8fb;color:#73879a;font-size:10px;line-height:1.9}
+.admin-footnote svg{flex:0 0 auto;margin-top:2px}
+@media(max-width:900px){.admin-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-editor-grid{grid-template-columns:1fr}.admin-form-wide{max-width:none}}
+@media(max-width:620px){.admin-page-heading{align-items:flex-start;flex-direction:column}.admin-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-editor{padding:10px}.admin-form{padding:15px}.admin-options-grid{grid-template-columns:1fr}.admin-tabs button{min-height:38px;padding:0 10px}}
