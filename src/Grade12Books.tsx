@@ -96,7 +96,7 @@ const trackNames: Record<Track, string> = { scientific: "القسم العلمي
 export default function Grade12BooksPage() {
   const [trackFilter, setTrackFilter] = useState<TrackFilter>("all");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
-  const [regionFilter, setRegionFilter] = useState<RegionFilter>("all");
+  const [regionFilter, setRegionFilter] = useState<RegionFilter>("عدن");
   const [query, setQuery] = useState("");
 
   const visibleBooks = useMemo(() => allBooks.filter((book) => {
@@ -104,7 +104,9 @@ export default function Grade12BooksPage() {
       (trackFilter === "shared" ? book.tracks.length === 2 : book.tracks.includes(trackFilter));
     const matchesSource = sourceFilter === "all" || book.source === sourceFilter;
     const matchesRegion = regionFilter === "all" ||
-      (regionFilter === "صنعاء وعدن" ? book.region === "صنعاء وعدن" : book.region === regionFilter);
+      (regionFilter === "عدن" ? book.region === "عدن" || book.region === "صنعاء وعدن" :
+        regionFilter === "صنعاء" ? book.region === "صنعاء" || book.region === "صنعاء وعدن" :
+        regionFilter === "صنعاء وعدن" ? book.region === "صنعاء وعدن" : book.region === regionFilter);
     const searchText = (book.title + " " + book.subject + " " + book.kind + " " + book.region).toLocaleLowerCase("ar");
     return matchesTrack && matchesSource && matchesRegion &&
       (!query.trim() || searchText.includes(query.trim().toLocaleLowerCase("ar")));
@@ -123,7 +125,7 @@ export default function Grade12BooksPage() {
   return <main className="container page g12-books-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><span>›</span><Link to="/grade/grade-12">الصف الثالث الثانوي</Link><span>›</span><b>مكتبة الكتب</b></div>
     <header className="g12-books-heading">
-      <div><span className="eyebrow">مكتبة الصف الثالث الثانوي</span><h1>كتب العلمي والأدبي حسب النسخة والمنطقة.</h1><p>قاعدة فهرسة تجمع نسخ 2026 المنشورة في فهرس مستقل، وملفات مكتب وزارة التربية والتعليم بحضرموت. استخدم فلاتر المنطقة والمسار لتحديد الكتاب الأقرب لمدرستك.</p></div>
+      <div><span className="eyebrow">مكتبة الصف الثالث الثانوي · عدن أولاً</span><h1>كتب الصف الثالث الثانوي — منهج عدن 2026.</h1><p>قاعدة فهرسة تجمع نسخ 2026 المنشورة في فهرس مستقل، وملفات مكتب وزارة التربية والتعليم بحضرموت. تبدأ المكتبة بكتب عدن، وتضم أيضاً النسخ التي يذكر فهرسها أنها مشتركة بين عدن وصنعاء. ويمكنك تغيير المنطقة من الفلاتر.</p></div>
       <div className="g12-books-total"><b>{allBooks.length}</b><span>سجلاً مفهرساً</span><small>{sourceCount2026} نسخة 2026 · {hadramoutCount} ملفاً إقليمياً</small></div>
     </header>
 
@@ -144,7 +146,7 @@ export default function Grade12BooksPage() {
       </div>
       <div className="g12-books-selects">
         <label><span>الطبعة / المصدر</span><select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value as SourceFilter)}><option value="all">كل المصادر</option><option value="2026">فهرس 2026 المستقل</option><option value="hadramout">فهرس حضرموت</option></select></label>
-        <label><span>المنطقة</span><select value={regionFilter} onChange={(event) => setRegionFilter(event.target.value as RegionFilter)}><option value="all">كل المناطق</option><option value="صنعاء">صنعاء</option><option value="عدن">عدن</option><option value="صنعاء وعدن">صنعاء وعدن — كما ورد في الفهرس</option><option value="حضرموت">حضرموت — سنة غير محددة</option></select></label>
+        <label><span>المنطقة</span><select value={regionFilter} onChange={(event) => setRegionFilter(event.target.value as RegionFilter)}><option value="all">كل المناطق</option><option value="صنعاء">صنعاء</option><option value="عدن">عدن والنسخ المشتركة مع عدن</option><option value="صنعاء وعدن">صنعاء وعدن — كما ورد في الفهرس</option><option value="حضرموت">حضرموت — سنة غير محددة</option></select></label>
       </div>
       <label className="g12-books-search"><Search size={17}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث باسم الكتاب أو المادة" aria-label="ابحث في كتب الصف الثالث الثانوي"/></label>
     </div>
