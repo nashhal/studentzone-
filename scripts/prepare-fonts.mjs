@@ -9,8 +9,8 @@ async function readFontParts(folder, count) {
       readFile(join(root, folder, `${String(index + 1).padStart(2, "0")}.b64`), "utf8"),
     ),
   );
-  const encoded = parts.join("").replace(/\\s+/g, "");
-  if (!encoded || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
+  const encoded = parts.join("").replace(/\s+/g, "");
+  if (!encoded || encoded.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) {
     throw new Error(`Invalid base64 font source in ${folder}`);
   }
   return Buffer.from(encoded, "base64");
@@ -43,5 +43,5 @@ for (const font of fonts) {
     throw new Error(`${font.output} has unexpected size: ${data.length} bytes`);
   }
   await writeFile(join(outputDirectory, font.output), data);
-  process.stdout.write(`Prepared ${font.output} (${data.length} bytes)\\n`);
+  process.stdout.write(`Prepared ${font.output} (${data.length} bytes)\n`);
 }
