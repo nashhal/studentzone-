@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
+import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
@@ -1044,16 +1045,16 @@ export default function App() {
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
-    <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
-    <Route path="/target-test" element={<TargetTestPage/>}/>
-    <Route path="/strengths-weaknesses" element={<StrengthsWeaknessesPage/>}/>
-    <Route path="/guided-study" element={<GuidedStudyPage/>}/>
-    <Route path="/guided-practice" element={<GuidedPracticePage/>}/>
-    <Route path="/smart-mark" element={<SmartMarkPage/>}/>
+    <Route path="/mock-exam" element={<StudyToolLayout><MockExamPage addScore={addScore}/></StudyToolLayout>}/>
+    <Route path="/target-test" element={<StudyToolLayout><TargetTestPage/></StudyToolLayout>}/>
+    <Route path="/strengths-weaknesses" element={<StudyToolLayout><StrengthsWeaknessesPage/></StudyToolLayout>}/>
+    <Route path="/guided-study" element={<StudyToolLayout><GuidedStudyPage/></StudyToolLayout>}/>
+    <Route path="/guided-practice" element={<StudyToolLayout><GuidedPracticePage/></StudyToolLayout>}/>
+    <Route path="/smart-mark" element={<StudyToolLayout><SmartMarkPage/></StudyToolLayout>}/>
     <Route path="/teacher/test-builder" element={<TestBuilderPage role={role}/>}/>
-    <Route path="/past-papers" element={<PastPapersPage/>}/>
-    <Route path="/study-plan" element={<StudyPlanPage/>}/>
-    <Route path="/dashboard" element={<DashboardPage progress={progress}/>}/>
+    <Route path="/past-papers" element={<StudyToolLayout><PastPapersPage/></StudyToolLayout>}/>
+    <Route path="/study-plan" element={<StudyToolLayout><StudyPlanPage/></StudyToolLayout>}/>
+    <Route path="/dashboard" element={<StudyToolLayout><DashboardPage progress={progress}/></StudyToolLayout>}/>
     <Route path="/admin" element={<AdminPage/>}/>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="*" element={<NotFound/>}/>
