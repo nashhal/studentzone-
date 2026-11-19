@@ -83,12 +83,20 @@ export default function Grade12PhysicsStudyPage() {
     setRevealed([]);
     setSubmitted(false);
   };
-  const downloadPdf = () => window.print();
+  const downloadPdf = (kind: "exam" | "summary" = "exam") => {
+    document.body.dataset.g12PrintMode = kind;
+    const clean = () => {
+      delete document.body.dataset.g12PrintMode;
+      window.removeEventListener("afterprint", clean);
+    };
+    window.addEventListener("afterprint", clean);
+    window.print();
+  };
 
   return <main className="container page g12-study-page">
     <div className="breadcrumbs g12-no-print"><Link to="/">الرئيسية</Link><span>›</span><Link to="/grade/grade-12">الصف الثالث الثانوي</Link><span>›</span><Link to="/subject/grade-12/scientific/physics">الفيزياء</Link><span>›</span><b>ملخص واختبارات</b></div>
     <header className="g12-study-heading g12-no-print">
-      <div><span className="eyebrow">الصف الثالث الثانوي · القسم العلمي · الفيزياء</span><h1>الكميات القياسية والمتجهة</h1><p>شرح منظم، ملخص للمراجعة، ومسائل متدرجة مع تفسير الإجابات. المحتوى هنا مكتوب داخل المنصة.</p></div>
+      <div><span className="eyebrow">مراجعة إضافية · الفيزياء</span><h1>الكميات القياسية والمتجهة</h1><p>مادة تدريبية إضافية وليست وحدة من بداية كتاب الفيزياء العدني 2026؛ ابدأ بمركز منهج عدن لموضوعات الكتاب المرتبة.</p></div>
       <span className="g12-demo-status"><ShieldCheck size={16}/> محتوى تدريبي توضيحي</span>
     </header>
 
@@ -135,11 +143,31 @@ export default function Grade12PhysicsStudyPage() {
 
       <aside className="g12-study-aside g12-no-print">
         <div className="g12-side-card"><span className="g12-side-kicker">خطة هذه المراجعة</span><h3>تعلّم ثم طبّق</h3><ul><li>اقرأ الشرح بالترتيب.</li><li>راجع القوانين والمثال المحلول.</li><li>ابدأ بالمستوى «جيد» ثم تدرّج.</li></ul><Link to="/lesson/scalars-and-vectors" className="g12-side-link">فتح الدرس التفاعلي القديم <ArrowLeft size={15}/></Link></div>
-        <div className="g12-side-card"><span className="g12-side-kicker">ورقة اختبار PDF</span><h3>اطبع المستوى المحدد</h3><p>تُنشأ ورقة الأسئلة من المحتوى الحالي داخل الموقع، ويمكن حفظها PDF من نافذة الطباعة.</p><label className="g12-answer-toggle"><input type="checkbox" checked={includeAnswerKey} onChange={(event) => setIncludeAnswerKey(event.target.checked)}/> تضمين مفتاح الإجابة والتفسير</label><button type="button" className="btn btn-primary full" onClick={downloadPdf}><Download size={16}/> تنزيل الاختبار PDF</button><small className="g12-print-hint">اختر «حفظ كملف PDF» في نافذة الطباعة.</small></div>
+        <div className="g12-side-card"><span className="g12-side-kicker">ملفات المراجعة PDF</span><h3>احفظ الملخص أو الاختبار</h3><p>اختر ما تريد حفظه. تفتح نافذة الطباعة، ثم اختر «حفظ كملف PDF».</p><label className="g12-answer-toggle"><input type="checkbox" checked={includeAnswerKey} onChange={(event) => setIncludeAnswerKey(event.target.checked)}/> تضمين مفتاح الإجابة في الاختبار</label><button type="button" className="btn btn-outline full" onClick={() => downloadPdf("summary")}><Download size={16}/> حفظ الملخص PDF</button><button type="button" className="btn btn-primary full" onClick={() => downloadPdf("exam")}><Download size={16}/> حفظ الاختبار PDF</button><small className="g12-print-hint">تعمل الميزة من متصفحك ولا تحتاج إلى برنامج إضافي.</small></div>
         <div className="g12-side-card g12-source-card"><ShieldCheck size={20}/><b>حالة المحتوى</b><p>شرح تدريبي أصلي تم التحقق من مفاهيمه علمياً، وليس بعدُ درساً معتمداً لطبعة يمنية محددة.</p></div>
       </aside>
     </section>
 
+    <section className="g12-summary-print-sheet">
+      <header><b>Yemen Study</b><span>الفيزياء · ورقة مراجعة إضافية</span><h1>الكميات القياسية والمتجهة</h1><p>ملخص للمراجعة الذاتية</p></header>
+      <h2>المفاهيم الأساسية</h2>
+      <ul>
+        <li>الكمية القياسية تحدد بمقدار ووحدة فقط، مثل الكتلة والزمن والطاقة.</li>
+        <li>الكمية المتجهة تحتاج إلى مقدار واتجاه، مثل الإزاحة والقوة والسرعة المتجهة.</li>
+        <li>المسافة طول المسار وهي قياسية، والإزاحة تغير الموضع وهي متجهة.</li>
+        <li>عند جمع متجهات على خط واحد نختار اتجاهاً موجباً ونراعي الإشارات.</li>
+      </ul>
+      <h2>العلاقات المهمة</h2>
+      <p dir="ltr">Aₓ = A cos θ　　Aᵧ = A sin θ</p>
+      <p dir="ltr">R = √(Rₓ² + Rᵧ²)</p>
+      <p>المركبتان المتعامدتان تُجمعان باستخدام نظرية فيثاغورس، وتحدد الزاوية بعد معرفة الربع الصحيح.</p>
+      <h2>مثال محلول</h2>
+      <p>تحرك جسم 3 m شرقاً ثم 4 m شمالاً.</p>
+      <ol><li>المركبة الأفقية 3 m شرقاً.</li><li>المركبة الرأسية 4 m شمالاً.</li><li>مقدار الإزاحة = √(3² + 4²) = 5 m.</li></ol>
+      <h2>خلاصة للحفظ</h2>
+      <ul><li>القياسية: مقدار ووحدة.</li><li>المتجهة: مقدار واتجاه.</li><li>المسافة قياسية والإزاحة متجهة.</li><li>الإشارات تحدد الاتجاه عند جمع المركبات.</li></ul>
+      <footer>ورقة مساعدة أصلية. هذا الموضوع مراجعة إضافية وليس ترتيباً معتمداً من كتاب عدن 2026.</footer>
+    </section>
     <section className="g12-print-sheet">
       <header><b>Yemen Study</b><span>الصف الثالث الثانوي · القسم العلمي · الفيزياء</span><h1>اختبار: الكميات القياسية والمتجهة</h1><p>المستوى: {tierDetails[tier].label}　|　الزمن المقترح: {tierDetails[tier].duration}　|　الدرجة: {questions.length}</p></header>
       <div className="g12-print-student"><span>اسم الطالب: ....................................................</span><span>التاريخ: .... / .... / ........</span></div>
