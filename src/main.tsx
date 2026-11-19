@@ -7,6 +7,7 @@ import "./styles.css";
 import "./premium.css";
 import "./clarity-theme.css";
 import "./fonts.css";
+import "./study-platform-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
