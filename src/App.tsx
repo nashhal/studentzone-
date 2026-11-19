@@ -292,6 +292,21 @@ function PracticePanel({ questions }: { questions: Question[] }) {
   );
   const score = visibleQuestions.filter((question) => answers[question.id] === question.correctIndex).length;
   const answeredCount = visibleQuestions.filter((question) => answers[question.id] !== undefined).length;
+  const recordPractice = () => {
+    setChecked(true);
+    try {
+      const saved = JSON.parse(localStorage.getItem("yemen-study-attempts-v1") || "[]") as Array<Record<string, unknown>>;
+      const attempt = {
+        id: String(Date.now()), createdAt: new Date().toISOString(), score, total: visibleQuestions.length,
+        answers: visibleQuestions.map((question) => ({
+          questionId: question.id, correct: answers[question.id] === question.correctIndex,
+          difficulty: question.difficulty,
+        })),
+        source: "mock",
+      };
+      localStorage.setItem("yemen-study-attempts-v1", JSON.stringify([...saved, attempt]));
+    } catch { /* Local progress is best-effort when storage is unavailable. */ }
+  };
   return <div className="practice-panel">
     <div className="resource-toolbar">
       <div><span className="content-status">تدريب حسب الموضوع</span><h2>اختبر فهمك</h2><p>{visibleQuestions.length} أسئلة · اختر مستوى الصعوبة ثم أجب وصحّح.</p></div>
@@ -303,7 +318,7 @@ function PracticePanel({ questions }: { questions: Question[] }) {
       <div className="answer-options">{question.options.map((option, optionIndex) => <button type="button" key={option} disabled={checked} className={checked && optionIndex === question.correctIndex ? "answer-option correct" : checked && answers[question.id] === optionIndex ? "answer-option incorrect" : answers[question.id] === optionIndex ? "answer-option chosen" : "answer-option"} onClick={() => setAnswers((old) => ({ ...old, [question.id]: optionIndex }))}><span>{["أ","ب","ج","د"][optionIndex]}</span>{option}{checked && optionIndex === question.correctIndex && <Check size={16}/>}</button>)}</div>
       {checked && <div className={answers[question.id] === question.correctIndex ? "answer-explanation good" : "answer-explanation"}><b>{answers[question.id] === question.correctIndex ? "إجابة صحيحة" : "راجع هذه الفكرة"}</b><p>{question.explanation}</p></div>}
     </article>)}
-    {visibleQuestions.length > 0 && (!checked ? <div className="practice-footer"><span>{answeredCount} من {visibleQuestions.length} تمت الإجابة عنها</span><button className="btn btn-primary" disabled={answeredCount !== visibleQuestions.length} onClick={() => setChecked(true)}>صحّح إجاباتي <CheckCircle2 size={17}/></button></div> : <div className="practice-result"><Trophy size={22}/><div><b>نتيجتك: {score} من {visibleQuestions.length}</b><p>راجع تفسيرات الإجابات ثم أعد المحاولة لتعزيز فهمك.</p></div><button className="btn btn-outline" onClick={() => { setAnswers({}); setChecked(false); }}>إعادة المحاولة</button></div>)}
+    {visibleQuestions.length > 0 && (!checked ? <div className="practice-footer"><span>{answeredCount} من {visibleQuestions.length} تمت الإجابة عنها</span><button className="btn btn-primary" disabled={answeredCount !== visibleQuestions.length} onClick={recordPractice}>صحّح إجاباتي <CheckCircle2 size={17}/></button></div> : <div className="practice-result"><Trophy size={22}/><div><b>نتيجتك: {score} من {visibleQuestions.length}</b><p>راجع تفسيرات الإجابات ثم أعد المحاولة لتعزيز فهمك.</p></div><button className="btn btn-outline" onClick={() => { setAnswers({}); setChecked(false); }}>إعادة المحاولة</button></div>)}
   </div>;
 }
 
@@ -459,16 +474,212 @@ function LoginPage() {
   return <main className="container page login-wrap"><section className="login-card"><span className="tool-icon"><GraduationCap size={26}/></span><span className="eyebrow">حساب Yemen Study</span><h1>{mode === "login" ? "مرحباً بعودتك." : "أنشئ حسابك."}</h1><p>احفظ تقدّمك وتابع مراجعتك من أي جهاز بعد تفعيل الحسابات.</p><form onSubmit={submit}><label htmlFor="email">البريد الإلكتروني</label><input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required/><label htmlFor="password">كلمة المرور</label><input id="password" type="password" minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(event) => setPassword(event.target.value)} required/>{!isSupabaseConfigured && <div className="form-hint">تسجيل الدخول يتطلب إعداد Supabase. تجربة الدروس متاحة دون حساب.</div>}{message && <div className="form-message" role="status">{message}</div>}<button className="btn btn-primary full" disabled={busy}>{busy ? "جارٍ التنفيذ..." : mode === "login" ? "تسجيل الدخول" : "إنشاء حساب"} <ArrowLeft size={16}/></button></form><button className="switch-mode" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMessage(""); }}>{mode === "login" ? "ليس لديك حساب؟ أنشئ حساباً" : "لديك حساب؟ سجّل الدخول"}</button></section></main>;
 }
 
+type CurriculumChoice = { id: string; label: string };
+type UnitChoice = { id: string; title: string; status: string };
+type LessonChoice = { id: string; title: string; unit_id: string; status: string };
+type SourceChoice = { id: string; title: string; rights_status: string };
+
+const makeSlug = (value: string) => value.trim().toLocaleLowerCase("ar")
+  .replace(/[^\\p{L}\\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
+
 function AdminPage() {
   const { role } = useAuth();
   const [health, setHealth] = useState("");
-  if (role !== "admin" && role !== "editor") return <main className="container page"><div className="paper-library-empty"><ShieldCheck/><h2>مساحة المحرر</h2><p>تحتاج صلاحية محرر أو مدير لإدارة المحتوى.</p></div></main>;
-  const check = async () => {
-    if (!supabase) { setHealth("Supabase غير مهيّأ بعد."); return; }
-    const { error } = await supabase.from("education_stages").select("id", { count: "exact", head: true });
-    setHealth(error ? "تعذر الاتصال: " + error.message : "الاتصال بقاعدة البيانات يعمل.");
+  const [loadingData, setLoadingData] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [activePanel, setActivePanel] = useState<"units" | "lessons" | "questions" | "sources">("units");
+  const [curriculumChoices, setCurriculumChoices] = useState<CurriculumChoice[]>([]);
+  const [units, setUnits] = useState<UnitChoice[]>([]);
+  const [lessons, setLessons] = useState<LessonChoice[]>([]);
+  const [sources, setSources] = useState<SourceChoice[]>([]);
+  const [unitForm, setUnitForm] = useState({ curriculum_subject_id: "", title: "", slug: "", description: "" });
+  const [lessonForm, setLessonForm] = useState({ unit_id: "", title: "", slug: "", summary: "", content_md: "", objectives: "", estimated_minutes: "15" });
+  const [questionForm, setQuestionForm] = useState({ lesson_id: "", prompt: "", option1: "", option2: "", option3: "", option4: "", correct: "0", explanation: "", difficulty: "medium" });
+  const [sourceForm, setSourceForm] = useState({ title: "", publisher: "وزارة التربية والتعليم اليمنية", publication_year: "", edition: "", source_url: "", rights_status: "needs_review", rights_notes: "" });
+
+  const loadContent = async () => {
+    if (!supabase) { setHealth("قاعدة البيانات غير مهيّأة. أضف متغيرات Supabase ثم طبّق ملف migration."); return; }
+    setLoadingData(true);
+    setHealth("");
+    try {
+      const [curriculumRes, subjectsRes, gradeTracksRes, gradesRes, tracksRes, unitsRes, lessonsRes, sourcesRes] = await Promise.all([
+        supabase.from("curriculum_subjects").select("id,subject_id,grade_track_id").eq("is_active", true),
+        supabase.from("subjects").select("id,name"),
+        supabase.from("grade_tracks").select("id,grade_id,track_id"),
+        supabase.from("grades").select("id,name,grade_number"),
+        supabase.from("tracks").select("id,name"),
+        supabase.from("units").select("id,title,curriculum_subject_id,status").order("sort_order"),
+        supabase.from("lessons").select("id,title,unit_id,status").order("sort_order"),
+        supabase.from("content_sources").select("id,title,rights_status").order("created_at", { ascending: false }),
+      ]);
+      const firstError = [curriculumRes,subjectsRes,gradeTracksRes,gradesRes,tracksRes,unitsRes,lessonsRes,sourcesRes].find((item) => item.error);
+      if (firstError?.error) throw firstError.error;
+      const subjects = subjectsRes.data ?? [];
+      const gradeTracks = gradeTracksRes.data ?? [];
+      const gradeRows = gradesRes.data ?? [];
+      const trackRows = tracksRes.data ?? [];
+      const choices = (curriculumRes.data ?? []).map((entry) => {
+        const subject = subjects.find((item) => item.id === entry.subject_id);
+        const gradeTrack = gradeTracks.find((item) => item.id === entry.grade_track_id);
+        const grade = gradeRows.find((item) => item.id === gradeTrack?.grade_id);
+        const track = trackRows.find((item) => item.id === gradeTrack?.track_id);
+        return { id: entry.id, label: [grade?.name, track?.name, subject?.name].filter(Boolean).join(" / ") || "مقرر غير مسمى" };
+      });
+      setCurriculumChoices(choices);
+      setUnits((unitsRes.data ?? []) as UnitChoice[]);
+      setLessons((lessonsRes.data ?? []) as LessonChoice[]);
+      setSources((sourcesRes.data ?? []) as SourceChoice[]);
+      setHealth("تم تحميل بيانات المحتوى والصلاحيات بنجاح.");
+      if (!unitForm.curriculum_subject_id && choices[0]) setUnitForm((old) => ({ ...old, curriculum_subject_id: choices[0].id }));
+      if (!lessonForm.unit_id && unitsRes.data?.[0]) setLessonForm((old) => ({ ...old, unit_id: unitsRes.data[0].id }));
+      if (!questionForm.lesson_id && lessonsRes.data?.[0]) setQuestionForm((old) => ({ ...old, lesson_id: lessonsRes.data[0].id }));
+    } catch (error) {
+      setHealth(error instanceof Error ? "تعذّر تحميل المحتوى: " + error.message : "تعذّر تحميل بيانات المحتوى.");
+    } finally {
+      setLoadingData(false);
+    }
   };
-  return <main className="container page"><span className="eyebrow">لوحة الإدارة</span><h1>إدارة المحتوى التعليمي.</h1><div className="admin-actions"><article><BookOpen/><h3>المواد والدروس</h3><p>إضافة فهرس الوحدات والدروس والملاحظات.</p></article><article><Target/><h3>الأسئلة والاختبارات</h3><p>تحرير الأسئلة ومستويات الصعوبة والإجابات.</p></article><article><ShieldCheck/><h3>المراجعة والنشر</h3><p>تدقيق المحتوى قبل إتاحته للطلاب.</p></article></div><div className="plan-card"><h2>حالة قاعدة البيانات</h2><p>{health || "افحص الاتصال بعد إعداد متغيرات Supabase."}</p><button className="btn btn-primary" onClick={check}>فحص الاتصال</button></div></main>;
+
+  useEffect(() => {
+    if (role === "admin" || role === "editor") void loadContent();
+  }, [role]);
+
+  const notifyError = (message: string) => setHealth(message);
+  const addUnit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase || !unitForm.curriculum_subject_id || !unitForm.title.trim()) return;
+    setSaving(true); setHealth("");
+    try {
+      const slug = unitForm.slug.trim() || makeSlug(unitForm.title);
+      const { error } = await supabase.from("units").insert({
+        curriculum_subject_id: unitForm.curriculum_subject_id,
+        title: unitForm.title.trim(), slug, description: unitForm.description.trim(),
+        sort_order: units.length + 1, status: "draft",
+      });
+      if (error) throw error;
+      setUnitForm((old) => ({ ...old, title: "", slug: "", description: "" }));
+      await loadContent();
+      setHealth("أُضيفت الوحدة كمسودة. راجعها قبل نشرها.");
+    } catch (error) { notifyError(error instanceof Error ? error.message : "فشل حفظ الوحدة."); }
+    finally { setSaving(false); }
+  };
+
+  const addLesson = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase || !lessonForm.unit_id || !lessonForm.title.trim() || !lessonForm.content_md.trim()) return;
+    setSaving(true); setHealth("");
+    try {
+      const slug = lessonForm.slug.trim() || makeSlug(lessonForm.title);
+      const objectives = lessonForm.objectives.split("\\n").map((item) => item.trim()).filter(Boolean);
+      const { error } = await supabase.from("lessons").insert({
+        unit_id: lessonForm.unit_id, title: lessonForm.title.trim(), slug,
+        summary: lessonForm.summary.trim(), content_md: lessonForm.content_md,
+        objectives, estimated_minutes: Math.max(1, Number(lessonForm.estimated_minutes) || 15),
+        sort_order: lessons.length + 1, status: "draft", access_level: "free",
+      });
+      if (error) throw error;
+      setLessonForm((old) => ({ ...old, title: "", slug: "", summary: "", content_md: "", objectives: "" }));
+      await loadContent();
+      setHealth("أُضيف الدرس كمسودة. لم يظهر للطلاب بعد.");
+    } catch (error) { notifyError(error instanceof Error ? error.message : "فشل حفظ الدرس."); }
+    finally { setSaving(false); }
+  };
+
+  const addQuestion = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase || !questionForm.lesson_id || !questionForm.prompt.trim()) return;
+    const optionTexts = [questionForm.option1,questionForm.option2,questionForm.option3,questionForm.option4].map((item) => item.trim());
+    if (optionTexts.some((item) => !item) || !questionForm.explanation.trim()) {
+      setHealth("أكمل الاختيارات الأربعة وتفسير الإجابة قبل الحفظ.");
+      return;
+    }
+    setSaving(true); setHealth("");
+    let questionId: string | undefined;
+    try {
+      const { data, error } = await supabase.from("questions").insert({
+        lesson_id: questionForm.lesson_id, question_type: "multiple_choice",
+        difficulty: questionForm.difficulty, body_md: questionForm.prompt.trim(),
+        explanation_md: questionForm.explanation.trim(), points: 1, status: "draft",
+      }).select("id").single();
+      if (error) throw error;
+      questionId = data.id;
+      const { data: options, error: optionsError } = await supabase.from("question_options").insert(
+        optionTexts.map((option_text, index) => ({ question_id: questionId, option_label: ["أ","ب","ج","د"][index], option_text, sort_order: index })),
+      ).select("id,sort_order");
+      if (optionsError) throw optionsError;
+      const correct = options?.find((item) => item.sort_order === Number(questionForm.correct));
+      if (!correct) throw new Error("تعذّر تحديد الاختيار الصحيح.");
+      const { error: keyError } = await supabase.from("question_answer_keys").insert({
+        question_id: questionId, correct_option_id: correct.id,
+        explanation_private: questionForm.explanation.trim(),
+      });
+      if (keyError) throw keyError;
+      setQuestionForm((old) => ({ ...old, prompt: "", option1: "", option2: "", option3: "", option4: "", explanation: "" }));
+      setHealth("أُضيف السؤال مع خياراته ومفتاح الإجابة الخاص كمسودة.");
+    } catch (error) {
+      if (questionId) await supabase.from("questions").delete().eq("id", questionId);
+      notifyError(error instanceof Error ? error.message : "فشل حفظ السؤال.");
+    } finally { setSaving(false); }
+  };
+
+  const addSource = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!supabase || !sourceForm.title.trim()) return;
+    setSaving(true); setHealth("");
+    try {
+      const { error } = await supabase.from("content_sources").insert({
+        title: sourceForm.title.trim(), publisher: sourceForm.publisher.trim(),
+        publication_year: sourceForm.publication_year.trim(), edition: sourceForm.edition.trim(),
+        source_url: sourceForm.source_url.trim() || null,
+        rights_status: sourceForm.rights_status, rights_notes: sourceForm.rights_notes.trim(),
+      });
+      if (error) throw error;
+      setSourceForm((old) => ({ ...old, title: "", publication_year: "", edition: "", source_url: "", rights_notes: "" }));
+      await loadContent();
+      setHealth("تم تسجيل المصدر وحالة حقوق الاستخدام.");
+    } catch (error) { notifyError(error instanceof Error ? error.message : "فشل تسجيل المصدر."); }
+    finally { setSaving(false); }
+  };
+
+  const setStatus = async (table: "units" | "lessons", id: string, status: "draft" | "review" | "published" | "archived") => {
+    if (!supabase) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from(table).update({ status }).eq("id", id);
+      if (error) throw error;
+      await loadContent();
+      setHealth(status === "published" ? "تم نشر العنصر." : "تم تحديث حالة العنصر.");
+    } catch (error) { notifyError(error instanceof Error ? error.message : "فشل تحديث الحالة."); }
+    finally { setSaving(false); }
+  };
+
+  if (role !== "admin" && role !== "editor") return <main className="container page"><div className="paper-library-empty"><ShieldCheck/><h2>مساحة المحرر</h2><p>تحتاج صلاحية محرر أو مدير لإدارة المحتوى.</p></div></main>;
+
+  return <main className="container page admin-page">
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>إدارة المحتوى</b></div>
+    <div className="admin-page-heading"><div><span className="eyebrow">غرفة إعداد المنهج</span><h1>إدارة المحتوى التعليمي</h1><p>أنشئ المصادر والوحدات والدروس والأسئلة، ثم راجعها قبل إتاحتها للطلاب.</p></div><button className="btn btn-outline" onClick={() => void loadContent()} disabled={loadingData}><RotateCcw size={15}/> {loadingData ? "جارٍ التحديث..." : "تحديث البيانات"}</button></div>
+    <div className="admin-overview">
+      <article><span>الوحدات</span><b>{units.length}</b><small>بما فيها المسودات</small></article>
+      <article><span>الدروس</span><b>{lessons.length}</b><small>محتوى محفوظ</small></article>
+      <article><span>المصادر المسجلة</span><b>{sources.length}</b><small>بحالات حقوق مختلفة</small></article>
+      <article><span>المقررات المتاحة للتحرير</span><b>{curriculumChoices.length}</b><small>حسب ربط المنهج بقاعدة البيانات</small></article>
+    </div>
+    <div className="admin-tabs" role="tablist">
+      <button className={activePanel === "units" ? "active" : ""} onClick={() => setActivePanel("units")}>الوحدات</button>
+      <button className={activePanel === "lessons" ? "active" : ""} onClick={() => setActivePanel("lessons")}>الدروس</button>
+      <button className={activePanel === "questions" ? "active" : ""} onClick={() => setActivePanel("questions")}>الأسئلة</button>
+      <button className={activePanel === "sources" ? "active" : ""} onClick={() => setActivePanel("sources")}>المصادر والحقوق</button>
+    </div>
+    {!isSupabaseConfigured && <div className="admin-setup-warning"><ShieldCheck/><div><b>قاعدة البيانات غير مهيّأة بعد</b><p>واجهة التحرير جاهزة، لكن الحفظ يتطلب إنشاء مشروع Supabase، تطبيق migration، ثم إضافة VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY في إعدادات GitHub Actions.</p></div></div>}
+    {isSupabaseConfigured && <section className="admin-editor">
+      {activePanel === "units" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addUnit}><div><span className="content-status">إضافة جديدة</span><h2>إنشاء وحدة دراسية</h2><p>اربط الوحدة بصف ومسار ومادة موجودة في الفهرس.</p></div><label>المقرر الدراسي<select required value={unitForm.curriculum_subject_id} onChange={(e) => setUnitForm((old) => ({ ...old, curriculum_subject_id: e.target.value }))}><option value="">اختر المقرر</option>{curriculumChoices.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label><label>اسم الوحدة<input required value={unitForm.title} onChange={(e) => setUnitForm((old) => ({ ...old, title: e.target.value, slug: old.slug || makeSlug(e.target.value) }))} placeholder="مثال: كمية التحرك والمقذوفات"/></label><label>المعرّف (Slug)<input value={unitForm.slug} onChange={(e) => setUnitForm((old) => ({ ...old, slug: e.target.value }))} placeholder="يُنشأ تلقائياً من العنوان"/></label><label>وصف موجز<textarea rows={3} value={unitForm.description} onChange={(e) => setUnitForm((old) => ({ ...old, description: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !curriculumChoices.length}>حفظ الوحدة كمسودة</button></form><div className="admin-list"><h3>الوحدات الحالية</h3>{units.length ? units.map((unit) => <article key={unit.id}><span><b>{unit.title}</b><small>{unit.status}</small></span><select value={unit.status} disabled={saving} onChange={(e) => void setStatus("units", unit.id, e.target.value as "draft" | "review" | "published" | "archived")}><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="published">منشورة</option><option value="archived">مؤرشفة</option></select></article>) : <p>لا توجد وحدات بعد.</p>}</div></div>}
+      {activePanel === "lessons" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addLesson}><div><span className="content-status">إضافة جديدة</span><h2>إنشاء درس</h2><p>اكتب شرحاً أصلياً منظماً بصيغة Markdown، وأضف أهداف الدرس.</p></div><label>الوحدة<select required value={lessonForm.unit_id} onChange={(e) => setLessonForm((old) => ({ ...old, unit_id: e.target.value }))}><option value="">اختر الوحدة</option>{units.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>عنوان الدرس<input required value={lessonForm.title} onChange={(e) => setLessonForm((old) => ({ ...old, title: e.target.value, slug: old.slug || makeSlug(e.target.value) }))}/></label><label>المعرّف (Slug)<input value={lessonForm.slug} onChange={(e) => setLessonForm((old) => ({ ...old, slug: e.target.value }))}/></label><label>ملخص الدرس<textarea rows={2} value={lessonForm.summary} onChange={(e) => setLessonForm((old) => ({ ...old, summary: e.target.value }))}/></label><label>أهداف التعلّم (هدف في كل سطر)<textarea rows={3} value={lessonForm.objectives} onChange={(e) => setLessonForm((old) => ({ ...old, objectives: e.target.value }))}/></label><label>محتوى الدرس — Markdown<textarea required rows={9} value={lessonForm.content_md} onChange={(e) => setLessonForm((old) => ({ ...old, content_md: e.target.value }))} placeholder={"## الفكرة الأساسية\\n\\nشرح أصلي للمفهوم...\\n\\n## مثال محلول\\nخطوات الحل..."}/></label><label>وقت الدراسة بالدقائق<input type="number" min="1" max="240" value={lessonForm.estimated_minutes} onChange={(e) => setLessonForm((old) => ({ ...old, estimated_minutes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !units.length}>حفظ الدرس كمسودة</button></form><div className="admin-list"><h3>الدروس الحالية</h3>{lessons.length ? lessons.map((lesson) => <article key={lesson.id}><span><b>{lesson.title}</b><small>{units.find((item) => item.id === lesson.unit_id)?.title || "وحدة"} · {lesson.status}</small></span><select value={lesson.status} disabled={saving} onChange={(e) => void setStatus("lessons", lesson.id, e.target.value as "draft" | "review" | "published" | "archived")}><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></article>) : <p>لا توجد دروس بعد.</p>}</div></div>}
+      {activePanel === "questions" && <div className="admin-form admin-form-wide"><div><span className="content-status">بنك الأسئلة</span><h2>إضافة سؤال اختيار من متعدد</h2><p>مفتاح الإجابة يُحفظ في جدول خاص غير متاح للطلاب وفق سياسات RLS.</p></div><form onSubmit={addQuestion}><label>الدرس<select required value={questionForm.lesson_id} onChange={(e) => setQuestionForm((old) => ({ ...old, lesson_id: e.target.value }))}><option value="">اختر الدرس</option>{lessons.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>نص السؤال<textarea required rows={3} value={questionForm.prompt} onChange={(e) => setQuestionForm((old) => ({ ...old, prompt: e.target.value }))}/></label><div className="admin-options-grid">{[1,2,3,4].map((number) => <label key={number}>الخيار {number}<input required value={questionForm[("option" + number) as "option1" | "option2" | "option3" | "option4"]} onChange={(e) => setQuestionForm((old) => ({ ...old, [("option" + number) as "option1" | "option2" | "option3" | "option4"]: e.target.value }))}/></label>)}</div><div className="admin-options-grid"><label>الإجابة الصحيحة<select value={questionForm.correct} onChange={(e) => setQuestionForm((old) => ({ ...old, correct: e.target.value }))}><option value="0">الخيار 1</option><option value="1">الخيار 2</option><option value="2">الخيار 3</option><option value="3">الخيار 4</option></select></label><label>الصعوبة<select value={questionForm.difficulty} onChange={(e) => setQuestionForm((old) => ({ ...old, difficulty: e.target.value }))}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">متقدم</option></select></label></div><label>تفسير الإجابة<textarea required rows={3} value={questionForm.explanation} onChange={(e) => setQuestionForm((old) => ({ ...old, explanation: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !lessons.length}>حفظ السؤال ومفتاحه كمسودة</button></form></div>}
+      {activePanel === "sources" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addSource}><div><span className="content-status">توثيق المصدر</span><h2>تسجيل مصدر المحتوى</h2><p>سجّل الطبعة والناشر وحالة الحقوق قبل اعتماد أي درس.</p></div><label>اسم المصدر<input required value={sourceForm.title} onChange={(e) => setSourceForm((old) => ({ ...old, title: e.target.value }))}/></label><label>الجهة الناشرة<input value={sourceForm.publisher} onChange={(e) => setSourceForm((old) => ({ ...old, publisher: e.target.value }))}/></label><div className="admin-options-grid"><label>العام الدراسي / سنة النشر<input value={sourceForm.publication_year} onChange={(e) => setSourceForm((old) => ({ ...old, publication_year: e.target.value }))}/></label><label>الطبعة<input value={sourceForm.edition} onChange={(e) => setSourceForm((old) => ({ ...old, edition: e.target.value }))}/></label></div><label>رابط المصدر (للتوثيق الداخلي)<input type="url" value={sourceForm.source_url} onChange={(e) => setSourceForm((old) => ({ ...old, source_url: e.target.value }))}/></label><label>حالة حقوق الاستخدام<select value={sourceForm.rights_status} onChange={(e) => setSourceForm((old) => ({ ...old, rights_status: e.target.value }))}><option value="needs_review">تحتاج مراجعة</option><option value="original">محتوى أصلي</option><option value="licensed">مرخّص</option><option value="public_domain">ملك عام</option><option value="link_only">رابط فقط</option><option value="permission_required">يتطلب إذناً</option></select></label><label>ملاحظات التحقق والحقوق<textarea rows={3} value={sourceForm.rights_notes} onChange={(e) => setSourceForm((old) => ({ ...old, rights_notes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving}>حفظ المصدر</button></form><div className="admin-list"><h3>المصادر المسجلة</h3>{sources.length ? sources.map((source) => <article key={source.id}><span><b>{source.title}</b><small>{source.rights_status}</small></span></article>) : <p>لم تُسجل مصادر بعد.</p>}</div></div>}
+    </section>}
+    <div className="admin-status" role="status">{health}</div>
+    <p className="admin-footnote"><ShieldCheck size={15}/> جميع العناصر الجديدة تُحفظ كمسودات. انشر فقط بعد مطابقة الطبعة، مراجعة الدرس والأسئلة، والتحقق من حقوق الاستخدام. لا تُعرض مفاتيح الإجابة للطلاب مباشرة.</p>
+  </main>;
 }
 
 function NotFound() {
