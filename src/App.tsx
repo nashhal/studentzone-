@@ -19,6 +19,7 @@ const GuidedPracticePage = lazy(() => import("./StudyTools").then(({ GuidedPract
 const SmartMarkPage = lazy(() => import("./StudyTools").then(({ SmartMarkPage }) => ({ default: SmartMarkPage })));
 const TestBuilderPage = lazy(() => import("./StudyTools").then(({ TestBuilderPage }) => ({ default: TestBuilderPage })));
 import "./study-tools.css";
+const Grade12PhysicsStudyPage = lazy(() => import("./Grade12Study").then(({ default: Page }) => ({ default: Page })));
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
 type AttemptSummary = { id?: string; createdAt?: string; score: number; total: number; source?: string };
@@ -401,7 +402,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
       </aside>}
       <div className="subject-main-column">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div>{isDemo && <Link className="btn btn-primary g12-subject-cta" to="/grade-12-study">ملخصات واختبارات متدرجة <ArrowLeft size={15}/></Link>}</div>
 
         <div className="course-shell">
       <section className="course-main">
@@ -431,7 +432,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           </div>}
           {activeTab === "questions" && <PracticePanel questions={demoLesson.questions}/>}
           {activeTab === "flashcards" && <FlashcardsPanel/>}
-          {activeTab === "exams" && <div className="exam-card"><span className="exam-card-icon"><Timer size={24}/></span><div><span className="content-status">اختبار قصير · 5 دقائق</span><h2>اختبر فهمك للكميات القياسية والمتجهة</h2><p>3 أسئلة اختيار من متعدد مع تصحيح وتفسير لكل إجابة.</p><Link className="btn btn-primary" to="/mock-exam">ابدأ الاختبار <ArrowLeft size={16}/></Link></div></div>}
+          {activeTab === "exams" && <div className="exam-card"><span className="exam-card-icon"><Timer size={24}/></span><div><span className="content-status">ثلاثة مستويات · 15 سؤالاً</span><h2>اختبارات متدرجة للكميات القياسية والمتجهة</h2><p>ابدأ بالمستوى الجيد، ثم انتقل إلى الصعب والأصعب. لكل سؤال تفسير، ويمكن حفظ ورقة المستوى المحدد بصيغة PDF.</p><Link className="btn btn-primary" to="/grade-12-study">فتح الملخص والاختبارات <ArrowLeft size={16}/></Link></div></div>}
           {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>لن نعرض أوراقاً غير موثقة. ستضاف نماذج الامتحانات السابقة مع سنة الامتحان ومصدرها ومفتاح الإجابة بعد مراجعة حقوق استخدامها.</p><Link to="/past-papers" className="text-link">عرض مكتبة الأوراق <ArrowLeft size={15}/></Link></div>}
         </>}
       </section>
@@ -1045,6 +1046,7 @@ export default function App() {
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
+    <Route path="/grade-12-study" element={<Grade12PhysicsStudyPage/>}/>
     <Route path="/mock-exam" element={<StudyToolLayout><MockExamPage addScore={addScore}/></StudyToolLayout>}/>
     <Route path="/target-test" element={<StudyToolLayout><TargetTestPage/></StudyToolLayout>}/>
     <Route path="/strengths-weaknesses" element={<StudyToolLayout><StrengthsWeaknessesPage/></StudyToolLayout>}/>
