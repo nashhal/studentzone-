@@ -11,6 +11,8 @@ import { useAuth } from "./lib/auth";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
+import { GuidedPracticePage, GuidedStudyPage, SmartMarkPage, StrengthsWeaknessesPage, TargetTestPage, TestBuilderPage } from "./StudyTools";
+import "./study-tools.css";
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
 const PROGRESS_KEY = "yemen-study-progress-v1";
@@ -47,6 +49,7 @@ function useStudyProgress() {
 function Header() {
   const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const navigate = useNavigate();
   const logout = async () => { await signOut(); navigate("/"); setMenuOpen(false); };
   return <>
@@ -63,6 +66,17 @@ function Header() {
           <NavLink to="/curriculum" onClick={() => setMenuOpen(false)}>المواد الدراسية</NavLink>
           <NavLink to="/past-papers" onClick={() => setMenuOpen(false)}>أوراق الامتحانات</NavLink>
           <NavLink to="/study-plan" onClick={() => setMenuOpen(false)}>خطة المذاكرة</NavLink>
+          <div className={toolsOpen ? "nav-dropdown open" : "nav-dropdown"}>
+            <button type="button" className="nav-dropdown-trigger" aria-expanded={toolsOpen} onClick={() => setToolsOpen((open) => !open)}>أدوات الدراسة <ChevronDown size={14}/></button>
+            {toolsOpen && <div className="nav-dropdown-panel">
+              <Link to="/target-test" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={15}/> الاختبار المستهدف</Link>
+              <Link to="/strengths-weaknesses" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Brain size={15}/> نقاط القوة والضعف</Link>
+              <Link to="/guided-study" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><BookOpen size={15}/> الدراسة الموجّهة</Link>
+              <Link to="/guided-practice" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={15}/> التدريب الموجّه</Link>
+              <Link to="/smart-mark" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Sparkles size={15}/> مراجع الإجابة</Link>
+              <Link to="/teacher/test-builder" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><FileText size={15}/> محرر الاختبارات للمعلمين</Link>
+            </div>}
+          </div>
           {user ? <button className="nav-account" onClick={logout}><LogOut size={15}/> خروج</button> : <Link className="nav-account" to="/login" onClick={() => setMenuOpen(false)}>دخول / حساب جديد <ArrowLeft size={15}/></Link>}
         </nav>
       </div>
@@ -141,6 +155,11 @@ function HomePage() {
         <ToolCard icon={Timer} title="الاختبارات التجريبية" description="حاكي أجواء الاختبار وتعرّف على نتيجتك ونقاط ضعفك." to="/mock-exam" tag="اختبر"/>
         <ToolCard icon={FileText} title="أوراق الامتحانات" description="مساحة للامتحانات السابقة ونماذج الإجابة المعتمدة." to="/past-papers" tag="استعد"/>
         <ToolCard icon={CalendarDays} title="خطة المذاكرة" description="قسّم وقتك إلى مهام يومية وتابع ما أنجزته." to="/study-plan" tag="نظّم"/>
+        <ToolCard icon={Target} title="الاختبار المستهدف" description="اختر مستوى الصعوبة والوقت وركّز على موضوع محدد." to="/target-test" tag="ركّز"/>
+        <ToolCard icon={Brain} title="نقاط القوة والضعف" description="اعرف الأسئلة التي تتقنها والتي تحتاج إلى مراجعة." to="/strengths-weaknesses" tag="حلّل"/>
+        <ToolCard icon={BookOpen} title="الدراسة الموجّهة" description="تعلّم الموضوع خطوة بخطوة مع تلميحات توضيحية." to="/guided-study" tag="تعلّم"/>
+        <ToolCard icon={Target} title="التدريب الموجّه" description="حل سؤالاً في كل مرة وتابع تفسير الإجابة." to="/guided-practice" tag="تدرّب"/>
+        <ToolCard icon={Sparkles} title="مراجع الإجابة" description="راجع إجابتك وفق عناصر أساسية ونموذج للمقارنة." to="/smart-mark" tag="راجع"/>
       </div>
     </section>
     <section className="grade-band">
@@ -396,7 +415,7 @@ function NotFound() {
 }
 
 export default function App() {
-  const { loading } = useAuth();
+  const { loading, role } = useAuth();
   const { progress, complete, toggleSaved, addScore } = useStudyProgress();
   if (loading) return <div className="app-loading"><BookOpenCheck/> Yemen Study</div>;
   return <div className="app-shell"><Header/><Routes>
@@ -406,6 +425,12 @@ export default function App() {
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
+    <Route path="/target-test" element={<TargetTestPage/>}/>
+    <Route path="/strengths-weaknesses" element={<StrengthsWeaknessesPage/>}/>
+    <Route path="/guided-study" element={<GuidedStudyPage/>}/>
+    <Route path="/guided-practice" element={<GuidedPracticePage/>}/>
+    <Route path="/smart-mark" element={<SmartMarkPage/>}/>
+    <Route path="/teacher/test-builder" element={<TestBuilderPage role={role}/>}/>
     <Route path="/past-papers" element={<PastPapersPage/>}/>
     <Route path="/study-plan" element={<StudyPlanPage/>}/>
     <Route path="/dashboard" element={<DashboardPage progress={progress}/>}/>
