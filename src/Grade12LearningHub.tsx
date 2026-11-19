@@ -156,7 +156,7 @@ const modules: LearningModule[] = [
       ],
       hard: [
         { id: "ma-h1", prompt: "أوجد (2 + i) + (3 − 4i).", options: ["5 − 3i", "1 + 5i", "5 + 5i", "6 − 4i"], answer: 0, explanation: "نجمع الحقيقي: 2+3=5، والتخيلي: 1−4=−3؛ إذن 5−3i." },
-        { id: "ma-h2", prompt: "أوجد (1 + 2i)(2 + i).", options: ["−1 + 5i", "4 + 3i", "2 + 2i", "−1 + 3i"], answer: 0, explanation: "2 + i + 4i + 2i² = 2 + 5i − 2 = 5i. التصحيح: الناتج الصحيح 5i، وليس ضمن الخيارات؛ تحقق من توزيع العبارات." },
+        { id: "ma-h2", prompt: "أوجد (1 + 2i)(2 + i).", options: ["5i", "2 + 5i", "−2 + 5i", "3i"], answer: 0, explanation: "نوزع الضرب: 2 + i + 4i + 2i². وبما أن i² = −1، يصبح الناتج 2 + 5i − 2 = 5i." },
         { id: "ma-h3", prompt: "ما قيمة (3 + 4i)(3 − 4i)؟", options: ["7", "−7", "25", "24i"], answer: 2, explanation: "حاصل ضرب العدد ومرافقه يساوي 3² + 4² = 25." }
       ],
       hardest: [
@@ -402,7 +402,7 @@ export default function Grade12LearningHubPage() {
           </div>
           <div className="g12-learning-outcomes"><b>أهداف التعلم</b><ul>{current.outcomes.map((item) => <li key={item}>{item}</li>)}</ul></div>
           <div className="g12-learning-section-list">
-            {current.sections.map((section, index) => <article key={section.title} className="g12-learning-section">
+            {current.sections.map((section) => <article key={section.title} className="g12-learning-section">
               <h3>{section.title}</h3><p>{section.body}</p>
               {section.formula && <div className="g12-learning-formula" dir="ltr">{section.formula}</div>}
               {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
