@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  ArrowLeft, ArrowRight, AlertCircle, BookOpen, Brain, CalendarDays,
-  Check, CheckCircle2, ChevronLeft, ClipboardList, Clock3, FileText,
-  ListChecks, RotateCcw, ShieldCheck, Sparkles, Target, Timer, Trophy, X
+  ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2, ChevronLeft,
+  RotateCcw, ShieldCheck, Sparkles, Target, Timer, Trophy, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { demoLesson, type Question } from "./data/learning";
@@ -57,7 +56,7 @@ function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: st
   return <div className="tool-page-intro"><div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{description}</p></div></div>;
 }
 
-function ToolNotice({ children }: { children: React.ReactNode }) {
+function ToolNotice({ children }: { children: ReactNode }) {
   return <div className="tool-notice"><ShieldCheck size={17}/><span>{children}</span></div>;
 }
 
