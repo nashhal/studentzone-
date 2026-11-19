@@ -50,5 +50,8 @@ Apply all SQL files in `supabase/migrations/` in lexical order, not just the fir
 
 1. `0001_initial_schema.sql`
 2. `0002_content_provenance.sql`
+3. `0003_seed_provisional_curriculum.sql`
 
-Migration 0002 adds source licence and reuse-policy metadata, lesson/question source links, and starter source records. Test migrations and RLS in a staging Supabase project before using live student data. The application does not apply migrations automatically.
+Migration 0002 adds source licence and reuse-policy metadata, lesson/question source links, and a starter source register. Migration 0003 seeds the provisional grade/track/subject index for Grades 1–12 so an editor can attach units and lessons to in-app subjects.
+
+The version inserted by migration 0003 is explicitly labelled **provisional and not an approved textbook edition**. It is for navigation and content mapping only. Verify authority, governorate/region, school year and edition for each subject before publishing any lesson. Test migrations and RLS in a staging Supabase project before using live student data. The application does not apply migrations automatically.
