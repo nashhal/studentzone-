@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
@@ -250,6 +250,22 @@ const tabs: { id: StudyTab; label: string; icon: typeof BookOpen }[] = [
   { id: "papers", label: "أوراق الامتحانات", icon: FileText },
 ];
 
+type PublishedLessonSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  estimated_minutes: number;
+  unit_id: string;
+};
+type PublishedUnit = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  lessons: PublishedLessonSummary[];
+};
+
 function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSaved: (id: string) => void }) {
   const { gradeSlug = "", trackSlug = "", subjectSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
@@ -257,18 +273,108 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const subject = track?.subjects.find((item) => item.slug === subjectSlug);
   const [activeTab, setActiveTab] = useState<StudyTab>("notes");
   const [expanded, setExpanded] = useState(true);
+  const [publishedUnits, setPublishedUnits] = useState<PublishedUnit[]>([]);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [contentError, setContentError] = useState("");
   const isDemo = gradeSlug === "grade-12" && trackSlug === "scientific" && subjectSlug === "physics";
+
+  useEffect(() => {
+    let active = true;
+    const loadPublishedContent = async () => {
+      if (isDemo) {
+        setPublishedUnits([]);
+        setContentError("");
+        setContentLoading(false);
+        return;
+      }
+      if (!supabase) {
+        setPublishedUnits([]);
+        setContentError("مكتبة الدروس ستظهر هنا بعد ربط قاعدة بيانات المحتوى. لن نحيل الطالب إلى مواقع أو ملفات خارجية.");
+        setContentLoading(false);
+        return;
+      }
+      setContentLoading(true);
+      setContentError("");
+      try {
+        const [subjectResult, gradeResult, trackResult] = await Promise.all([
+          supabase.from("subjects").select("id").eq("slug", subjectSlug).maybeSingle(),
+          supabase.from("grades").select("id").eq("slug", gradeSlug).maybeSingle(),
+          supabase.from("tracks").select("id").eq("slug", trackSlug).maybeSingle(),
+        ]);
+        const firstError = [subjectResult, gradeResult, trackResult].find((item) => item.error);
+        if (firstError?.error) throw firstError.error;
+        if (!subjectResult.data || !gradeResult.data || !trackResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const gradeTrackResult = await supabase.from("grade_tracks").select("id")
+          .eq("grade_id", gradeResult.data.id).eq("track_id", trackResult.data.id).maybeSingle();
+        if (gradeTrackResult.error) throw gradeTrackResult.error;
+        if (!gradeTrackResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const curriculumResult = await supabase.from("curriculum_subjects").select("id")
+          .eq("grade_track_id", gradeTrackResult.data.id)
+          .eq("subject_id", subjectResult.data.id).eq("is_active", true).maybeSingle();
+        if (curriculumResult.error) throw curriculumResult.error;
+        if (!curriculumResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const unitsResult = await supabase.from("units")
+          .select("id,title,slug,description")
+          .eq("curriculum_subject_id", curriculumResult.data.id)
+          .eq("status", "published").order("sort_order");
+        if (unitsResult.error) throw unitsResult.error;
+        const unitRows = unitsResult.data ?? [];
+        const lessonRows = unitRows.length
+          ? await supabase.from("lessons")
+              .select("id,title,slug,summary,estimated_minutes,unit_id")
+              .in("unit_id", unitRows.map((unit) => unit.id))
+              .eq("status", "published").order("sort_order")
+          : { data: [], error: null };
+        if (lessonRows.error) throw lessonRows.error;
+        const lessonsByUnit = new Map<string, PublishedLessonSummary[]>();
+        for (const lesson of lessonRows.data ?? []) {
+          const current = lessonsByUnit.get(lesson.unit_id) ?? [];
+          current.push(lesson as PublishedLessonSummary);
+          lessonsByUnit.set(lesson.unit_id, current);
+        }
+        const mapped = unitRows
+          .map((unit) => ({ ...unit, lessons: lessonsByUnit.get(unit.id) ?? [] }))
+          .filter((unit) => unit.lessons.length > 0) as PublishedUnit[];
+        if (active) setPublishedUnits(mapped);
+      } catch (error) {
+        if (active) setContentError(error instanceof Error ? error.message : "تعذّر تحميل الدروس المنشورة.");
+      } finally {
+        if (active) setContentLoading(false);
+      }
+    };
+    void loadPublishedContent();
+    return () => { active = false; };
+  }, [gradeSlug, trackSlug, subjectSlug, isDemo]);
+
   if (!grade || !track || !subject) return <NotFound/>;
   const lessonDone = progress.completed.includes(demoLesson.slug);
+  const allPublishedLessons = publishedUnits.flatMap((unit) => unit.lessons);
+  const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
+  const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
+
   return <main className="container page subject-page">
-    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={"/grade/" + grade.slug}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : "0%"}</b><div className="progress-track"><i style={{ width: isDemo && lessonDone ? "100%" : "0%" }}/></div></div></div>
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
     <div className="course-shell">
       <aside className="course-sidebar">
         <div className="sidebar-title"><span>محتويات المادة</span><button onClick={() => setExpanded(!expanded)} aria-label="توسيع/طي"><ChevronDown className={expanded ? "" : "collapsed"} size={16}/></button></div>
         {expanded && <div className="sidebar-tree">
-          <div className="tree-unit"><span className="tree-unit-dot"/> {isDemo ? demoCourse.unitTitle : "الوحدات والموضوعات"}</div>
-          {isDemo ? <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={14}/>}</Link> : <div className="tree-placeholder">تُضاف الموضوعات بعد توثيق فهرس الطبعة الدراسية المعتمدة.</div>}
+          {isDemo ? <>
+            <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
+            <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={14}/>}</Link>
+          </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
+            <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
+            {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span>{progress.completed.includes(lesson.id) && <Check size={14}/>}</Link>)}
+          </div>) : <div className="tree-placeholder">لا توجد وحدات منشورة لهذه المادة بعد.</div>}
         </div>}
         <div className="sidebar-tools">
           <Link to="/study-plan"><CalendarDays size={16}/> خطة المذاكرة</Link>
@@ -277,12 +383,23 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
       </aside>
       <section className="course-main">
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
-        {!isDemo ? <div className="content-coming">
-          <span className="content-icon"><BookOpen size={26}/></span><span className="content-status">قيد إعداد المحتوى</span>
-          <h2>مساحة {subject.name} جاهزة لاستقبال مواردها.</h2>
-          <p>ستظهر هنا ملاحظات الدروس والأسئلة والبطاقات والاختبارات بعد توثيق وحدات الكتاب والطبعة المعتمدة. لم نضع دروساً عشوائية أو عناوين غير مؤكدة.</p>
-          <div className="coming-feature-grid"><span><BookOpen/> ملاحظات المراجعة</span><span><Target/> الأسئلة والإجابات</span><span><Layers3/> البطاقات التعليمية</span><span><Timer/> الاختبارات التجريبية</span></div>
-        </div> : <>
+        {!isDemo ? <>
+          {activeTab === "notes" && <div className="resource-list">
+            <div className="resource-toolbar"><div><span className="content-status">مكتبة المادة</span><h2>الدروس والمراجعة</h2><p>تظهر هنا الدروس المنشورة بعد مراجعتها. افتح الدرس واقرأ الشرح وحل أمثلته داخل الموقع.</p></div></div>
+            {contentLoading ? <div className="content-loading" role="status">جارٍ تحميل الدروس المنشورة...</div> : contentError ? <div className="content-coming"><span className="content-status">المكتبة الداخلية</span><h2>محتوى المادة داخل Yemen Study</h2><p>{contentError}</p></div> : publishedUnits.length ? publishedUnits.map((unit) => <section className="published-unit" key={unit.id}>
+              <div className="published-unit-heading"><span className="eyebrow">وحدة دراسية</span><h3>{unit.title}</h3>{unit.description && <p>{unit.description}</p>}</div>
+              {unit.lessons.map((lesson) => <Link className="lesson-row" key={lesson.id} to={`/library-lesson/${lesson.id}`}>
+                <span className="lesson-row-icon"><FileText size={19}/></span>
+                <span className="lesson-row-copy"><b>{lesson.title}</b><small>{lesson.estimated_minutes} دقيقة{lesson.summary ? " · " + lesson.summary : ""}</small></span>
+                <span className="lesson-row-state">{progress.completed.includes(lesson.id) ? <><CheckCircle2 size={15}/> مكتمل</> : "افتح الدرس"}</span><ChevronLeft size={17}/>
+              </Link>)}
+            </section>) : <div className="content-coming"><span className="content-icon"><BookOpen size={26}/></span><span className="content-status">لا توجد دروس منشورة بعد</span><h2>ستجد شروحات المادة هنا.</h2><p>سيظهر كل شرح وأمثلة ومسائل وتدريبات داخل هذه الصفحة. لا نعتمد على روابط خارجية كبديل عن الدرس.</p><div className="coming-feature-grid"><span><BookOpen/> شرح كامل</span><span><Target/> مسائل محلولة</span><span><Layers3/> بطاقات مراجعة</span><span><Timer/> اختبارات داخلية</span></div></div>}
+          </div>}
+          {activeTab === "questions" && <div className="content-coming"><span className="content-status">تدريب داخل الموقع</span><h2>أسئلة الموضوع</h2><p>ستظهر الأسئلة المرتبطة بالدروس المنشورة هنا بعد تفعيل التصحيح الآمن. لن نرسل إجابات الطالب إلى موقع خارجي.</p></div>}
+          {activeTab === "flashcards" && <div className="content-coming"><span className="content-status">مراجعة داخل الموقع</span><h2>بطاقات المادة</h2><p>ستُنشأ البطاقات من مفاهيم الدروس المنشورة وتظهر داخل هذه الصفحة.</p></div>}
+          {activeTab === "exams" && <div className="content-coming"><span className="content-status">اختبارات داخل الموقع</span><h2>اختبارات المادة</h2><p>سيُبنى الاختبار من بنك الأسئلة المعتمد، وتظهر النتيجة والتفسيرات داخل Yemen Study.</p></div>}
+          {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>ستُعرض أوراق الامتحانات التي يسمح باستخدامها داخل المكتبة، أو تُبنى اختبارات تدريبية أصلية داخل الموقع.</p></div>}
+        </> : <>
           {activeTab === "notes" && <div className="resource-list">
             <div className="resource-toolbar"><div><span className="content-status">نموذج تفاعلي</span><h2>ملاحظات المراجعة</h2><p>ملاحظات تعليمية منظمة مع أمثلة وتلخيص سريع.</p></div><button className={progress.saved.includes(demoLesson.slug) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(demoLesson.slug)}><Bookmark size={16}/>{progress.saved.includes(demoLesson.slug) ? "محفوظ" : "احفظ الدرس"}</button></div>
             <Link className="lesson-row" to="/lesson/scalars-and-vectors"><span className="lesson-row-icon"><FileText size={19}/></span><span className="lesson-row-copy"><b>{demoLesson.title}</b><small>{demoLesson.duration} دقيقة · {demoLesson.sections.length} أقسام · مثال محلول</small></span><span className="lesson-row-state">{lessonDone ? <><CheckCircle2 size={15}/> مكتمل</> : "ابدأ الدرس"}</span><ChevronLeft size={17}/></Link>
@@ -295,6 +412,173 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
         </>}
       </section>
     </div>
+  </main>;
+}
+
+
+type PublishedLessonRecord = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  content_md: string;
+  objectives: string[];
+  estimated_minutes: number;
+  unit_id: string;
+};
+type LessonReferenceRecord = {
+  reference_role: string;
+  source_locator: string | null;
+  content_sources: { title: string; publisher: string | null } | null;
+};
+
+function InlineLessonText({ value }: { value: string }) {
+  const parts = value.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return <>{parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
+    return part;
+  })}</>;
+}
+
+function LessonMarkdown({ content }: { content: string }) {
+  const lines = content.replace(/\r/g, "").split(/\r?\n/);
+  const blocks: ReactNode[] = [];
+  let paragraph: string[] = [];
+  let list: string[] = [];
+  let listType: "ul" | "ol" | null = null;
+  const flushParagraph = () => {
+    if (paragraph.length) {
+      blocks.push(<p key={"p-" + blocks.length}><InlineLessonText value={paragraph.join(" ")}/></p>);
+      paragraph = [];
+    }
+  };
+  const flushList = () => {
+    if (list.length && listType) {
+      const ListTag = listType;
+      blocks.push(<ListTag key={"list-" + blocks.length}>{list.map((item, index) => <li key={index}><InlineLessonText value={item}/></li>)}</ListTag>);
+    }
+    list = [];
+    listType = null;
+  };
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (!line) { flushParagraph(); flushList(); continue; }
+    if (line === "$$" || (line.startsWith("$$") && line.endsWith("$$") && line.length > 4)) {
+      flushParagraph(); flushList();
+      if (line.length > 4) {
+        blocks.push(<div className="lesson-formula" dir="ltr" key={"math-" + blocks.length}>{line.slice(2, -2).trim()}</div>);
+      } else {
+        const mathLines: string[] = [];
+        while (index + 1 < lines.length && lines[index + 1].trim() !== "$$") {
+          index += 1;
+          mathLines.push(lines[index].trim());
+        }
+        if (index + 1 < lines.length) index += 1;
+        blocks.push(<div className="lesson-formula" dir="ltr" key={"math-" + blocks.length}>{mathLines.join(" ")}</div>);
+      }
+      continue;
+    }
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    if (heading) {
+      flushParagraph(); flushList();
+      const level = heading[1].length;
+      const text = <InlineLessonText value={heading[2]}/>;
+      if (level === 1) blocks.push(<h2 key={"h-" + blocks.length}>{text}</h2>);
+      else if (level === 2) blocks.push(<h3 key={"h-" + blocks.length}>{text}</h3>);
+      else blocks.push(<h4 key={"h-" + blocks.length}>{text}</h4>);
+      continue;
+    }
+    if (line.startsWith(">")) {
+      flushParagraph(); flushList();
+      blocks.push(<blockquote key={"q-" + blocks.length}><InlineLessonText value={line.slice(1).trim()}/></blockquote>);
+      continue;
+    }
+    if (/^[-*]\s+/.test(line) || /^\d+[.)]\s+/.test(line)) {
+      flushParagraph();
+      const nextType = /^\d+[.)]\s+/.test(line) ? "ol" : "ul";
+      if (listType && listType !== nextType) flushList();
+      listType = nextType;
+      list.push(line.replace(/^([-*]|\d+[.)])\s+/, ""));
+      continue;
+    }
+    if (/^---+$/.test(line)) {
+      flushParagraph(); flushList();
+      blocks.push(<hr key={"hr-" + blocks.length}/>);
+      continue;
+    }
+    flushList();
+    paragraph.push(line);
+  }
+  flushParagraph(); flushList();
+  return <div className="lesson-markdown">{blocks}</div>;
+}
+
+function PublishedLessonPage({ progress, complete, toggleSaved }: { progress: Progress; complete: (id: string) => void; toggleSaved: (id: string) => void }) {
+  const { lessonId = "" } = useParams();
+  const [lesson, setLesson] = useState<PublishedLessonRecord | null>(null);
+  const [unitTitle, setUnitTitle] = useState("");
+  const [references, setReferences] = useState<LessonReferenceRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      if (!supabase) {
+        setError("مكتبة الدروس تحتاج إلى ربط قاعدة البيانات. سيبقى محتوى الدروس داخل Yemen Study عند تفعيلها.");
+        setLoading(false);
+        return;
+      }
+      setLoading(true); setError("");
+      try {
+        const result = await supabase.from("lessons")
+          .select("id,title,slug,summary,content_md,objectives,estimated_minutes,unit_id")
+          .eq("id", lessonId).eq("status", "published").maybeSingle();
+        if (result.error) throw result.error;
+        if (!result.data) {
+          if (active) { setLesson(null); setError("هذا الدرس غير موجود أو لم يُنشر بعد."); }
+          return;
+        }
+        const [unitResult, sourceResult] = await Promise.all([
+          supabase.from("units").select("id,title").eq("id", result.data.unit_id).maybeSingle(),
+          supabase.from("lesson_sources")
+            .select("reference_role,source_locator,content_sources(title,publisher)")
+            .eq("lesson_id", lessonId),
+        ]);
+        if (unitResult.error) throw unitResult.error;
+        if (sourceResult.error) throw sourceResult.error;
+        if (active) {
+          setLesson(result.data as PublishedLessonRecord);
+          setUnitTitle(unitResult.data?.title ?? "");
+          setReferences((sourceResult.data ?? []) as unknown as LessonReferenceRecord[]);
+        }
+      } catch (loadError) {
+        if (active) setError(loadError instanceof Error ? loadError.message : "تعذّر تحميل الدرس.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => { active = false; };
+  }, [lessonId]);
+
+  if (loading) return <main className="container page"><div className="content-loading" role="status">جارٍ فتح الدرس داخل الموقع...</div></main>;
+  if (!lesson) return <main className="container page"><div className="content-coming"><span className="content-status">مكتبة Yemen Study</span><h1>تعذّر فتح الدرس</h1><p>{error || "الدرس غير متاح حالياً."}</p><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد الدراسية</Link></div></main>;
+
+  return <main className="container page lesson-page published-lesson-page">
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد الدراسية</Link><ChevronLeft size={14}/>{unitTitle && <><span>{unitTitle}</span><ChevronLeft size={14}/></>}<b>{lesson.title}</b></div>
+    <article className="lesson-main published-lesson-main">
+      <span className="content-status">درس منشور داخل Yemen Study</span>
+      <h1>{lesson.title}</h1>
+      {lesson.summary && <p className="lesson-lead">{lesson.summary}</p>}
+      <div className="lesson-meta"><span><Clock3 size={15}/>{lesson.estimated_minutes} دقيقة</span><span><BookOpen size={15}/>شرح ومراجعة</span></div>
+      {lesson.objectives?.length > 0 && <section className="lesson-objectives"><h2><Target size={19}/> أهداف التعلّم</h2><ul>{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>}
+      <LessonMarkdown content={lesson.content_md}/>
+      {references.length > 0 && <section className="lesson-sources"><h2><FileText size={18}/> توثيق المحتوى</h2><p>هذه المراجع استُخدمت للتحقق من المنهج والمعلومات. الشرح المعروض والأسئلة والأنشطة التعليمية متاحة داخل Yemen Study.</p><div>{references.map((reference, index) => <article key={index}><div><b>{reference.content_sources?.title ?? "مرجع موثق"}</b><small>{reference.content_sources?.publisher ?? "جهة النشر غير محددة"}{reference.source_locator ? " · " + reference.source_locator : ""}</small><p>{reference.reference_role === "curriculum_alignment" ? "مرجع مطابقة المنهج" : reference.reference_role === "fact_check" ? "مرجع للتحقق العلمي" : "مرجع إضافي"}</p></div></article>)}</div></section>}
+      <div className="published-lesson-actions"><button className={progress.completed.includes(lesson.id) ? "btn btn-outline" : "btn btn-primary"} onClick={() => complete(lesson.id)}>{progress.completed.includes(lesson.id) ? "تم تسجيل إكمال الدرس" : "علّم الدرس كمكتمل"} <Check size={16}/></button><button className={progress.saved.includes(lesson.id) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(lesson.id)}><Bookmark size={16}/>{progress.saved.includes(lesson.id) ? "إزالة من المحفوظات" : "احفظ للرجوع لاحقاً"}</button></div>
+      <div className="lesson-next"><div><span className="eyebrow">انتهيت من القراءة؟</span><h2>راجع الأفكار وحل التدريب.</h2><p>تظهر الأنشطة المرتبطة بهذا الدرس ضمن مكتبة المادة.</p></div><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد <ArrowLeft size={16}/></Link></div>
+    </article>
   </main>;
 }
 
@@ -387,6 +671,7 @@ function LessonPage({ progress, complete, toggleSaved }: { progress: Progress; c
         {demoLesson.sections.map((section, index) => <section className="note-section" id={"section-" + index} key={section.heading}><span className="note-section-number">{String(index + 1).padStart(2, "0")}</span><div><h2>{section.heading}</h2><p>{section.body}</p>{section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}</div></section>)}
         <section className="worked-example"><span className="eyebrow">مثال محلول</span><h2>{demoLesson.example.title}</h2><ol>{demoLesson.example.steps.map((step) => <li key={step}>{step}</li>)}</ol><div className="example-answer"><CheckCircle2 size={18}/><b>{demoLesson.example.answer}</b></div></section>
         <section className="lesson-recap"><h2><Zap size={19}/> ملخص سريع</h2><ul>{demoLesson.recap.map((line) => <li key={line}>{line}</li>)}</ul></section>
+        {demoLesson.sources?.length ? <section className="lesson-sources"><h2><FileText size={18}/> توثيق المحتوى</h2><p>تمت مراجعة المفاهيم والمصطلحات بالاستناد إلى مراجع علمية موثوقة. جميع الشروحات والأمثلة والأسئلة المعروضة هنا مكتوبة داخل Yemen Study، ولا تحتاج إلى مغادرة الموقع لمتابعة الدرس.</p><div>{demoLesson.sources.map((source) => <article key={source.id}><div><b>{source.title}</b><small>{source.publisher} · {source.locator}</small><p>{source.role}</p><em>{source.note}</em></div></article>)}</div></section> : null}
         <section className="lesson-next"><div><span className="eyebrow">الخطوة التالية</span><h2>هل فهمت الموضوع؟ اختبر نفسك.</h2><p>انتقل إلى الأسئلة لتطبيق ما تعلمته.</p></div><Link className="btn btn-primary" to="/subject/grade-12/scientific/physics">افتح أسئلة الموضوع <ArrowLeft size={16}/></Link></section>
       </article>
       <aside className="lesson-aside"><div className="aside-sticky"><div className="aside-card"><span className="aside-card-title">تقدّمك في الدرس</span><div className="lesson-check-state">{done ? <CheckCircle2/> : <BookOpen/>}<b>{done ? "أكملت هذا الدرس" : "لم تكمل الدرس بعد"}</b></div><button className={done ? "btn btn-outline full" : "btn btn-primary full"} onClick={() => complete(demoLesson.slug)}>{done ? "تم تسجيل الإكمال" : "علّم الدرس كمكتمل"} <Check size={16}/></button><button className={saved ? "save-button saved full" : "save-button full"} onClick={() => toggleSaved(demoLesson.slug)}><Bookmark size={16}/>{saved ? "إزالة من المحفوظات" : "احفظ للرجوع لاحقاً"}</button></div><div className="aside-card"><b>في هذا الدرس</b><div className="aside-toc">{demoLesson.sections.map((section, i) => <a key={section.heading} href={"#section-" + i}>{section.heading}</a>)}</div></div></div></aside>
@@ -492,7 +777,7 @@ function LoginPage() {
 type CurriculumChoice = { id: string; label: string };
 type UnitChoice = { id: string; title: string; status: string };
 type LessonChoice = { id: string; title: string; unit_id: string; status: string };
-type SourceChoice = { id: string; title: string; rights_status: string };
+type SourceChoice = { id: string; title: string; rights_status: string; source_type: string; reuse_policy: string };
 
 const makeSlug = (value: string) => value.trim().toLocaleLowerCase("ar")
   .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
@@ -508,9 +793,9 @@ function AdminPage() {
   const [lessons, setLessons] = useState<LessonChoice[]>([]);
   const [sources, setSources] = useState<SourceChoice[]>([]);
   const [unitForm, setUnitForm] = useState({ curriculum_subject_id: "", title: "", slug: "", description: "" });
-  const [lessonForm, setLessonForm] = useState({ unit_id: "", title: "", slug: "", summary: "", content_md: "", objectives: "", estimated_minutes: "15" });
+  const [lessonForm, setLessonForm] = useState({ unit_id: "", title: "", slug: "", summary: "", content_md: "", objectives: "", estimated_minutes: "15", syllabus_source_id: "", syllabus_locator: "", reference_source_id: "", reference_locator: "" });
   const [questionForm, setQuestionForm] = useState({ lesson_id: "", prompt: "", option1: "", option2: "", option3: "", option4: "", correct: "0", explanation: "", difficulty: "medium" });
-  const [sourceForm, setSourceForm] = useState({ title: "", publisher: "وزارة التربية والتعليم اليمنية", publication_year: "", edition: "", source_url: "", rights_status: "needs_review", rights_notes: "" });
+  const [sourceForm, setSourceForm] = useState({ title: "", publisher: "وزارة التربية والتعليم اليمنية", publication_year: "", edition: "", source_url: "", source_type: "educational_reference", licence_name: "", licence_url: "", reuse_policy: "reference_only", rights_status: "needs_review", rights_notes: "" });
 
   const loadContent = async () => {
     if (!supabase) { setHealth("قاعدة البيانات غير مهيّأة. أضف متغيرات Supabase ثم طبّق ملف migration."); return; }
@@ -525,7 +810,7 @@ function AdminPage() {
         supabase.from("tracks").select("id,name"),
         supabase.from("units").select("id,title,curriculum_subject_id,status").order("sort_order"),
         supabase.from("lessons").select("id,title,unit_id,status").order("sort_order"),
-        supabase.from("content_sources").select("id,title,rights_status").order("created_at", { ascending: false }),
+        supabase.from("content_sources").select("id,title,rights_status,source_type,reuse_policy").order("created_at", { ascending: false }),
       ]);
       const firstError = [curriculumRes,subjectsRes,gradeTracksRes,gradesRes,tracksRes,unitsRes,lessonsRes,sourcesRes].find((item) => item.error);
       if (firstError?.error) throw firstError.error;
@@ -582,17 +867,37 @@ function AdminPage() {
   const addLesson = async (event: FormEvent) => {
     event.preventDefault();
     if (!supabase || !lessonForm.unit_id || !lessonForm.title.trim() || !lessonForm.content_md.trim()) return;
+    if (!lessonForm.syllabus_source_id) { setHealth("اختر مصدر المنهج اليمني المعتمد وسجّل موضعه قبل حفظ الدرس."); return; }
     setSaving(true); setHealth("");
     try {
       const slug = lessonForm.slug.trim() || makeSlug(lessonForm.title);
       const objectives = lessonForm.objectives.split("\\n").map((item) => item.trim()).filter(Boolean);
-      const { error } = await supabase.from("lessons").insert({
+      const { data: insertedLesson, error } = await supabase.from("lessons").insert({
         unit_id: lessonForm.unit_id, title: lessonForm.title.trim(), slug,
         summary: lessonForm.summary.trim(), content_md: lessonForm.content_md,
         objectives, estimated_minutes: Math.max(1, Number(lessonForm.estimated_minutes) || 15),
         sort_order: lessons.length + 1, status: "draft", access_level: "free",
-      });
+      }).select("id").single();
       if (error) throw error;
+      const lessonReferences = [
+        {
+          lesson_id: insertedLesson.id,
+          source_id: lessonForm.syllabus_source_id,
+          reference_role: "curriculum_alignment",
+          source_locator: lessonForm.syllabus_locator.trim() || null,
+        },
+        ...(lessonForm.reference_source_id ? [{
+          lesson_id: insertedLesson.id,
+          source_id: lessonForm.reference_source_id,
+          reference_role: "fact_check",
+          source_locator: lessonForm.reference_locator.trim() || null,
+        }] : []),
+      ];
+      const { error: referenceError } = await supabase.from("lesson_sources").insert(lessonReferences);
+      if (referenceError) {
+        await supabase.from("lessons").delete().eq("id", insertedLesson.id);
+        throw referenceError;
+      }
       setLessonForm((old) => ({ ...old, title: "", slug: "", summary: "", content_md: "", objectives: "" }));
       await loadContent();
       setHealth("أُضيف الدرس كمسودة. لم يظهر للطلاب بعد.");
@@ -646,6 +951,8 @@ function AdminPage() {
         title: sourceForm.title.trim(), publisher: sourceForm.publisher.trim(),
         publication_year: sourceForm.publication_year.trim(), edition: sourceForm.edition.trim(),
         source_url: sourceForm.source_url.trim() || null,
+        source_type: sourceForm.source_type, licence_name: sourceForm.licence_name.trim() || null,
+        licence_url: sourceForm.licence_url.trim() || null, reuse_policy: sourceForm.reuse_policy,
         rights_status: sourceForm.rights_status, rights_notes: sourceForm.rights_notes.trim(),
       });
       if (error) throw error;
@@ -688,9 +995,9 @@ function AdminPage() {
     {!isSupabaseConfigured && <div className="admin-setup-warning"><ShieldCheck/><div><b>قاعدة البيانات غير مهيّأة بعد</b><p>واجهة التحرير جاهزة، لكن الحفظ يتطلب إنشاء مشروع Supabase، تطبيق migration، ثم إضافة VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY في إعدادات GitHub Actions.</p></div></div>}
     {isSupabaseConfigured && <section className="admin-editor">
       {activePanel === "units" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addUnit}><div><span className="content-status">إضافة جديدة</span><h2>إنشاء وحدة دراسية</h2><p>اربط الوحدة بصف ومسار ومادة موجودة في الفهرس.</p></div><label>المقرر الدراسي<select required value={unitForm.curriculum_subject_id} onChange={(e) => setUnitForm((old) => ({ ...old, curriculum_subject_id: e.target.value }))}><option value="">اختر المقرر</option>{curriculumChoices.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label><label>اسم الوحدة<input required value={unitForm.title} onChange={(e) => setUnitForm((old) => ({ ...old, title: e.target.value, slug: old.slug || makeSlug(e.target.value) }))} placeholder="مثال: كمية التحرك والمقذوفات"/></label><label>المعرّف (Slug)<input value={unitForm.slug} onChange={(e) => setUnitForm((old) => ({ ...old, slug: e.target.value }))} placeholder="يُنشأ تلقائياً من العنوان"/></label><label>وصف موجز<textarea rows={3} value={unitForm.description} onChange={(e) => setUnitForm((old) => ({ ...old, description: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !curriculumChoices.length}>حفظ الوحدة كمسودة</button></form><div className="admin-list"><h3>الوحدات الحالية</h3>{units.length ? units.map((unit) => <article key={unit.id}><span><b>{unit.title}</b><small>{unit.status}</small></span><select value={unit.status} disabled={saving} onChange={(e) => void setStatus("units", unit.id, e.target.value as "draft" | "review" | "published" | "archived")}><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="published">منشورة</option><option value="archived">مؤرشفة</option></select></article>) : <p>لا توجد وحدات بعد.</p>}</div></div>}
-      {activePanel === "lessons" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addLesson}><div><span className="content-status">إضافة جديدة</span><h2>إنشاء درس</h2><p>اكتب شرحاً أصلياً منظماً بصيغة Markdown، وأضف أهداف الدرس.</p></div><label>الوحدة<select required value={lessonForm.unit_id} onChange={(e) => setLessonForm((old) => ({ ...old, unit_id: e.target.value }))}><option value="">اختر الوحدة</option>{units.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>عنوان الدرس<input required value={lessonForm.title} onChange={(e) => setLessonForm((old) => ({ ...old, title: e.target.value, slug: old.slug || makeSlug(e.target.value) }))}/></label><label>المعرّف (Slug)<input value={lessonForm.slug} onChange={(e) => setLessonForm((old) => ({ ...old, slug: e.target.value }))}/></label><label>ملخص الدرس<textarea rows={2} value={lessonForm.summary} onChange={(e) => setLessonForm((old) => ({ ...old, summary: e.target.value }))}/></label><label>أهداف التعلّم (هدف في كل سطر)<textarea rows={3} value={lessonForm.objectives} onChange={(e) => setLessonForm((old) => ({ ...old, objectives: e.target.value }))}/></label><label>محتوى الدرس — Markdown<textarea required rows={9} value={lessonForm.content_md} onChange={(e) => setLessonForm((old) => ({ ...old, content_md: e.target.value }))} placeholder={"## الفكرة الأساسية\\n\\nشرح أصلي للمفهوم...\\n\\n## مثال محلول\\nخطوات الحل..."}/></label><label>وقت الدراسة بالدقائق<input type="number" min="1" max="240" value={lessonForm.estimated_minutes} onChange={(e) => setLessonForm((old) => ({ ...old, estimated_minutes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !units.length}>حفظ الدرس كمسودة</button></form><div className="admin-list"><h3>الدروس الحالية</h3>{lessons.length ? lessons.map((lesson) => <article key={lesson.id}><span><b>{lesson.title}</b><small>{units.find((item) => item.id === lesson.unit_id)?.title || "وحدة"} · {lesson.status}</small></span><select value={lesson.status} disabled={saving} onChange={(e) => void setStatus("lessons", lesson.id, e.target.value as "draft" | "review" | "published" | "archived")}><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></article>) : <p>لا توجد دروس بعد.</p>}</div></div>}
+      {activePanel === "lessons" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addLesson}><div><span className="content-status">إضافة جديدة</span><h2>إنشاء درس</h2><p>اكتب شرحاً أصلياً واربطه بمصدر المنهج، ثم أضف مرجعاً علمياً دولياً عند الحاجة.</p></div><label>الوحدة<select required value={lessonForm.unit_id} onChange={(e) => setLessonForm((old) => ({ ...old, unit_id: e.target.value }))}><option value="">اختر الوحدة</option>{units.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>عنوان الدرس<input required value={lessonForm.title} onChange={(e) => setLessonForm((old) => ({ ...old, title: e.target.value, slug: old.slug || makeSlug(e.target.value) }))}/></label><label>المعرّف (Slug)<input value={lessonForm.slug} onChange={(e) => setLessonForm((old) => ({ ...old, slug: e.target.value }))}/></label><label>ملخص الدرس<textarea rows={2} value={lessonForm.summary} onChange={(e) => setLessonForm((old) => ({ ...old, summary: e.target.value }))}/></label><label>أهداف التعلّم (هدف في كل سطر)<textarea rows={3} value={lessonForm.objectives} onChange={(e) => setLessonForm((old) => ({ ...old, objectives: e.target.value }))}/></label><div className="admin-options-grid"><label>مصدر المنهج اليمني (مطلوب)<select required value={lessonForm.syllabus_source_id} onChange={(e) => setLessonForm((old) => ({ ...old, syllabus_source_id: e.target.value }))}><option value="">اختر مصدر المنهج والطبعة</option>{sources.filter((item) => item.source_type === "curriculum_authority" || item.source_type === "textbook").map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>موضع المصدر (الصفحات / الفهرس)<input value={lessonForm.syllabus_locator} onChange={(e) => setLessonForm((old) => ({ ...old, syllabus_locator: e.target.value }))} placeholder="مثال: فهرس الوحدة، ص 12–18"/></label></div><div className="admin-options-grid"><label>مرجع دولي للتحقق (اختياري)<select value={lessonForm.reference_source_id} onChange={(e) => setLessonForm((old) => ({ ...old, reference_source_id: e.target.value }))}><option value="">لا يوجد</option>{sources.filter((item) => item.source_type !== "curriculum_authority" && item.source_type !== "textbook").map((item) => <option key={item.id} value={item.id}>{item.title} · {item.reuse_policy}</option>)}</select></label><label>موضع المرجع الدولي<input value={lessonForm.reference_locator} onChange={(e) => setLessonForm((old) => ({ ...old, reference_locator: e.target.value }))} placeholder="الفصل / القسم / الصفحة"/></label></div><label>محتوى الدرس — Markdown<textarea required rows={9} value={lessonForm.content_md} onChange={(e) => setLessonForm((old) => ({ ...old, content_md: e.target.value }))} placeholder={"## الفكرة الأساسية\\n\\nشرح أصلي للمفهوم...\\n\\n## مثال محلول\\nخطوات الحل..."}/></label><label>وقت الدراسة بالدقائق<input type="number" min="1" max="240" value={lessonForm.estimated_minutes} onChange={(e) => setLessonForm((old) => ({ ...old, estimated_minutes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !units.length}>حفظ الدرس كمسودة</button></form><div className="admin-list"><h3>الدروس الحالية</h3>{lessons.length ? lessons.map((lesson) => <article key={lesson.id}><span><b>{lesson.title}</b><small>{units.find((item) => item.id === lesson.unit_id)?.title || "وحدة"} · {lesson.status}</small></span><select value={lesson.status} disabled={saving} onChange={(e) => void setStatus("lessons", lesson.id, e.target.value as "draft" | "review" | "published" | "archived")}><option value="draft">مسودة</option><option value="review">قيد المراجعة</option><option value="published">منشور</option><option value="archived">مؤرشف</option></select></article>) : <p>لا توجد دروس بعد.</p>}</div></div>}
       {activePanel === "questions" && <div className="admin-form admin-form-wide"><div><span className="content-status">بنك الأسئلة</span><h2>إضافة سؤال اختيار من متعدد</h2><p>مفتاح الإجابة يُحفظ في جدول خاص غير متاح للطلاب وفق سياسات RLS.</p></div><form onSubmit={addQuestion}><label>الدرس<select required value={questionForm.lesson_id} onChange={(e) => setQuestionForm((old) => ({ ...old, lesson_id: e.target.value }))}><option value="">اختر الدرس</option>{lessons.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></label><label>نص السؤال<textarea required rows={3} value={questionForm.prompt} onChange={(e) => setQuestionForm((old) => ({ ...old, prompt: e.target.value }))}/></label><div className="admin-options-grid">{[1,2,3,4].map((number) => <label key={number}>الخيار {number}<input required value={questionForm[("option" + number) as "option1" | "option2" | "option3" | "option4"]} onChange={(e) => setQuestionForm((old) => ({ ...old, [("option" + number) as "option1" | "option2" | "option3" | "option4"]: e.target.value }))}/></label>)}</div><div className="admin-options-grid"><label>الإجابة الصحيحة<select value={questionForm.correct} onChange={(e) => setQuestionForm((old) => ({ ...old, correct: e.target.value }))}><option value="0">الخيار 1</option><option value="1">الخيار 2</option><option value="2">الخيار 3</option><option value="3">الخيار 4</option></select></label><label>الصعوبة<select value={questionForm.difficulty} onChange={(e) => setQuestionForm((old) => ({ ...old, difficulty: e.target.value }))}><option value="easy">سهل</option><option value="medium">متوسط</option><option value="hard">متقدم</option></select></label></div><label>تفسير الإجابة<textarea required rows={3} value={questionForm.explanation} onChange={(e) => setQuestionForm((old) => ({ ...old, explanation: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving || !lessons.length}>حفظ السؤال ومفتاحه كمسودة</button></form></div>}
-      {activePanel === "sources" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addSource}><div><span className="content-status">توثيق المصدر</span><h2>تسجيل مصدر المحتوى</h2><p>سجّل الطبعة والناشر وحالة الحقوق قبل اعتماد أي درس.</p></div><label>اسم المصدر<input required value={sourceForm.title} onChange={(e) => setSourceForm((old) => ({ ...old, title: e.target.value }))}/></label><label>الجهة الناشرة<input value={sourceForm.publisher} onChange={(e) => setSourceForm((old) => ({ ...old, publisher: e.target.value }))}/></label><div className="admin-options-grid"><label>العام الدراسي / سنة النشر<input value={sourceForm.publication_year} onChange={(e) => setSourceForm((old) => ({ ...old, publication_year: e.target.value }))}/></label><label>الطبعة<input value={sourceForm.edition} onChange={(e) => setSourceForm((old) => ({ ...old, edition: e.target.value }))}/></label></div><label>رابط المصدر (للتوثيق الداخلي)<input type="url" value={sourceForm.source_url} onChange={(e) => setSourceForm((old) => ({ ...old, source_url: e.target.value }))}/></label><label>حالة حقوق الاستخدام<select value={sourceForm.rights_status} onChange={(e) => setSourceForm((old) => ({ ...old, rights_status: e.target.value }))}><option value="needs_review">تحتاج مراجعة</option><option value="original">محتوى أصلي</option><option value="licensed">مرخّص</option><option value="public_domain">ملك عام</option><option value="link_only">رابط فقط</option><option value="permission_required">يتطلب إذناً</option></select></label><label>ملاحظات التحقق والحقوق<textarea rows={3} value={sourceForm.rights_notes} onChange={(e) => setSourceForm((old) => ({ ...old, rights_notes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving}>حفظ المصدر</button></form><div className="admin-list"><h3>المصادر المسجلة</h3>{sources.length ? sources.map((source) => <article key={source.id}><span><b>{source.title}</b><small>{source.rights_status}</small></span></article>) : <p>لم تُسجل مصادر بعد.</p>}</div></div>}
+      {activePanel === "sources" && <div className="admin-editor-grid"><form className="admin-form" onSubmit={addSource}><div><span className="content-status">توثيق المصدر</span><h2>تسجيل مصدر المحتوى</h2><p>سجّل الطبعة والناشر وحالة الحقوق قبل اعتماد أي درس.</p></div><label>اسم المصدر<input required value={sourceForm.title} onChange={(e) => setSourceForm((old) => ({ ...old, title: e.target.value }))}/></label><label>الجهة الناشرة<input value={sourceForm.publisher} onChange={(e) => setSourceForm((old) => ({ ...old, publisher: e.target.value }))}/></label><div className="admin-options-grid"><label>العام الدراسي / سنة النشر<input value={sourceForm.publication_year} onChange={(e) => setSourceForm((old) => ({ ...old, publication_year: e.target.value }))}/></label><label>الطبعة<input value={sourceForm.edition} onChange={(e) => setSourceForm((old) => ({ ...old, edition: e.target.value }))}/></label></div><label>رابط المصدر (للتوثيق الداخلي)<input type="url" value={sourceForm.source_url} onChange={(e) => setSourceForm((old) => ({ ...old, source_url: e.target.value }))}/></label><label>نوع المصدر<select value={sourceForm.source_type} onChange={(e) => setSourceForm((old) => ({ ...old, source_type: e.target.value }))}><option value="curriculum_authority">جهة اعتماد المنهج</option><option value="textbook">كتاب دراسي</option><option value="open_educational_resource">مورد تعليمي مفتوح</option><option value="scientific_reference">مرجع علمي</option><option value="primary_source">مصدر أولي</option><option value="interactive_tool">أداة تفاعلية</option><option value="dataset">مجموعة بيانات</option><option value="educational_reference">مرجع تعليمي</option></select></label><div className="admin-options-grid"><label>اسم الرخصة (إن وجدت)<input value={sourceForm.licence_name} onChange={(e) => setSourceForm((old) => ({ ...old, licence_name: e.target.value }))} placeholder="مثال: CC BY-NC-SA 4.0"/></label><label>رابط نص الرخصة<input type="url" value={sourceForm.licence_url} onChange={(e) => setSourceForm((old) => ({ ...old, licence_url: e.target.value }))}/></label></div><label>سياسة إعادة الاستخدام<select value={sourceForm.reuse_policy} onChange={(e) => setSourceForm((old) => ({ ...old, reuse_policy: e.target.value }))}><option value="link_only">رابط خارجي فقط</option><option value="reference_only">للاستناد والتحقق فقط</option><option value="reuse_allowed">إعادة الاستخدام مسموحة حسب الرخصة</option><option value="reuse_allowed_noncommercial">غير تجاري فقط</option><option value="public_domain_verified">ملك عام تم التحقق منه</option><option value="permission_required">يتطلب إذناً</option></select></label><label>حالة حقوق الاستخدام<select value={sourceForm.rights_status} onChange={(e) => setSourceForm((old) => ({ ...old, rights_status: e.target.value }))}><option value="needs_review">تحتاج مراجعة</option><option value="original">محتوى أصلي</option><option value="licensed">مرخّص</option><option value="public_domain">ملك عام</option><option value="link_only">رابط فقط</option><option value="permission_required">يتطلب إذناً</option></select></label><label>ملاحظات التحقق والحقوق<textarea rows={3} value={sourceForm.rights_notes} onChange={(e) => setSourceForm((old) => ({ ...old, rights_notes: e.target.value }))}/></label><button className="btn btn-primary" disabled={saving}>حفظ المصدر</button></form><div className="admin-list"><h3>المصادر المسجلة</h3>{sources.length ? sources.map((source) => <article key={source.id}><span><b>{source.title}</b><small>{source.rights_status} · {source.reuse_policy}</small></span></article>) : <p>لم تُسجل مصادر بعد.</p>}</div></div>}
     </section>}
     <div className="admin-status" role="status">{health}</div>
     <p className="admin-footnote"><ShieldCheck size={15}/> جميع العناصر الجديدة تُحفظ كمسودات. انشر فقط بعد مطابقة الطبعة، مراجعة الدرس والأسئلة، والتحقق من حقوق الاستخدام. لا تُعرض مفاتيح الإجابة للطلاب مباشرة.</p>
@@ -710,6 +1017,7 @@ export default function App() {
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
+    <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
     <Route path="/target-test" element={<TargetTestPage/>}/>

@@ -97,3 +97,196 @@
 @media(max-width:900px){.nav-dropdown{height:auto;display:block;width:100%}.nav-dropdown-trigger{min-height:42px;width:100%;justify-content:flex-start}.nav-dropdown-panel{position:static;width:100%;box-shadow:none;border:0;border-top:1px solid #edf0f3;padding:4px 8px 8px}.builder-layout{grid-template-columns:1fr}}
 @media(max-width:620px){.tool-workspace{padding:16px}.builder-grid,.performance-summary,.mark-criteria{grid-template-columns:1fr}.tool-page-intro{margin-bottom:19px}.guided-shell{padding:17px}.guided-body{font-size:13px}.topic-performance-list article{grid-template-columns:1fr;gap:10px}.topic-meter{max-width:360px}.test-ready-row{align-items:flex-start;flex-direction:column}.test-ready-row .btn{width:100%}.next-revision{align-items:flex-start;flex-wrap:wrap}.next-revision .text-link{margin-right:52px}.result-actions .btn{width:100%}}
 @media print{.announcement,.site-header,.site-footer,.breadcrumbs,.tool-page-intro,.tool-notice,.builder-layout>.tool-workspace:first-child,.paper-preview .content-status{display:none!important}.app-shell,.page{background:#fff!important}.paper-preview{border:0!important;padding:0!important}.paper-preview h2{font-size:22px}.paper-preview article{break-inside:avoid}}
+
+
+/* Visible source provenance */
+.lesson-sources {
+  margin-top: 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+}
+.lesson-sources h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 7px;
+  color: #2d4d6b;
+  font-size: 15px;
+}
+.lesson-sources > p {
+  margin: 0 0 12px;
+  color: #8391a0;
+  font-size: 10px;
+  line-height: 1.9;
+}
+.lesson-sources > div {
+  display: grid;
+  gap: 9px;
+}
+.lesson-sources article {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px;
+  border: 1px solid #e3eaf0;
+  background: #fff;
+}
+.lesson-sources article > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.lesson-sources article b {
+  color: #34516d;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.lesson-sources article small,
+.lesson-sources article p,
+.lesson-sources article em {
+  margin: 0;
+  color: #8190a0;
+  font-size: 9px;
+  line-height: 1.8;
+  font-style: normal;
+}
+.lesson-sources article em {
+  color: #9a8a69;
+}
+.lesson-sources article a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: #326e9f;
+  font-size: 10px;
+  white-space: nowrap;
+}
+@media(max-width:620px) {
+  .lesson-sources { padding: 15px; }
+  .lesson-sources article { flex-direction: column; gap: 8px; }
+}
+
+
+/* Internal published curriculum and lesson reader */
+.published-unit {
+  margin-top: 20px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+}
+.published-unit-heading {
+  margin-bottom: 12px;
+}
+.published-unit-heading h3 {
+  margin: 5px 0;
+  color: #29445f;
+  font-size: 16px;
+}
+.published-unit-heading p {
+  margin: 0;
+  color: #8593a2;
+  font-size: 10px;
+  line-height: 1.8;
+}
+.published-unit .lesson-row + .lesson-row {
+  margin-top: 7px;
+}
+.content-loading {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  color: #71869a;
+  font-size: 12px;
+}
+.published-lesson-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 27px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.lesson-markdown {
+  color: #536b82;
+  font-size: 13px;
+  line-height: 2.15;
+}
+.lesson-markdown h2 {
+  margin: 27px 0 9px;
+  color: #29445f;
+  font-size: 21px;
+  line-height: 1.6;
+}
+.lesson-markdown h3 {
+  margin: 21px 0 8px;
+  color: #315574;
+  font-size: 17px;
+  line-height: 1.7;
+}
+.lesson-markdown h4 {
+  margin: 17px 0 7px;
+  color: #3d617f;
+  font-size: 14px;
+}
+.lesson-markdown p {
+  margin: 9px 0 13px;
+}
+.lesson-markdown ul,
+.lesson-markdown ol {
+  margin: 10px 0 17px;
+  padding-right: 25px;
+}
+.lesson-markdown li {
+  padding: 3px 0;
+}
+.lesson-markdown blockquote {
+  margin: 17px 0;
+  padding: 12px 15px;
+  border-right: 3px solid #78a0bf;
+  background: #f4f8fb;
+  color: #486782;
+}
+.lesson-markdown code {
+  padding: 2px 5px;
+  background: #f0f4f7;
+  color: #315978;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.lesson-code-block {
+  overflow-x: auto;
+  margin: 16px 0;
+  padding: 15px;
+  background: #f4f7fa;
+  color: #31516e;
+  direction: ltr;
+  text-align: left;
+  white-space: pre-wrap;
+}
+.lesson-formula {
+  overflow-x: auto;
+  margin: 17px 0;
+  padding: 15px 18px;
+  border: 1px solid #dbe6ee;
+  background: #f6f9fb;
+  color: #183c59;
+  font-family: "Cambria Math", Cambria, Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.published-lesson-main .lesson-objectives {
+  margin-top: 21px;
+}
+@media(max-width:620px) {
+  .published-unit { padding: 12px; }
+  .published-lesson-main { padding: 17px; }
+  .lesson-markdown { font-size: 12px; }
+  .lesson-markdown h2 { font-size: 18px; }
+  .lesson-markdown h3 { font-size: 15px; }
+  .lesson-formula { font-size: 16px; padding: 12px; }
+}

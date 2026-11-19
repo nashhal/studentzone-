@@ -8,6 +8,14 @@ export type Question = {
 };
 
 export type Flashcard = { front: string; back: string };
+export type LessonSource = {
+  id: string;
+  title: string;
+  publisher: string;
+  locator: string;
+  role: string;
+  note: string;
+};
 
 export type Lesson = {
   slug: string;
@@ -20,6 +28,7 @@ export type Lesson = {
   recap: string[];
   flashcards: Flashcard[];
   questions: Question[];
+  sources?: LessonSource[];
 };
 
 export const demoLesson: Lesson = {
@@ -62,6 +71,24 @@ export const demoLesson: Lesson = {
     ],
     answer: "المسافة = 8 m، والإزاحة = 4 m شرقاً.",
   },
+  sources: [
+    {
+      title: "University Physics Volume 1 — Section 2.1: Scalars and Vectors",
+      publisher: "OpenStax, Rice University",
+      id: "openstax-university-physics-1-2-1",
+      locator: "Section 2.1",
+      role: "مرجع للتحقق من المفاهيم الأساسية والتمييز بين الكميات القياسية والمتجهة.",
+      note: "استُخدم للتحقق العلمي فقط؛ الشرح والأمثلة والأسئلة في هذا النموذج مكتوبة بصورة مستقلة، ولا يُدّعى أن الدرس مطابق لطبعة يمنية."
+    },
+    {
+      title: "SI Units",
+      publisher: "National Institute of Standards and Technology (NIST)",
+      id: "nist-si-units",
+      locator: "Base and Derived Units",
+      role: "مرجع للتحقق من أسماء وحدات النظام الدولي ورموزها.",
+      note: "مرجع معياري للوحدات، وليس مصدراً لتحديد ترتيب المنهج اليمني."
+    }
+  ],
   recap: [
     "الكمية القياسية تحتاج إلى مقدار ووحدة.",
     "الكمية المتجهة تحتاج إلى مقدار واتجاه.",
