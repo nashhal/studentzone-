@@ -307,7 +307,7 @@ const modules: LearningModule[] = [
     },
     source: { title: "Encyclopaedia Britannica — Political Geography", url: "https://www.britannica.com/topic/political-geography" },
     curriculumSource: { title: "فهرس كتاب الجغرافيا 2026 — الوحدة الأولى", url: "https://yembooks.com/item/geography-grade-12" }
-  }
+  },
 
   {
     slug: "chemistry-thermochemistry", name: "الكيمياء", track: "القسم العلمي",
