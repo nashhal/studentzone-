@@ -129,3 +129,21 @@
   .g12-learning-print-exam article{break-inside:avoid;margin:0 0 16px;font-size:10px;line-height:1.8}
   .g12-learning-print-exam article ol{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin:6px 0;padding-right:24px}
 }
+.g12-learning-summary-head p{margin:5px 0 0;color:#8393a2;font-size:9px;line-height:1.7}
+.g12-revision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g12-revision-grid>section{padding:14px 15px;border:1px solid #e2eaf0;background:#fff;min-width:0}
+.g12-revision-grid h4,.g12-learning-summary-quick h4{margin:0 0 9px;color:#345772;font-size:11px;line-height:1.7}
+.g12-revision-grid ul,.g12-revision-grid ol{margin:0;padding-right:18px}
+.g12-revision-grid li{padding:3px 0;color:#5b7184;font-size:9px;line-height:1.9}
+.g12-learning-summary-quick{margin-top:12px;padding:14px 15px;border:1px solid #dce6ed;background:#f9fbfc}
+.g12-learning-summary-quick ol{margin:0;padding-right:19px}
+.g12-learning-summary-quick li{padding:3px 0;color:#526a7f;font-size:9px;line-height:1.85}
+.g12-print-revision h3{margin-top:12px}
+.g12-print-revision ul,.g12-print-revision ol{margin-top:4px}
+.g12-print-revision li{margin:2px 0}
+@media(max-width:650px){.g12-revision-grid{grid-template-columns:1fr}}
+@media print{
+  .g12-learning-print-summary section.g12-print-revision{break-inside:auto!important}
+  .g12-learning-print-summary section.g12-print-revision h3{break-after:avoid}
+  .g12-learning-print-summary section.g12-print-revision li{break-inside:avoid}
+}
