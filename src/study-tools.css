@@ -168,3 +168,125 @@
   .lesson-sources { padding: 15px; }
   .lesson-sources article { flex-direction: column; gap: 8px; }
 }
+
+
+/* Internal published curriculum and lesson reader */
+.published-unit {
+  margin-top: 20px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+}
+.published-unit-heading {
+  margin-bottom: 12px;
+}
+.published-unit-heading h3 {
+  margin: 5px 0;
+  color: #29445f;
+  font-size: 16px;
+}
+.published-unit-heading p {
+  margin: 0;
+  color: #8593a2;
+  font-size: 10px;
+  line-height: 1.8;
+}
+.published-unit .lesson-row + .lesson-row {
+  margin-top: 7px;
+}
+.content-loading {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  color: #71869a;
+  font-size: 12px;
+}
+.published-lesson-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 27px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+.lesson-markdown {
+  color: #536b82;
+  font-size: 13px;
+  line-height: 2.15;
+}
+.lesson-markdown h2 {
+  margin: 27px 0 9px;
+  color: #29445f;
+  font-size: 21px;
+  line-height: 1.6;
+}
+.lesson-markdown h3 {
+  margin: 21px 0 8px;
+  color: #315574;
+  font-size: 17px;
+  line-height: 1.7;
+}
+.lesson-markdown h4 {
+  margin: 17px 0 7px;
+  color: #3d617f;
+  font-size: 14px;
+}
+.lesson-markdown p {
+  margin: 9px 0 13px;
+}
+.lesson-markdown ul,
+.lesson-markdown ol {
+  margin: 10px 0 17px;
+  padding-right: 25px;
+}
+.lesson-markdown li {
+  padding: 3px 0;
+}
+.lesson-markdown blockquote {
+  margin: 17px 0;
+  padding: 12px 15px;
+  border-right: 3px solid #78a0bf;
+  background: #f4f8fb;
+  color: #486782;
+}
+.lesson-markdown code {
+  padding: 2px 5px;
+  background: #f0f4f7;
+  color: #315978;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.lesson-code-block {
+  overflow-x: auto;
+  margin: 16px 0;
+  padding: 15px;
+  background: #f4f7fa;
+  color: #31516e;
+  direction: ltr;
+  text-align: left;
+  white-space: pre-wrap;
+}
+.lesson-formula {
+  overflow-x: auto;
+  margin: 17px 0;
+  padding: 15px 18px;
+  border: 1px solid #dbe6ee;
+  background: #f6f9fb;
+  color: #183c59;
+  font-family: "Cambria Math", Cambria, Georgia, serif;
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: center;
+  white-space: pre-wrap;
+}
+.published-lesson-main .lesson-objectives {
+  margin-top: 21px;
+}
+@media(max-width:620px) {
+  .published-unit { padding: 12px; }
+  .published-lesson-main { padding: 17px; }
+  .lesson-markdown { font-size: 12px; }
+  .lesson-markdown h2 { font-size: 18px; }
+  .lesson-markdown h3 { font-size: 15px; }
+  .lesson-formula { font-size: 16px; padding: 12px; }
+}
