@@ -236,11 +236,11 @@ function GradePage() {
   return <main className="container page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد</Link><ChevronLeft size={14}/><b>{grade.name}</b></div>
     <div className="page-title-row"><div><span className="eyebrow">{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"}</span><h1>{grade.name}</h1><p>{grade.description}</p></div><div className="catalog-count"><b>{getSubjectCount(grade)}</b><span>مادة / مسار</span></div></div>
-    {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الصف الثالث الثانوي</span><Link className="btn btn-primary" to="/grade-12-books"><BookOpen size={16}/> عرض الكتب الـ25 <ArrowLeft size={15}/></Link></div>}
+    {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب حسب المسار والمنطقة والطبعة</span><Link className="btn btn-primary" to="/grade-12-books"><BookOpen size={16}/> فتح مكتبة الكتب <ArrowLeft size={15}/></Link></div>}
     {grade.tracks.length > 1 && <div className="filter-pills track-pills">{grade.tracks.map((item) => <button key={item.slug} className={track.slug === item.slug ? "filter-pill active" : "filter-pill"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="subject-list-heading"><h2>المواد الدراسية</h2><span>{track.name}</span></div>
     <div className="subject-grid">{track.subjects.map((subject, index) => <Link className="subject-tile" key={subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
-      <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p className="subject-tile-status">{grade.slug === "grade-12" && track.slug === "scientific" && subject.slug === "physics" ? "درس تجريبي تفاعلي متاح" : "فهرس المادة متاح · الدروس قيد الإعداد"}</p></div><ChevronLeft size={18}/>
+      <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p className="subject-tile-status">{grade.slug === "grade-12" && track.slug === "scientific" && subject.slug === "physics" ? "شرح تجريبي لموضوع واحد متاح" : "صفحة المادة متاحة · إعداد الدروس مستمر"}</p></div><ChevronLeft size={18}/>
     </Link>)}</div>
   </main>;
 }
