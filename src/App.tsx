@@ -362,10 +362,8 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
   const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
 
-  return <main className="container page subject-page">
-    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
-    <div className={sidebarOpen ? "course-shell" : "course-shell sidebar-collapsed"}>
+  return <main className="page subject-page">
+    <div className={sidebarOpen ? "subject-layout" : "subject-layout sidebar-collapsed"}>
       {sidebarOpen && <aside className="course-sidebar">
         <div className="sidebar-hide-row">
           <button type="button" onClick={() => setSidebarOpen(false)}><ChevronLeft size={19}/> إخفاء القائمة</button>
@@ -400,7 +398,11 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           </div>}
         </div>
       </aside>}
+      <div className="subject-main-column">
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
 
+        <div className="course-shell">
       <section className="course-main">
         {!sidebarOpen && <button type="button" className="sidebar-show-button" onClick={() => setSidebarOpen(true)}><Menu size={17}/> إظهار القائمة</button>}
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
@@ -432,6 +434,8 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>لن نعرض أوراقاً غير موثقة. ستضاف نماذج الامتحانات السابقة مع سنة الامتحان ومصدرها ومفتاح الإجابة بعد مراجعة حقوق استخدامها.</p><Link to="/past-papers" className="text-link">عرض مكتبة الأوراق <ArrowLeft size={15}/></Link></div>}
         </>}
       </section>
+        </div>
+      </div>
     </div>
   </main>;
 }
