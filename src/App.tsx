@@ -414,7 +414,6 @@ function DashboardPage({ progress }: { progress: Progress }) {
     window.addEventListener("storage", refresh);
     return () => window.removeEventListener("storage", refresh);
   }, []);
-  const latestAttempt = attempts[attempts.length - 1];
   const totalQuestions = attempts.reduce((sum, attempt) => sum + attempt.total, 0);
   const correctAnswers = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
   const accuracy = totalQuestions ? Math.round(correctAnswers / totalQuestions * 100) : undefined;
