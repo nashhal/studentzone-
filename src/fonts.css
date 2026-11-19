@@ -1,0 +1,37 @@
+/* Locally hosted fonts supplied for Yemen Study. */
+@font-face {
+  font-family: "RTL Bushra";
+  src: url("/studentzone-/fonts/RTL-Bushra-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EidFontByRola";
+  src: url("/studentzone-/fonts/EidFontByRola.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Bushra covers Arabic glyphs; Tahoma/Arial supply Latin and other missing glyphs. */
+:root,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "RTL Bushra", Tahoma, Arial, sans-serif;
+}
+
+/* EidFontByRola contains ASCII digits only, so use it for numeric UI labels only. */
+.grade-card-num,
+.subject-number,
+.visual-index,
+.catalog-count b {
+  font-family: "EidFontByRola", "RTL Bushra", Tahoma, sans-serif;
+  font-weight: 400;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
