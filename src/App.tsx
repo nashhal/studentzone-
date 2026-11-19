@@ -433,31 +433,30 @@ type LessonReferenceRecord = {
 };
 
 function InlineLessonText({ value }: { value: string }) {
-  const parts = value.split(/(\\*\\*[^*]+\\*\\*|\\*[^*]+\\*|\`[^\`]+\`)/g);
+  const parts = value.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
   return <>{parts.map((part, index) => {
     if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
-    if (part.startsWith("\`") && part.endsWith("\`")) return <code key={index}>{part.slice(1, -1)}</code>;
     return part;
   })}</>;
 }
 
 function LessonMarkdown({ content }: { content: string }) {
-  const lines = content.replace(/\\r/g, "").split("\\n");
+  const lines = content.replace(/\r/g, "").split(/\r?\n/);
   const blocks: ReactNode[] = [];
   let paragraph: string[] = [];
   let list: string[] = [];
   let listType: "ul" | "ol" | null = null;
   const flushParagraph = () => {
     if (paragraph.length) {
-      blocks.push(<p key={`p-${blocks.length}`}><InlineLessonText value={paragraph.join(" ")}/></p>);
+      blocks.push(<p key={"p-" + blocks.length}><InlineLessonText value={paragraph.join(" ")}/></p>);
       paragraph = [];
     }
   };
   const flushList = () => {
     if (list.length && listType) {
       const ListTag = listType;
-      blocks.push(<ListTag key={`list-${blocks.length}`}>{list.map((item, index) => <li key={index}><InlineLessonText value={item}/></li>)}</ListTag>);
+      blocks.push(<ListTag key={"list-" + blocks.length}>{list.map((item, index) => <li key={index}><InlineLessonText value={item}/></li>)}</ListTag>);
     }
     list = [];
     listType = null;
@@ -465,55 +464,47 @@ function LessonMarkdown({ content }: { content: string }) {
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index].trim();
     if (!line) { flushParagraph(); flushList(); continue; }
-    if (line.startsWith("```")) {
+    if (line === "$$" || (line.startsWith("$$") && line.endsWith("$$") && line.length > 4)) {
       flushParagraph(); flushList();
-      const codeLines: string[] = [];
-      while (index + 1 < lines.length && !lines[index + 1].trim().startsWith("```")) {
-        index += 1; codeLines.push(lines[index]);
-      }
-      if (index + 1 < lines.length) index += 1;
-      blocks.push(<pre className="lesson-code-block" key={`code-${blocks.length}`}><code>{codeLines.join("\\n")}</code></pre>);
-      continue;
-    }
-    if (line === "$" || (line.startsWith("$") && line.endsWith("$") && line.length > 4)) {
-      flushParagraph(); flushList();
-      if (line.length > 4) blocks.push(<div className="lesson-formula" dir="ltr" key={`math-${blocks.length}`}>{line.slice(2, -2).trim()}</div>);
-      else {
+      if (line.length > 4) {
+        blocks.push(<div className="lesson-formula" dir="ltr" key={"math-" + blocks.length}>{line.slice(2, -2).trim()}</div>);
+      } else {
         const mathLines: string[] = [];
-        while (index + 1 < lines.length && lines[index + 1].trim() !== "$") {
-          index += 1; mathLines.push(lines[index].trim());
+        while (index + 1 < lines.length && lines[index + 1].trim() !== "$$") {
+          index += 1;
+          mathLines.push(lines[index].trim());
         }
         if (index + 1 < lines.length) index += 1;
-        blocks.push(<div className="lesson-formula" dir="ltr" key={`math-${blocks.length}`}>{mathLines.join(" ")}</div>);
+        blocks.push(<div className="lesson-formula" dir="ltr" key={"math-" + blocks.length}>{mathLines.join(" ")}</div>);
       }
       continue;
     }
-    const heading = line.match(/^(#{1,3})\\s+(.+)$/);
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
     if (heading) {
       flushParagraph(); flushList();
       const level = heading[1].length;
       const text = <InlineLessonText value={heading[2]}/>;
-      if (level === 1) blocks.push(<h2 key={`h-${blocks.length}`}>{text}</h2>);
-      else if (level === 2) blocks.push(<h3 key={`h-${blocks.length}`}>{text}</h3>);
-      else blocks.push(<h4 key={`h-${blocks.length}`}>{text}</h4>);
+      if (level === 1) blocks.push(<h2 key={"h-" + blocks.length}>{text}</h2>);
+      else if (level === 2) blocks.push(<h3 key={"h-" + blocks.length}>{text}</h3>);
+      else blocks.push(<h4 key={"h-" + blocks.length}>{text}</h4>);
       continue;
     }
     if (line.startsWith(">")) {
       flushParagraph(); flushList();
-      blocks.push(<blockquote key={`q-${blocks.length}`}><InlineLessonText value={line.slice(1).trim()}/></blockquote>);
+      blocks.push(<blockquote key={"q-" + blocks.length}><InlineLessonText value={line.slice(1).trim()}/></blockquote>);
       continue;
     }
-    if (/^[-*]\\s+/.test(line) || /^\\d+[.)]\\s+/.test(line)) {
+    if (/^[-*]\s+/.test(line) || /^\d+[.)]\s+/.test(line)) {
       flushParagraph();
-      const nextType = /^\\d+[.)]\\s+/.test(line) ? "ol" : "ul";
+      const nextType = /^\d+[.)]\s+/.test(line) ? "ol" : "ul";
       if (listType && listType !== nextType) flushList();
       listType = nextType;
-      list.push(line.replace(/^([-*]|\\d+[.)])\\s+/, ""));
+      list.push(line.replace(/^([-*]|\d+[.)])\s+/, ""));
       continue;
     }
     if (/^---+$/.test(line)) {
       flushParagraph(); flushList();
-      blocks.push(<hr key={`hr-${blocks.length}`}/>);
+      blocks.push(<hr key={"hr-" + blocks.length}/>);
       continue;
     }
     flushList();
