@@ -12,6 +12,7 @@ import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
+const Grade12SubjectPage = lazy(() => import("./Grade12SubjectPage"));
 const TargetTestPage = lazy(() => import("./StudyTools").then(({ TargetTestPage }) => ({ default: TargetTestPage })));
 const StrengthsWeaknessesPage = lazy(() => import("./StudyTools").then(({ StrengthsWeaknessesPage }) => ({ default: StrengthsWeaknessesPage })));
 const GuidedStudyPage = lazy(() => import("./StudyTools").then(({ GuidedStudyPage }) => ({ default: GuidedStudyPage })));
@@ -1042,6 +1043,7 @@ export default function App() {
     <Route path="/" element={<HomePage/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
+    <Route path="/subject/grade-12/:trackSlug/:subjectSlug" element={<Grade12SubjectPage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
