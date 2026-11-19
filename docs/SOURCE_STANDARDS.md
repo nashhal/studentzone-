@@ -95,3 +95,15 @@ For every lesson/question, link all supporting sources and state their role: cur
 ## 7. Coverage and delivery
 
 The coverage matrix in [CURRICULUM_COVERAGE.md](./CURRICULUM_COVERAGE.md) is the single progress register. Do not count a subject tile or a source link as a completed lesson. Count only teacher-reviewed and published lessons. Build by verified syllabus units, not by inventing a target number of lessons.
+
+
+## 8. Student experience is fully in-site
+
+The learner-facing product must not send students to an external site to complete a learning task.
+
+- Lesson explanations, formulae, diagrams, worked examples, practice questions, answer explanations, flashcards, recaps and tests must be rendered inside Yemen Study.
+- Do not embed a third-party course, video player, textbook chapter, quiz or remote worksheet as a substitute for authoring the lesson.
+- External references are used by the editorial team for verification. The student view may show a compact, non-clickable attribution note (publisher/title/section) but must not require the student to open the external source.
+- Do not expose external resource links in the learner flow by default. A separate optional reading list can be considered later, but it must never be required to understand or complete the lesson.
+- Diagrams and interactive activities should be authored inside Yemen Study, or integrated only when a clear licence permits it and the activity remains usable within the site.
+- A link to an official syllabus source in the editor is evidence for the author, not a substitute for the actual lesson content.
