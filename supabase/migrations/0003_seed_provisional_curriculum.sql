@@ -70,21 +70,21 @@ on conflict (slug) do update set name=excluded.name,sort_order=excluded.sort_ord
 insert into public.grade_tracks (grade_id,track_id)
 select g.id,t.id
 from (values
-  ('grade-1','basic','general'),
-  ('grade-2','basic','general'),
-  ('grade-3','basic','general'),
-  ('grade-4','basic','general'),
-  ('grade-5','basic','general'),
-  ('grade-6','basic','general'),
-  ('grade-7','basic','general'),
-  ('grade-8','basic','general'),
-  ('grade-9','basic','general'),
-  ('grade-10','secondary','general'),
-  ('grade-11','secondary','scientific'),
-  ('grade-11','secondary','literary'),
-  ('grade-12','secondary','scientific'),
-  ('grade-12','secondary','literary')
-) as v(grade_slug,track_slug,track_name)
+  ('grade-1','general'),
+  ('grade-2','general'),
+  ('grade-3','general'),
+  ('grade-4','general'),
+  ('grade-5','general'),
+  ('grade-6','general'),
+  ('grade-7','general'),
+  ('grade-8','general'),
+  ('grade-9','general'),
+  ('grade-10','general'),
+  ('grade-11','scientific'),
+  ('grade-11','literary'),
+  ('grade-12','scientific'),
+  ('grade-12','literary')
+) as v(grade_slug,track_slug)
 join public.grades g on g.slug=v.grade_slug
 join public.tracks t on t.slug=v.track_slug
 on conflict (grade_id,track_id) do nothing;
