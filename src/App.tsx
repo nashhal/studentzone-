@@ -236,7 +236,7 @@ function GradePage() {
     {grade.tracks.length > 1 && <div className="filter-pills track-pills">{grade.tracks.map((item) => <button key={item.slug} className={track.slug === item.slug ? "filter-pill active" : "filter-pill"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="subject-list-heading"><h2>المواد الدراسية</h2><span>{track.name}</span></div>
     <div className="subject-grid">{track.subjects.map((subject, index) => <Link className="subject-tile" key={subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
-      <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p>ملاحظات مراجعة · أسئلة · بطاقات · اختبارات</p></div><ChevronLeft size={18}/>
+      <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p className="subject-tile-status">{grade.slug === "grade-12" && track.slug === "scientific" && subject.slug === "physics" ? "درس تجريبي تفاعلي متاح" : "فهرس المادة متاح · الدروس قيد الإعداد"}</p></div><ChevronLeft size={18}/>
     </Link>)}</div>
   </main>;
 }
@@ -289,7 +289,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
       }
       if (!supabase) {
         setPublishedUnits([]);
-        setContentError("مكتبة الدروس ستظهر هنا بعد ربط قاعدة بيانات المحتوى. لن نحيل الطالب إلى مواقع أو ملفات خارجية.");
+        setContentError("لم تُنشر دروس هذه المادة بعد. ستظهر الشروحات والأمثلة والأسئلة والأنشطة كاملة داخل الموقع بعد التحقق منها، ولن نعتمد على روابط خارجية بديلاً عن الدرس.");
         setContentLoading(false);
         return;
       }
