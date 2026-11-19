@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, BookOpen, ExternalLink, FileText, Search, ShieldCheck } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, Search, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./grade12-books.css";
 
