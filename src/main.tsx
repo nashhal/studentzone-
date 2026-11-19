@@ -5,6 +5,7 @@ import { AuthProvider } from "./lib/auth";
 import App from "./App";
 import "./styles.css";
 import "./premium.css";
+import "./clarity-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
