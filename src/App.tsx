@@ -514,7 +514,7 @@ function LessonMarkdown({ content }: { content: string }) {
   return <div className="lesson-markdown">{blocks}</div>;
 }
 
-function PublishedLessonPage() {
+function PublishedLessonPage({ progress, complete, toggleSaved }: { progress: Progress; complete: (id: string) => void; toggleSaved: (id: string) => void }) {
   const { lessonId = "" } = useParams();
   const [lesson, setLesson] = useState<PublishedLessonRecord | null>(null);
   const [unitTitle, setUnitTitle] = useState("");
@@ -576,6 +576,7 @@ function PublishedLessonPage() {
       {lesson.objectives?.length > 0 && <section className="lesson-objectives"><h2><Target size={19}/> أهداف التعلّم</h2><ul>{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>}
       <LessonMarkdown content={lesson.content_md}/>
       {references.length > 0 && <section className="lesson-sources"><h2><FileText size={18}/> توثيق المحتوى</h2><p>هذه المراجع استُخدمت للتحقق من المنهج والمعلومات. الشرح المعروض والأسئلة والأنشطة التعليمية متاحة داخل Yemen Study.</p><div>{references.map((reference, index) => <article key={index}><div><b>{reference.content_sources?.title ?? "مرجع موثق"}</b><small>{reference.content_sources?.publisher ?? "جهة النشر غير محددة"}{reference.source_locator ? " · " + reference.source_locator : ""}</small><p>{reference.reference_role === "curriculum_alignment" ? "مرجع مطابقة المنهج" : reference.reference_role === "fact_check" ? "مرجع للتحقق العلمي" : "مرجع إضافي"}</p></div></article>)}</div></section>}
+      <div className="published-lesson-actions"><button className={progress.completed.includes(lesson.id) ? "btn btn-outline" : "btn btn-primary"} onClick={() => complete(lesson.id)}>{progress.completed.includes(lesson.id) ? "تم تسجيل إكمال الدرس" : "علّم الدرس كمكتمل"} <Check size={16}/></button><button className={progress.saved.includes(lesson.id) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(lesson.id)}><Bookmark size={16}/>{progress.saved.includes(lesson.id) ? "إزالة من المحفوظات" : "احفظ للرجوع لاحقاً"}</button></div>
       <div className="lesson-next"><div><span className="eyebrow">انتهيت من القراءة؟</span><h2>راجع الأفكار وحل التدريب.</h2><p>تظهر الأنشطة المرتبطة بهذا الدرس ضمن مكتبة المادة.</p></div><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد <ArrowLeft size={16}/></Link></div>
     </article>
   </main>;
@@ -1016,7 +1017,7 @@ export default function App() {
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
-    <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage/>}/>
+    <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
     <Route path="/target-test" element={<TargetTestPage/>}/>
