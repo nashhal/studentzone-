@@ -47,7 +47,7 @@ function useStudyProgress() {
 }
 
 function Header() {
-  const { user, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const navigate = useNavigate();
@@ -66,6 +66,8 @@ function Header() {
           <NavLink to="/curriculum" onClick={() => setMenuOpen(false)}>المواد الدراسية</NavLink>
           <NavLink to="/past-papers" onClick={() => setMenuOpen(false)}>أوراق الامتحانات</NavLink>
           <NavLink to="/study-plan" onClick={() => setMenuOpen(false)}>خطة المذاكرة</NavLink>
+          <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>مساحة الطالب</NavLink>
+          {(role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>إدارة المحتوى</NavLink>}
           <div className={toolsOpen ? "nav-dropdown open" : "nav-dropdown"}>
             <button type="button" className="nav-dropdown-trigger" aria-expanded={toolsOpen} onClick={() => setToolsOpen((open) => !open)}>أدوات الدراسة <ChevronDown size={14}/></button>
             {toolsOpen && <div className="nav-dropdown-panel">
@@ -273,29 +275,59 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
 }
 
 function PracticePanel({ questions }: { questions: Question[] }) {
+  const [difficulty, setDifficulty] = useState("all");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [checked, setChecked] = useState(false);
-  const score = questions.filter((question) => answers[question.id] === question.correctIndex).length;
+  const visibleQuestions = useMemo(
+    () => questions.filter((question) => difficulty === "all" || question.difficulty === difficulty),
+    [questions, difficulty],
+  );
+  const score = visibleQuestions.filter((question) => answers[question.id] === question.correctIndex).length;
+  const answeredCount = visibleQuestions.filter((question) => answers[question.id] !== undefined).length;
   return <div className="practice-panel">
-    <div className="resource-toolbar"><div><span className="content-status">تدريب حسب الموضوع</span><h2>اختبر فهمك</h2><p>{questions.length} أسئلة · اختر إجابة لكل سؤال ثم صحّح إجاباتك.</p></div><span className="difficulty-key">سهل ← متقدم</span></div>
-    {questions.map((question, index) => <article className="practice-question" key={question.id}>
-      <div className="question-top"><span>السؤال {index + 1}</span><span className="difficulty">{question.difficulty}</span></div>
+    <div className="resource-toolbar">
+      <div><span className="content-status">تدريب حسب الموضوع</span><h2>اختبر فهمك</h2><p>{visibleQuestions.length} أسئلة · اختر مستوى الصعوبة ثم أجب وصحّح.</p></div>
+      <label className="practice-filter"><span>مستوى الصعوبة</span><select value={difficulty} onChange={(event) => { setDifficulty(event.target.value); setChecked(false); setAnswers({}); }}><option value="all">كل المستويات</option><option value="سهل">سهل</option><option value="متوسط">متوسط</option><option value="متقدم">متقدم</option></select></label>
+    </div>
+    {visibleQuestions.length === 0 ? <div className="empty-panel"><Target/><h3>لا توجد أسئلة بهذا المستوى</h3><p>اختر مستوى آخر لعرض الأسئلة المتاحة.</p></div> : visibleQuestions.map((question, index) => <article className="practice-question" key={question.id}>
+      <div className="question-top"><span>السؤال {index + 1} من {visibleQuestions.length}</span><span className="difficulty">{question.difficulty}</span></div>
       <h3>{question.prompt}</h3>
-      <div className="answer-options">{question.options.map((option, optionIndex) => <button key={option} disabled={checked} className={checked && optionIndex === question.correctIndex ? "answer-option correct" : checked && answers[question.id] === optionIndex ? "answer-option incorrect" : answers[question.id] === optionIndex ? "answer-option chosen" : "answer-option"} onClick={() => setAnswers((old) => ({ ...old, [question.id]: optionIndex }))}><span>{["أ","ب","ج","د"][optionIndex]}</span>{option}{checked && optionIndex === question.correctIndex && <Check size={16}/>}</button>)}</div>
+      <div className="answer-options">{question.options.map((option, optionIndex) => <button type="button" key={option} disabled={checked} className={checked && optionIndex === question.correctIndex ? "answer-option correct" : checked && answers[question.id] === optionIndex ? "answer-option incorrect" : answers[question.id] === optionIndex ? "answer-option chosen" : "answer-option"} onClick={() => setAnswers((old) => ({ ...old, [question.id]: optionIndex }))}><span>{["أ","ب","ج","د"][optionIndex]}</span>{option}{checked && optionIndex === question.correctIndex && <Check size={16}/>}</button>)}</div>
       {checked && <div className={answers[question.id] === question.correctIndex ? "answer-explanation good" : "answer-explanation"}><b>{answers[question.id] === question.correctIndex ? "إجابة صحيحة" : "راجع هذه الفكرة"}</b><p>{question.explanation}</p></div>}
     </article>)}
-    {!checked ? <button className="btn btn-primary" disabled={Object.keys(answers).length !== questions.length} onClick={() => setChecked(true)}>صحّح إجاباتي <CheckCircle2 size={17}/></button> : <div className="practice-result"><Trophy size={22}/><div><b>نتيجتك: {score} من {questions.length}</b><p>راجع تفسيرات الإجابات ثم أعد المحاولة لتعزيز فهمك.</p></div><button className="btn btn-outline" onClick={() => { setAnswers({}); setChecked(false); }}>إعادة المحاولة</button></div>}
+    {visibleQuestions.length > 0 && (!checked ? <div className="practice-footer"><span>{answeredCount} من {visibleQuestions.length} تمت الإجابة عنها</span><button className="btn btn-primary" disabled={answeredCount !== visibleQuestions.length} onClick={() => setChecked(true)}>صحّح إجاباتي <CheckCircle2 size={17}/></button></div> : <div className="practice-result"><Trophy size={22}/><div><b>نتيجتك: {score} من {visibleQuestions.length}</b><p>راجع تفسيرات الإجابات ثم أعد المحاولة لتعزيز فهمك.</p></div><button className="btn btn-outline" onClick={() => { setAnswers({}); setChecked(false); }}>إعادة المحاولة</button></div>)}
   </div>;
 }
 
 function FlashcardsPanel() {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [ratings, setRatings] = useState<Record<string, "known" | "review">>(() => {
+    try {
+      const saved = localStorage.getItem("yemen-study-flashcard-ratings-v1");
+      return saved ? JSON.parse(saved) as Record<string, "known" | "review"> : {};
+    } catch { return {}; }
+  });
   const card = demoLesson.flashcards[index];
+  const knownCount = Object.values(ratings).filter((value) => value === "known").length;
+  const reviewCount = Object.values(ratings).filter((value) => value === "review").length;
+  useEffect(() => {
+    try { localStorage.setItem("yemen-study-flashcard-ratings-v1", JSON.stringify(ratings)); } catch { /* storage may be unavailable */ }
+  }, [ratings]);
+  const move = (next: number) => {
+    setIndex(next);
+    setFlipped(false);
+  };
+  const rate = (value: "known" | "review") => {
+    setRatings((old) => ({ ...old, [String(index)]: value }));
+    if (index < demoLesson.flashcards.length - 1) move(index + 1);
+  };
   return <div className="flashcards-panel">
-    <div className="resource-toolbar"><div><span className="content-status">مراجعة نشطة</span><h2>البطاقات التعليمية</h2><p>حاول تذكّر الإجابة قبل قلب البطاقة.</p></div><span className="flashcard-count">{index + 1} / {demoLesson.flashcards.length}</span></div>
-    <button className={flipped ? "flashcard flipped" : "flashcard"} onClick={() => setFlipped(!flipped)}><small>{flipped ? "الإجابة" : "السؤال"}</small><strong>{flipped ? card.back : card.front}</strong><span>{flipped ? "انقر لرؤية السؤال" : "انقر لقلب البطاقة"}</span></button>
-    <div className="flashcard-controls"><button className="btn btn-outline" onClick={() => { setIndex((index - 1 + demoLesson.flashcards.length) % demoLesson.flashcards.length); setFlipped(false); }}>السابق</button><div className="flashcard-dots">{demoLesson.flashcards.map((_, i) => <button key={i} aria-label={"البطاقة " + (i + 1)} className={i === index ? "active" : ""} onClick={() => { setIndex(i); setFlipped(false); }}/>)}</div><button className="btn btn-primary" onClick={() => { setIndex((index + 1) % demoLesson.flashcards.length); setFlipped(false); }}>التالي <ArrowLeft size={15}/></button></div>
+    <div className="resource-toolbar"><div><span className="content-status">مراجعة نشطة</span><h2>البطاقات التعليمية</h2><p>حاول تذكّر الإجابة قبل قلب البطاقة، ثم صنّفها حسب مستوى إتقانك.</p></div><span className="flashcard-count">{index + 1} / {demoLesson.flashcards.length}</span></div>
+    <div className="flashcard-progress"><span>أتقنتها: <b>{knownCount}</b></span><span>تحتاج مراجعة: <b>{reviewCount}</b></span><span>لم تصنّف: <b>{demoLesson.flashcards.length - knownCount - reviewCount}</b></span></div>
+    <button type="button" className={flipped ? "flashcard flipped" : "flashcard"} onClick={() => setFlipped(!flipped)}><small>{flipped ? "الإجابة" : "السؤال"}</small><strong>{flipped ? card.back : card.front}</strong><span>{flipped ? "انقر لرؤية السؤال" : "انقر لقلب البطاقة"}</span></button>
+    {flipped && <div className="flashcard-rating"><button type="button" className="flash-rating review" onClick={() => rate("review")}>أحتاج إلى مراجعتها</button><button type="button" className="flash-rating mastered" onClick={() => rate("known")}>أعرفها جيداً <Check size={15}/></button></div>}
+    <div className="flashcard-controls"><button className="btn btn-outline" onClick={() => move((index - 1 + demoLesson.flashcards.length) % demoLesson.flashcards.length)}>السابق</button><div className="flashcard-dots">{demoLesson.flashcards.map((_, i) => <button key={i} aria-label={"البطاقة " + (i + 1)} className={i === index ? "active" : ""} onClick={() => move(i)}/>)}</div><button className="btn btn-primary" onClick={() => move((index + 1) % demoLesson.flashcards.length)}>التالي <ArrowLeft size={15}/></button></div>
   </div>;
 }
 

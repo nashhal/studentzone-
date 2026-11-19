@@ -227,32 +227,52 @@ export function GuidedPracticePage() {
   const [index, setIndex] = useState(0);
   const [choice, setChoice] = useState<number | undefined>(undefined);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [feedbackShown, setFeedbackShown] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [result, setResult] = useState<Attempt | null>(null);
   const question = demoLesson.questions[index];
-  const doneCount = Object.keys(answers).length;
-  const finish = () => {
-    const fullAnswers = { ...answers, [question.id]: choice as number };
-    setAnswers(fullAnswers);
-    saveAttempt("guided-practice", demoLesson.questions, fullAnswers);
-    setFinished(true);
-  };
-  const next = () => {
-    setAnswers((old) => ({ ...old, [question.id]: choice as number }));
-    setChoice(undefined);
+  const answeredCount = Object.keys(answers).length + (choice !== undefined && answers[question.id] === undefined ? 1 : 0);
+  const score = demoLesson.questions.filter((item) => {
+    const answer = item.id === question.id && choice !== undefined ? choice : answers[item.id];
+    return answer === item.correctIndex;
+  }).length;
+  const continuePractice = () => {
+    if (choice === undefined) return;
+    const nextAnswers = { ...answers, [question.id]: choice };
+    setAnswers(nextAnswers);
+    if (index === demoLesson.questions.length - 1) {
+      setResult(saveAttempt("guided-practice", demoLesson.questions, nextAnswers));
+      setFinished(true);
+      return;
+    }
     setIndex((value) => value + 1);
+    setChoice(undefined);
+    setFeedbackShown(false);
+  };
+  const restart = () => {
+    setIndex(0);
+    setChoice(undefined);
+    setAnswers({});
+    setFeedbackShown(false);
+    setFinished(false);
+    setResult(null);
   };
   return <main className="container page study-tool-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>التدريب الموجّه</b></div>
     <PageIntro eyebrow="تدريب يتدرّج مع إجاباتك" title="التدريب الموجّه" description="أجب عن سؤال واحد في كل مرة، راجع تفسيره، ثم انتقل إلى السؤال التالي."/>
     <section className="tool-workspace">
       {!finished ? <>
-        <div className="guided-top"><div><span className="content-status">سؤال {index + 1} من {demoLesson.questions.length}</span><h2>{demoLesson.title}</h2></div><span>{doneCount} إجابات</span></div>
+        <div className="guided-top"><div><span className="content-status">سؤال {index + 1} من {demoLesson.questions.length}</span><h2>{demoLesson.title}</h2></div><span>{answeredCount} إجابات</span></div>
         <div className="guided-progress">{demoLesson.questions.map((_, i) => <i key={i} className={i <= index ? "active" : ""}/>)}</div>
-        <QuestionCard question={question} index={index} selected={choice} onSelect={setChoice}/>
-        <div className="guided-actions">{index < demoLesson.questions.length - 1 ? <button className="btn btn-primary" disabled={choice === undefined} onClick={next}>السؤال التالي <ArrowLeft size={15}/></button> : <button className="btn btn-primary" disabled={choice === undefined} onClick={finish}>إنهاء التدريب <CheckCircle2 size={15}/></button>}</div>
-      </> : <div className="tool-result"><span className="tool-result-icon"><CheckCircle2 size={28}/></span><h2>أكملت التدريب الموجّه</h2><p>تم حفظ المحاولة محلياً. راجع نتيجة أدائك قبل الانتقال لموضوع آخر.</p><Link className="btn btn-primary" to="/strengths-weaknesses">تحليل الأداء <ArrowLeft size={15}/></Link></div>}
+        <QuestionCard question={question} index={index} selected={choice} disabled={feedbackShown} onSelect={setChoice} reveal={feedbackShown}/>
+        <div className="guided-actions">
+          {!feedbackShown
+            ? <button className="btn btn-primary" disabled={choice === undefined} onClick={() => setFeedbackShown(true)}>تحقّق من إجابتي <CheckCircle2 size={15}/></button>
+            : <><span className="guided-feedback-score">{score} من {index + 1} صحيحة حتى الآن</span><button className="btn btn-primary" onClick={continuePractice}>{index === demoLesson.questions.length - 1 ? "عرض النتيجة" : "السؤال التالي"} <ArrowLeft size={15}/></button></>}
+        </div>
+      </> : <div className="tool-result"><span className="tool-result-icon"><Trophy size={28}/></span><span className="eyebrow">نتيجة التدريب</span><strong>{result?.score ?? 0} / {result?.total ?? demoLesson.questions.length}</strong><p>تم حفظ محاولتك على هذا الجهاز. راجع التفسيرات وأعد التدريب عند الحاجة.</p><div className="result-actions"><button className="btn btn-outline" onClick={restart}><RotateCcw size={15}/> إعادة التدريب</button><Link className="btn btn-primary" to="/strengths-weaknesses">تحليل الأداء <ArrowLeft size={15}/></Link></div></div>}
     </section>
-    <ToolNotice>يعمل هذا النموذج على بنك أسئلة الدرس التجريبي فقط، وتُحفظ المحاولات على الجهاز الحالي.</ToolNotice>
+    <ToolNotice>التدريب الحالي مرتبط ببنك الأسئلة التجريبي في الفيزياء فقط. عند إضافة دروس موثقة ستُربط الأسئلة بكل موضوع بدلاً من استخدام هذا النموذج الواحد.</ToolNotice>
   </main>;
 }
 
