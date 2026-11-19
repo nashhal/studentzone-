@@ -3,7 +3,7 @@ import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
   CircleHelp, Clock3, FileText, GraduationCap, Layers3,
-  LogOut, Menu, Play, Search, ShieldCheck, Sparkles,
+  LogOut, Menu, Play, RotateCcw, Search, ShieldCheck, Sparkles,
   Target, Timer, Trophy, X, Zap
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
@@ -480,7 +480,7 @@ type LessonChoice = { id: string; title: string; unit_id: string; status: string
 type SourceChoice = { id: string; title: string; rights_status: string };
 
 const makeSlug = (value: string) => value.trim().toLocaleLowerCase("ar")
-  .replace(/[^\\p{L}\\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
+  .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
 
 function AdminPage() {
   const { role } = useAuth();
