@@ -342,3 +342,77 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .admin-footnote svg{flex:0 0 auto;margin-top:2px}
 @media(max-width:900px){.admin-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-editor-grid{grid-template-columns:1fr}.admin-form-wide{max-width:none}}
 @media(max-width:620px){.admin-page-heading{align-items:flex-start;flex-direction:column}.admin-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-editor{padding:10px}.admin-form{padding:15px}.admin-options-grid{grid-template-columns:1fr}.admin-tabs button{min-height:38px;padding:0 10px}}
+
+
+/* Smooth navigation and mobile ergonomics */
+html {
+  scroll-behavior: smooth;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.route-loading {
+  min-height: clamp(320px, 55vh, 560px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #718196;
+  font-size: 13px;
+}
+
+.route-loading > span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dce6ee;
+  border-top-color: #286fa9;
+  border-radius: 50%;
+  animation: yemen-study-spin .75s linear infinite;
+}
+
+@keyframes yemen-study-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 760px) {
+  .mobile-menu {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 44px;
+  }
+
+  .main-nav.open {
+    z-index: 60;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(17px, env(safe-area-inset-bottom));
+  }
+
+  .main-nav > a,
+  .nav-dropdown-trigger,
+  .nav-dropdown-panel a,
+  .main-nav .nav-account {
+    min-height: 44px;
+  }
+
+  .main-nav > a {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-dropdown-panel a {
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .route-loading > span { animation: none; }
+}
