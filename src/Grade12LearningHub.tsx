@@ -1615,8 +1615,7 @@ const revisionGuides: Record<string, RevisionGuide> = {
       "لا تنسب خصائص مدرسة كاملة إلى كل شاعر أو نص دون دليل.",
       "لا تنسخ أبياتاً طويلة؛ استخدم شاهداً قصيراً عند الحاجة ثم حلله."
     ]
-  }
-
+  },
   english: {
     terms:["Adjective: a word that describes a noun.","Material adjective: an adjective that tells what something is made of.","Comparative: a form used to compare two things.","Description: a text that presents observable features and purpose."],
     rules:["Adjectives usually come before nouns or after linking verbs.","Adjectives do not normally change for singular and plural nouns.","A common adjective order is opinion, size, shape, age, colour, origin, material, purpose.","A useful description selects accurate details rather than excessive adjectives."],
