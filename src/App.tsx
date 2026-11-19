@@ -15,6 +15,14 @@ import { GuidedPracticePage, GuidedStudyPage, SmartMarkPage, StrengthsWeaknesses
 import "./study-tools.css";
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
+type AttemptSummary = { id?: string; createdAt?: string; score: number; total: number; source?: string };
+const readAttemptSummaries = (): AttemptSummary[] => {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem("yemen-study-attempts-v1") || "[]");
+    if (!Array.isArray(value)) return [];
+    return (value as AttemptSummary[]).filter((item) => Number.isFinite(item.score) && Number.isFinite(item.total) && item.total > 0);
+  } catch { return []; }
+};
 const PROGRESS_KEY = "yemen-study-progress-v1";
 const readProgress = (): Progress => {
   try {
@@ -92,7 +100,7 @@ function SearchBox({ large = false }: { large?: boolean }) {
   const navigate = useNavigate();
   return <div className={large ? "search-box search-box-large" : "search-box"}>
     <Search size={19}/>
-    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن المادة أو الموضوع أو الصف..." aria-label="ابحث في المنهج"/>
+    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة الدراسية..." aria-label="ابحث في المنهج"/>
     {query && <button className="search-clear" onClick={() => setQuery("")} aria-label="مسح"><X size={15}/></button>}
     <button className="search-action" onClick={() => navigate("/curriculum?q=" + encodeURIComponent(query))}>ابحث <ArrowLeft size={15}/></button>
     {matches.length > 0 && <div className="search-results">{matches.map(({ grade, track, subject }) =>
@@ -145,7 +153,7 @@ function HomePage() {
       </div>
     </section>
     <section className="container search-section">
-      <div><span className="eyebrow">ابدأ المراجعة</span><h2>ماذا تدرس اليوم؟</h2><p>ابحث باسم صفك أو مادتك أو موضوعك.</p></div>
+      <div><span className="eyebrow">ابدأ المراجعة</span><h2>ماذا تدرس اليوم؟</h2><p>ابحث باسم صفك أو مادتك الدراسية.</p></div>
       <SearchBox large/>
     </section>
     <section className="container section">
@@ -360,13 +368,14 @@ function MockExamPage({ addScore }: { addScore: (score: number) => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [seconds, setSeconds] = useState(300);
   const [started, setStarted] = useState(false);
-  useEffect(() => {
-    if (!started || submitted || seconds <= 0) return;
-    const timer = window.setInterval(() => setSeconds((value) => value - 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [started, submitted, seconds]);
   const score = demoLesson.questions.filter((question) => answers[question.id] === question.correctIndex).length;
   const finish = () => { if (submitted) return; setSubmitted(true); addScore(score); };
+  useEffect(() => {
+    if (!started || submitted) return;
+    if (seconds <= 0) { finish(); return; }
+    const timer = window.setInterval(() => setSeconds((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearInterval(timer);
+  }, [started, submitted, seconds, score]);
   const formattedTime = String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
   return <main className="container page mock-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/subject/grade-12/scientific/physics">الفيزياء</Link><ChevronLeft size={14}/><b>اختبار تجريبي</b></div>
@@ -383,12 +392,32 @@ function MockExamPage({ addScore }: { addScore: (score: number) => void }) {
 }
 
 function DashboardPage({ progress }: { progress: Progress }) {
+  const [attempts, setAttempts] = useState<AttemptSummary[]>(readAttemptSummaries);
   const latestScore = progress.quizScores.length ? progress.quizScores[progress.quizScores.length - 1] : undefined;
+  useEffect(() => {
+    const refresh = () => setAttempts(readAttemptSummaries());
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
+  const latestAttempt = attempts[attempts.length - 1];
+  const totalQuestions = attempts.reduce((sum, attempt) => sum + attempt.total, 0);
+  const correctAnswers = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
+  const accuracy = totalQuestions ? Math.round(correctAnswers / totalQuestions * 100) : undefined;
+  const attemptCount = attempts.length + progress.quizScores.length;
   return <main className="container page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>مساحة الطالب</b></div>
-    <div className="page-title-row"><div><span className="eyebrow">مساحة الطالب</span><h1>تقدّمك الدراسي.</h1><p>مكان واحد لمتابعة الدروس المحفوظة والمكتملة ونتائج الاختبارات.</p></div><Link className="btn btn-primary" to="/curriculum">واصل التعلّم <ArrowLeft size={16}/></Link></div>
-    <div className="dashboard-stats"><article><span className="dash-icon"><CheckCircle2/></span><span>دروس مكتملة</span><b>{progress.completed.length}</b><small>من الدروس التي درستها</small></article><article><span className="dash-icon"><Bookmark/></span><span>دروس محفوظة</span><b>{progress.saved.length}</b><small>للعودة إليها لاحقاً</small></article><article><span className="dash-icon"><Trophy/></span><span>اختبارات مكتملة</span><b>{progress.quizScores.length}</b><small>محاولات مسجلة</small></article><article><span className="dash-icon"><Award/></span><span>آخر نتيجة</span><b>{latestScore === undefined ? "—" : latestScore + "/3"}</b><small>في آخر اختبار تجريبي</small></article></div>
-    <div className="dashboard-columns"><section className="dashboard-panel"><div className="panel-heading"><h2>متابعة المراجعة</h2><span>آخر نشاط</span></div>{progress.completed.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><CheckCircle2/><span><b>{demoLesson.title}</b><small>الفيزياء · الثالث الثانوي العلمي</small></span><span className="done-label">مكتمل</span></Link> : <div className="dashboard-empty"><BookOpen/><b>ابدأ أول درس لك</b><p>ستظهر هنا الدروس التي أكملتها وتقدّمك فيها.</p><Link to="/subject/grade-12/scientific/physics" className="text-link">افتح الدرس التجريبي <ArrowLeft size={15}/></Link></div>}</section><section className="dashboard-panel"><div className="panel-heading"><h2>المحفوظات</h2><span>{progress.saved.length} عناصر</span></div>{progress.saved.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><Bookmark/><span><b>{demoLesson.title}</b><small>الفيزياء · ملاحظات المراجعة</small></span><ChevronLeft/></Link> : <div className="dashboard-empty"><Bookmark/><b>لم تحفظ أي درس بعد</b><p>استخدم زر الحفظ في صفحة الدرس للرجوع إلى ملاحظاتك.</p></div>}</section></div>
+    <div className="page-title-row"><div><span className="eyebrow">مساحة الطالب</span><h1>تقدّمك الدراسي.</h1><p>مكان واحد لمتابعة الدروس المحفوظة والاختبارات والموضوعات التي تحتاج إلى مراجعة.</p></div><Link className="btn btn-primary" to="/curriculum">واصل التعلّم <ArrowLeft size={16}/></Link></div>
+    <div className="dashboard-stats">
+      <article><span className="dash-icon"><CheckCircle2/></span><span>دروس مكتملة</span><b>{progress.completed.length}</b><small>من الدروس التي درستها</small></article>
+      <article><span className="dash-icon"><Bookmark/></span><span>دروس محفوظة</span><b>{progress.saved.length}</b><small>للعودة إليها لاحقاً</small></article>
+      <article><span className="dash-icon"><Trophy/></span><span>اختبارات مكتملة</span><b>{attemptCount}</b><small>محاولات مسجلة على هذا الجهاز</small></article>
+      <article><span className="dash-icon"><Award/></span><span>دقة الإجابات</span><b>{accuracy === undefined ? (latestScore === undefined ? "—" : latestScore + "/3") : accuracy + "%"}</b><small>{totalQuestions ? correctAnswers + " من " + totalQuestions + " إجابات صحيحة" : "تظهر بعد أول اختبار"}</small></article>
+    </div>
+    <div className="dashboard-columns">
+      <section className="dashboard-panel"><div className="panel-heading"><h2>متابعة المراجعة</h2><span>آخر نشاط</span></div>{progress.completed.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><CheckCircle2/><span><b>{demoLesson.title}</b><small>الفيزياء · الثالث الثانوي العلمي</small></span><span className="done-label">مكتمل</span></Link> : <div className="dashboard-empty"><BookOpen/><b>ابدأ أول درس لك</b><p>ستظهر هنا الدروس التي أكملتها وتقدّمك فيها.</p><Link to="/subject/grade-12/scientific/physics" className="text-link">افتح الدرس التجريبي <ArrowLeft size={15}/></Link></div>}</section>
+      <section className="dashboard-panel"><div className="panel-heading"><h2>المحفوظات</h2><span>{progress.saved.length} عناصر</span></div>{progress.saved.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><Bookmark/><span><b>{demoLesson.title}</b><small>الفيزياء · ملاحظات المراجعة</small></span><ChevronLeft/></Link> : <div className="dashboard-empty"><Bookmark/><b>لم تحفظ أي درس بعد</b><p>استخدم زر الحفظ في صفحة الدرس للرجوع إلى ملاحظاتك.</p></div>}</section>
+    </div>
+    {attempts.length > 0 && <section className="dashboard-panel dashboard-attempts"><div className="panel-heading"><h2>آخر محاولاتك</h2><span>{attempts.length} اختبارات</span></div>{attempts.slice(-5).reverse().map((attempt, index) => <div className="dashboard-row" key={attempt.id || attempt.createdAt || index}><Trophy/><span><b>{attempt.source === "guided-practice" ? "التدريب الموجّه" : attempt.source === "target-test" ? "الاختبار المستهدف" : "اختبار تدريبي"}</b><small>{attempt.createdAt ? new Date(attempt.createdAt).toLocaleString("ar") : "محاولة محفوظة على هذا الجهاز"}</small></span><span className="done-label">{attempt.score}/{attempt.total}</span></div>)}</section>}
     <div className="data-note"><ShieldCheck size={15}/> بيانات هذه النسخة التجريبية تُخزّن محلياً في المتصفح. مزامنة الحسابات بين الأجهزة تتطلب إعداد قاعدة البيانات.</div>
   </main>;
 }
