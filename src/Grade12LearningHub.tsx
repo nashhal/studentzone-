@@ -2852,9 +2852,7 @@ const revisionGuides: Record<string, RevisionGuide> = {
     rules:["حدد الجنس الأدبي قبل التحليل.","تتفاوت سمات المدارس الأدبية ولا تنطبق آلياً على كل نص.","الشاهد يساند الحكم النقدي عند تفسير اللغة والدلالة.","التلخيص يعرض الفكرة دون نسخ النص."],
     method:["حدد موضوع النص وسياقه.","استخرج السمات الفنية واللغوية.","اربط الشاهد بالفكرة والعاطفة.","قارن الاتجاهات بمعايير واضحة."],
     pitfalls:["لا تصنف النص من عنوانه وحده.","لا تساوِ بين الرومانسية والذاتية المطلقة أو الواقعية والتقرير الحرفي.","لا تعِد نشر نصوص أدبية طويلة."]
-  }
-
-
+  },
   "reading-texts-culture": {
     terms:["Main idea: central message of a reading passage.","Claim: statement the author seeks to establish.","Evidence: information supporting a claim.","Context: surrounding ideas that shape a word or passage meaning."],
     rules:["The title introduces a topic but the passage determines the meaning.","Examples support a claim but do not necessarily exhaust it.","A summary restates the main idea accurately and briefly.","A short quotation should be explained, not left without analysis."],
