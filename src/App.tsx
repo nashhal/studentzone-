@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
+import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
@@ -76,49 +77,49 @@ function Header() {
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [menuOpen]);
-  return <>
-    <div className="announcement"><span><Sparkles size={13}/> منصة مراجعة للمناهج اليمنية</span><span>ملاحظات · تدريب · اختبارات · تقدّمك في مكان واحد</span></div>
-    <header className="site-header">
-      <div className="container header-inner">
+  return <header className="site-header">
+    <div className="container header-inner">
+      <div className="header-brand-group">
         <Link to="/" className="brand" aria-label="Yemen Study">
           <span className="brand-mark"><BookOpenCheck size={23}/></span>
           <span className="brand-copy"><b>Yemen Study</b><small>تعلّم. تدرّب. أتقن.</small></span>
         </Link>
         <button className="mobile-menu" type="button" aria-controls="primary-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}>{menuOpen ? <X/> : <Menu/>}</button>
-        <nav id="primary-navigation" className={menuOpen ? "main-nav open" : "main-nav"}>
-          <NavLink to="/" end onClick={() => setMenuOpen(false)}>الرئيسية</NavLink>
-          <NavLink to="/curriculum" onClick={() => setMenuOpen(false)}>المواد الدراسية</NavLink>
-          <NavLink to="/past-papers" onClick={() => setMenuOpen(false)}>أوراق الامتحانات</NavLink>
-          <NavLink to="/study-plan" onClick={() => setMenuOpen(false)}>خطة المذاكرة</NavLink>
-          <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>مساحة الطالب</NavLink>
-          {(role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>إدارة المحتوى</NavLink>}
-          <div className={toolsOpen ? "nav-dropdown open" : "nav-dropdown"}>
-            <button type="button" className="nav-dropdown-trigger" aria-expanded={toolsOpen} onClick={() => setToolsOpen((open) => !open)}>أدوات الدراسة <ChevronDown size={14}/></button>
-            {toolsOpen && <div className="nav-dropdown-panel">
-              <Link to="/target-test" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={15}/> الاختبار المستهدف</Link>
-              <Link to="/strengths-weaknesses" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Brain size={15}/> نقاط القوة والضعف</Link>
-              <Link to="/guided-study" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><BookOpen size={15}/> الدراسة الموجّهة</Link>
-              <Link to="/guided-practice" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={15}/> التدريب الموجّه</Link>
-              <Link to="/smart-mark" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Sparkles size={15}/> مراجع الإجابة</Link>
-              <Link to="/teacher/test-builder" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><FileText size={15}/> محرر الاختبارات للمعلمين</Link>
-            </div>}
-          </div>
-          {user ? <button className="nav-account" onClick={logout}><LogOut size={15}/> خروج</button> : <Link className="nav-account" to="/login" onClick={() => setMenuOpen(false)}>دخول / حساب جديد <ArrowLeft size={15}/></Link>}
-        </nav>
       </div>
-    </header>
-  </>;
+      <nav id="primary-navigation" className={menuOpen ? "main-nav open" : "main-nav"}>
+        <Link className="header-start-link" to="/curriculum" onClick={() => setMenuOpen(false)}>ابدأ الدراسة <ChevronDown size={17}/></Link>
+        <div className={toolsOpen ? "nav-dropdown open" : "nav-dropdown"}>
+          <button type="button" className="nav-dropdown-trigger" aria-expanded={toolsOpen} onClick={() => setToolsOpen((open) => !open)}>أدوات الدراسة <ChevronDown size={17}/></button>
+          {toolsOpen && <div className="nav-dropdown-panel">
+            <Link to="/target-test" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={17}/> الاختبار المستهدف</Link>
+            <Link to="/strengths-weaknesses" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Brain size={17}/> نقاط القوة والضعف</Link>
+            <Link to="/guided-study" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><BookOpen size={17}/> الدراسة الموجّهة</Link>
+            <Link to="/guided-practice" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={17}/> التدريب الموجّه</Link>
+            <Link to="/smart-mark" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Sparkles size={17}/> مراجع الإجابة</Link>
+            <Link to="/teacher/test-builder" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><FileText size={17}/> محرر الاختبارات للمعلمين</Link>
+          </div>}
+        </div>
+        <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>لوحة الطالب</NavLink>
+        {(role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>إدارة المحتوى</NavLink>}
+      </nav>
+      <div className="header-search-wrap"><SearchBox header/></div>
+      <div className="header-actions">
+        {user ? <button className="nav-account" onClick={logout}><LogOut size={16}/> خروج</button> : <Link className="header-dashboard" to="/login">تسجيل الدخول</Link>}
+        <Link className="header-upgrade" to="/curriculum">اختَر صفك</Link>
+      </div>
+    </div>
+  </header>;
 }
 
-function SearchBox({ large = false }: { large?: boolean }) {
+function SearchBox({ large = false, header = false }: { large?: boolean; header?: boolean }) {
   const [query, setQuery] = useState("");
   const matches = useMemo(() => findSubjects(query).slice(0, 6), [query]);
   const navigate = useNavigate();
-  return <div className={large ? "search-box search-box-large" : "search-box"}>
+  return <div className={header ? "search-box header-search-box" : large ? "search-box search-box-large" : "search-box"}>
     <Search size={19}/>
-    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة الدراسية..." aria-label="ابحث في المنهج"/>
+    <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={header ? "ابحث عن مادة أو درس" : "ابحث عن الصف أو المادة الدراسية..."} aria-label="ابحث في المنهج"/>
     {query && <button className="search-clear" onClick={() => setQuery("")} aria-label="مسح"><X size={15}/></button>}
-    <button className="search-action" onClick={() => navigate("/curriculum?q=" + encodeURIComponent(query))}>ابحث <ArrowLeft size={15}/></button>
+    <button className="search-action" aria-label="ابحث" onClick={() => navigate("/curriculum?q=" + encodeURIComponent(query))}>{header ? <Search size={19}/> : <>ابحث <ArrowLeft size={15}/></>}</button>
     {query.trim().length > 0 && matches.length > 0 && <div className="search-results">{matches.map(({ grade, track, subject }) =>
       <Link key={grade.slug + track.slug + subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
         <span>{subject.name}</span><small>{grade.name} · {track.name}</small><ChevronLeft size={15}/>
@@ -273,6 +274,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const subject = track?.subjects.find((item) => item.slug === subjectSlug);
   const [activeTab, setActiveTab] = useState<StudyTab>("notes");
   const [expanded, setExpanded] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [publishedUnits, setPublishedUnits] = useState<PublishedUnit[]>([]);
   const [contentLoading, setContentLoading] = useState(false);
   const [contentError, setContentError] = useState("");
@@ -361,27 +363,49 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
   const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
 
-  return <main className="container page subject-page">
+  return <main className="page subject-page">
+    <div className={sidebarOpen ? "subject-layout" : "subject-layout sidebar-collapsed"}>
+      {sidebarOpen && <aside className="course-sidebar">
+        <div className="sidebar-hide-row">
+          <button type="button" onClick={() => setSidebarOpen(false)}><ChevronLeft size={19}/> إخفاء القائمة</button>
+        </div>
+        <span className="sidebar-section-label">المقرر</span>
+        <Link className="sidebar-course-picker" to={`/grade/${grade.slug}`}>
+          <BookOpen size={21}/>
+          <span><small>{grade.name} · {track.name}</small><b>{subject.name}</b></span>
+          <ChevronDown size={17}/>
+        </Link>
+        <div className="sidebar-section-label">موارد المقرر</div>
+        <button type="button" className={activeTab === "notes" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("notes")}><BookOpen size={20}/><span>موارد المادة</span></button>
+        <Link className="course-nav-item" to="/strengths-weaknesses"><Brain size={20}/><span>نقاط القوة والضعف</span></Link>
+        <div className="sidebar-section-label">المراجعة</div>
+        <button type="button" className={activeTab === "notes" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("notes")}><Bookmark size={20}/><span>ملاحظات المراجعة</span></button>
+        <button type="button" className={activeTab === "flashcards" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("flashcards")}><Layers3 size={20}/><span>البطاقات التعليمية</span></button>
+        <div className="sidebar-section-label">الاختبارات والتدريب</div>
+        <button type="button" className={activeTab === "questions" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("questions")}><CircleHelp size={20}/><span>أسئلة الامتحان</span></button>
+        <Link className="course-nav-item" to="/target-test"><Target size={20}/><span>الاختبار المستهدف</span></Link>
+        <button type="button" className={activeTab === "papers" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("papers")}><FileText size={20}/><span>أوراق الامتحانات</span></button>
+        <Link className="course-nav-item" to="/mock-exam"><Timer size={20}/><span>الاختبارات التجريبية</span></Link>
+        <div className="sidebar-course-outline">
+          <div className="sidebar-title"><span>فهرس المادة</span><button onClick={() => setExpanded(!expanded)} aria-label="توسيع أو طي فهرس المادة"><ChevronDown className={expanded ? "" : "collapsed"} size={17}/></button></div>
+          {expanded && <div className="sidebar-tree">
+            {isDemo ? <>
+              <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
+              <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={15}/>}</Link>
+            </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
+              <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
+              {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span>{progress.completed.includes(lesson.id) && <Check size={15}/>}</Link>)}
+            </div>) : <div className="tree-placeholder">لا توجد وحدات منشورة لهذه المادة بعد.</div>}
+          </div>}
+        </div>
+      </aside>}
+      <div className="subject-main-column">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
     <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
-    <div className="course-shell">
-      <aside className="course-sidebar">
-        <div className="sidebar-title"><span>محتويات المادة</span><button onClick={() => setExpanded(!expanded)} aria-label="توسيع/طي"><ChevronDown className={expanded ? "" : "collapsed"} size={16}/></button></div>
-        {expanded && <div className="sidebar-tree">
-          {isDemo ? <>
-            <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
-            <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={14}/>}</Link>
-          </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
-            <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
-            {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span>{progress.completed.includes(lesson.id) && <Check size={14}/>}</Link>)}
-          </div>) : <div className="tree-placeholder">لا توجد وحدات منشورة لهذه المادة بعد.</div>}
-        </div>}
-        <div className="sidebar-tools">
-          <Link to="/study-plan"><CalendarDays size={16}/> خطة المذاكرة</Link>
-          <Link to="/dashboard"><Award size={16}/> تقدّم الطالب</Link>
-        </div>
-      </aside>
+
+        <div className="course-shell">
       <section className="course-main">
+        {!sidebarOpen && <button type="button" className="sidebar-show-button" onClick={() => setSidebarOpen(true)}><Menu size={17}/> إظهار القائمة</button>}
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
         {!isDemo ? <>
           {activeTab === "notes" && <div className="resource-list">
@@ -411,6 +435,8 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>لن نعرض أوراقاً غير موثقة. ستضاف نماذج الامتحانات السابقة مع سنة الامتحان ومصدرها ومفتاح الإجابة بعد مراجعة حقوق استخدامها.</p><Link to="/past-papers" className="text-link">عرض مكتبة الأوراق <ArrowLeft size={15}/></Link></div>}
         </>}
       </section>
+        </div>
+      </div>
     </div>
   </main>;
 }
@@ -1019,16 +1045,16 @@ export default function App() {
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
     <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
-    <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
-    <Route path="/target-test" element={<TargetTestPage/>}/>
-    <Route path="/strengths-weaknesses" element={<StrengthsWeaknessesPage/>}/>
-    <Route path="/guided-study" element={<GuidedStudyPage/>}/>
-    <Route path="/guided-practice" element={<GuidedPracticePage/>}/>
-    <Route path="/smart-mark" element={<SmartMarkPage/>}/>
+    <Route path="/mock-exam" element={<StudyToolLayout><MockExamPage addScore={addScore}/></StudyToolLayout>}/>
+    <Route path="/target-test" element={<StudyToolLayout><TargetTestPage/></StudyToolLayout>}/>
+    <Route path="/strengths-weaknesses" element={<StudyToolLayout><StrengthsWeaknessesPage/></StudyToolLayout>}/>
+    <Route path="/guided-study" element={<StudyToolLayout><GuidedStudyPage/></StudyToolLayout>}/>
+    <Route path="/guided-practice" element={<StudyToolLayout><GuidedPracticePage/></StudyToolLayout>}/>
+    <Route path="/smart-mark" element={<StudyToolLayout><SmartMarkPage/></StudyToolLayout>}/>
     <Route path="/teacher/test-builder" element={<TestBuilderPage role={role}/>}/>
-    <Route path="/past-papers" element={<PastPapersPage/>}/>
-    <Route path="/study-plan" element={<StudyPlanPage/>}/>
-    <Route path="/dashboard" element={<DashboardPage progress={progress}/>}/>
+    <Route path="/past-papers" element={<StudyToolLayout><PastPapersPage/></StudyToolLayout>}/>
+    <Route path="/study-plan" element={<StudyToolLayout><StudyPlanPage/></StudyToolLayout>}/>
+    <Route path="/dashboard" element={<StudyToolLayout><DashboardPage progress={progress}/></StudyToolLayout>}/>
     <Route path="/admin" element={<AdminPage/>}/>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="*" element={<NotFound/>}/>
