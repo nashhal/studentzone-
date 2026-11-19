@@ -868,8 +868,7 @@ export function getGrade12Subject(trackSlug: string, subjectSlug: string, editio
     subject.slug === subjectSlug && (subject.track === "both" || subject.track === trackSlug),
   );
   return candidates.find((subject) => subject.edition === edition)
-    ?? candidates.find((subject) => subject.edition === "common-2026")
-    ?? candidates[0];
+    ?? candidates.find((subject) => subject.edition === "common-2026");
 }
 
 export function getGrade12SourceState(status: Grade12Subject["sourceStatus"]): string {
