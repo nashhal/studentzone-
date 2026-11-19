@@ -416,3 +416,11 @@ a {
   html { scroll-behavior: auto; }
   .route-loading > span { animation: none; }
 }
+
+/* Grade 12 Aden learning entry points */
+.g12-grade-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g12-grade-actions .btn{white-space:nowrap}
+@media(max-width:720px){
+  .g12-grade-actions{width:100%}
+  .g12-grade-actions .btn{flex:1 1 180px;justify-content:center}
+}

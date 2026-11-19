@@ -1,0 +1,149 @@
+.g12-learning-page{max-width:1280px}
+.g12-learning-header{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;margin:4px 0 20px}
+.g12-learning-header h1{margin:8px 0;color:var(--navy);font-size:clamp(27px,3.2vw,39px);line-height:1.45}
+.g12-learning-header p{max-width:770px;margin:0;color:#77899a;font-size:12px;line-height:2}
+.g12-learning-header-meta{display:flex;align-items:center;gap:9px;padding:12px 14px;border:1px solid #dfe8ee;background:#f8fafb;color:#55758d;font-size:10px;white-space:nowrap}
+.g12-learning-notice{display:flex;align-items:flex-start;gap:10px;padding:13px 15px;margin-bottom:18px;border:1px solid #dce7ed;background:#f7fafb}
+.g12-learning-notice svg{flex:0 0 auto;margin-top:2px;color:#5c839f}
+.g12-learning-notice p{margin:0;color:#657c90;font-size:10px;line-height:1.9}
+.g12-learning-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px;align-items:start}
+.g12-learning-nav{position:sticky;top:92px;display:grid;gap:7px;padding:15px;border:1px solid var(--line);background:#fff}
+.g12-learning-nav h2{margin:1px 0 8px;color:#385670;font-size:13px}
+.g12-learning-nav-card{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px;padding:9px;border:1px solid #edf1f4;background:#fff;color:#587187;transition:background .15s,border-color .15s}
+.g12-learning-nav-card:hover{border-color:#c5d5e1;background:#fafcfd}
+.g12-learning-nav-card.active{border-color:#7d9eb6;background:#f2f7fa}
+.g12-learning-nav-icon{width:32px;height:32px;display:grid;place-items:center;background:#f0f5f8;color:#527a98}
+.g12-learning-nav-card>span:nth-child(2){display:grid;gap:3px;min-width:0}
+.g12-learning-nav-card b{font-size:10px;color:#3c5871}
+.g12-learning-nav-card small{color:#8796a3;font-size:9px;line-height:1.5}
+.g12-learning-nav-status{font-size:8px;color:#6889a1;white-space:nowrap}
+.g12-learning-pending{margin-top:7px;padding:12px;background:#f8fafb;border:1px solid #e7edf1}
+.g12-learning-pending>b{color:#6a8195;font-size:10px}
+.g12-learning-pending p{margin:5px 0 9px;color:#8a98a5;font-size:9px;line-height:1.7}
+.g12-learning-pending>div{display:flex;flex-wrap:wrap;gap:5px}
+.g12-learning-pending span{padding:4px 6px;border:1px solid #e4eaee;background:#fff;color:#8392a0;font-size:8px}
+.g12-learning-main{display:grid;gap:17px;min-width:0}
+.g12-learning-panel{padding:22px;border:1px solid var(--line);background:#fff;min-width:0}
+.g12-learning-course-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:17px;border-bottom:1px solid #edf1f4}
+.g12-learning-course-head h2{margin:6px 0;color:#2d4b66;font-size:20px;line-height:1.55}
+.g12-learning-course-head p{max-width:780px;margin:0;color:#697f92;font-size:11px;line-height:2}
+.g12-learning-course-head .eyebrow{color:#67839a;font-size:9px;font-weight:700}
+.g12-learning-badge{flex:0 0 auto;padding:7px 9px;border:1px solid #dfe8ee;background:#f8fafb;color:#638199;font-size:9px;white-space:nowrap}
+.g12-learning-outcomes{margin:16px 0;padding:14px 16px;background:#f7fafc;border:1px solid #e4ecf1}
+.g12-learning-outcomes>b{color:#3e5b75;font-size:11px}
+.g12-learning-outcomes ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 20px;margin:9px 0 0;padding-right:18px}
+.g12-learning-outcomes li{color:#637b90;font-size:10px;line-height:1.8}
+.g12-learning-section-list{display:grid;gap:15px}
+.g12-learning-section{padding:0 0 15px;border-bottom:1px solid #edf1f4}
+.g12-learning-section:last-child{padding-bottom:0;border-bottom:0}
+.g12-learning-section h3{margin:0 0 7px;color:#36536e;font-size:14px}
+.g12-learning-section p,.g12-learning-section li{color:#536c82;font-size:11px;line-height:2}
+.g12-learning-section p{margin:0}
+.g12-learning-section ul{margin:8px 0 0;padding-right:20px}
+.g12-learning-section li{padding:2px 0}
+.g12-learning-formula{margin-top:11px;padding:12px 14px;overflow-x:auto;border:1px solid #dfe7ed;background:#f8fafb;color:#254e70;text-align:center;white-space:nowrap;font:600 15px "Cambria Math",Cambria,serif}
+.g12-learning-example{margin-top:18px;padding:16px 18px;border:1px solid #dce6ed;background:#fbfcfd}
+.g12-learning-example>span{color:#68869e;font-size:9px;font-weight:700}
+.g12-learning-example h3{margin:7px 0;color:#35546f;font-size:15px}
+.g12-learning-example p,.g12-learning-example li{color:#5d7488;font-size:10px;line-height:1.9}
+.g12-learning-example ol{margin:8px 0;padding-right:22px}
+.g12-learning-example li{padding:2px 0}
+.g12-learning-example>b{display:block;margin-top:10px;padding-top:10px;border-top:1px solid #e7edf1;color:#315b7a;font-size:11px;line-height:1.8}
+.g12-learning-summary{margin-top:17px;padding:17px 18px;border:1px solid #dce7ef;background:#f2f7fa}
+.g12-learning-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.g12-learning-summary-head h3{margin:4px 0 0;color:#2f506b;font-size:15px}
+.g12-learning-summary-head .eyebrow{color:#7891a6;font-size:9px}
+.g12-learning-summary>ol{margin:0;padding-right:20px}
+.g12-learning-summary>ol li{padding:4px 0;color:#516a80;font-size:10px;line-height:1.9}
+.g12-learning-source{display:flex;align-items:flex-start;gap:10px;margin-top:16px;padding:13px 14px;border:1px solid #e5ebef;background:#fafcfd}
+.g12-learning-source svg{flex:0 0 auto;margin-top:2px;color:#6b8aa2}
+.g12-learning-source>div{display:grid;gap:6px}
+.g12-learning-source b{color:#4c6880;font-size:10px}
+.g12-learning-source a{color:#3d7399;font-size:10px;line-height:1.7}
+.g12-learning-source small{color:#8493a0;font-size:9px;line-height:1.8}
+.g12-learning-panel-title{display:flex;align-items:center;gap:11px;padding-bottom:15px;margin-bottom:16px;border-bottom:1px solid #edf1f4}
+.g12-learning-panel-title>span{width:38px;height:38px;display:grid;place-items:center;background:#eff5f8;color:#517b9b}
+.g12-learning-panel-title h2{margin:0;color:#2f4e68;font-size:17px}
+.g12-learning-panel-title p{margin:4px 0 0;color:#8493a0;font-size:10px}
+.g12-learning-tier-switch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.g12-learning-tier-switch button{display:grid;gap:5px;min-height:72px;padding:11px;text-align:right;border:1px solid #dfe7ed;background:#fff;color:#506a80}
+.g12-learning-tier-switch button.active{border-color:#426e91;background:#f0f6fa;box-shadow:inset 0 0 0 1px #426e91}
+.g12-learning-tier-switch b{color:#31516c;font-size:13px}
+.g12-learning-tier-switch small{color:#8191a0;font-size:9px;line-height:1.6}
+.g12-learning-quiz-meta{display:flex;flex-wrap:wrap;gap:15px;margin:13px 0;padding:10px 0;border-top:1px solid #edf1f4;border-bottom:1px solid #edf1f4;color:#7c8e9e;font-size:9px}
+.g12-learning-quiz-meta span{display:inline-flex;align-items:center;gap:6px}
+.g12-learning-questions{display:grid}
+.g12-learning-question{padding:15px 0;border-bottom:1px solid #edf1f4}
+.g12-learning-question:last-child{border-bottom:0}
+.g12-learning-question-num{color:#7890a3;font-size:9px;font-weight:700}
+.g12-learning-question h3{margin:7px 0 11px;color:#344f68;font-size:12px;line-height:1.9}
+.g12-learning-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.g12-learning-options button{display:flex;align-items:center;gap:8px;min-height:42px;padding:8px 10px;text-align:right;border:1px solid #e1e8ee;background:#fff;color:#5a7185;font-size:10px;line-height:1.7}
+.g12-learning-options button:hover:not(:disabled){border-color:#a8becf;background:#fafcfd}
+.g12-learning-options button i{width:23px;height:23px;display:grid;place-items:center;flex:0 0 23px;background:#f1f5f8;color:#70889d;font-size:9px;font-style:normal}
+.g12-learning-options button.selected{border-color:#789bb6;background:#f2f7fa}
+.g12-learning-options button.correct{border-color:#8eb8a0;background:#f2f8f4;color:#386548}
+.g12-learning-options button.wrong{border-color:#d8a6a0;background:#fff7f6;color:#94534a}
+.g12-learning-explanation{margin-top:10px;padding:11px 12px;border-right:3px solid #83a7c0;background:#f5f8fa}
+.g12-learning-explanation b{color:#426886;font-size:10px}
+.g12-learning-explanation p{margin:5px 0 0;color:#60788d;font-size:10px;line-height:1.9}
+.g12-learning-check{margin-top:9px;padding:7px 10px;border:1px solid #dce6ec;background:#fff;color:#426f91;font-size:9px}
+.g12-learning-check:disabled{opacity:.45;cursor:not-allowed}
+.g12-learning-quiz-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:15px;border-top:1px solid #edf1f4}
+.g12-learning-quiz-footer>span{color:#7b8d9d;font-size:9px}
+.g12-learning-quiz-footer>div{display:flex;gap:7px;flex-wrap:wrap}
+.g12-learning-quiz-footer .btn{font-size:10px}
+.g12-learning-result{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px;border:1px solid #dce7ef;background:#f4f8fb;color:#4c7593}
+.g12-learning-result>div{display:grid;gap:4px}
+.g12-learning-result b{color:#315672;font-size:12px}
+.g12-learning-result span{color:#7a8e9f;font-size:9px}
+.g12-learning-final-note{display:flex;align-items:flex-start;gap:8px;margin:16px 0 0;padding:12px 14px;border:1px solid #e2e9ee;background:#f8fafb;color:#788b9c;font-size:9px;line-height:1.9}
+.g12-learning-final-note svg{flex:0 0 auto;margin-top:2px}
+.g12-learning-print-summary,.g12-learning-print-exam{display:none}
+@media(max-width:980px){.g12-learning-layout{grid-template-columns:250px minmax(0,1fr)}.g12-learning-panel{padding:18px}}
+@media(max-width:760px){.g12-learning-layout{grid-template-columns:1fr}.g12-learning-nav{position:static;grid-template-columns:1fr 1fr}.g12-learning-nav h2,.g12-learning-pending{grid-column:1/-1}.g12-learning-header{align-items:flex-start;flex-direction:column}.g12-learning-header-meta{align-self:flex-start}}
+@media(max-width:560px){.g12-learning-nav{grid-template-columns:1fr}.g12-learning-nav h2,.g12-learning-pending{grid-column:auto}.g12-learning-panel{padding:15px}.g12-learning-course-head{flex-direction:column}.g12-learning-badge{align-self:flex-start}.g12-learning-outcomes ul{grid-template-columns:1fr}.g12-learning-tier-switch{grid-template-columns:1fr}.g12-learning-tier-switch button{min-height:58px}.g12-learning-options{grid-template-columns:1fr}.g12-learning-quiz-footer{align-items:flex-start;flex-direction:column}.g12-learning-quiz-footer>div{width:100%}.g12-learning-quiz-footer .btn{flex:1}.g12-learning-summary-head{align-items:flex-start;flex-direction:column}.g12-learning-summary-head .btn{width:100%}}
+@media print{
+  @page{size:A4;margin:16mm}
+  body[data-g12-learning-print="summary"] *{visibility:hidden!important}
+  body[data-g12-learning-print="summary"] .g12-learning-print-summary,
+  body[data-g12-learning-print="summary"] .g12-learning-print-summary *{visibility:visible!important}
+  body[data-g12-learning-print="summary"] .g12-learning-print-summary{display:block!important;position:absolute!important;inset:0 auto auto 0!important;width:100%!important;color:#111!important;background:#fff!important;font-family:Arial,Tahoma,sans-serif!important;direction:rtl!important}
+  body[data-g12-learning-print="summary"] .g12-learning-print-exam{display:none!important}
+  body[data-g12-learning-print="exam"] *{visibility:hidden!important}
+  body[data-g12-learning-print="exam"] .g12-learning-print-exam,
+  body[data-g12-learning-print="exam"] .g12-learning-print-exam *{visibility:visible!important}
+  body[data-g12-learning-print="exam"] .g12-learning-print-exam{display:block!important;position:absolute!important;inset:0 auto auto 0!important;width:100%!important;color:#111!important;background:#fff!important;font-family:Arial,Tahoma,sans-serif!important;direction:rtl!important}
+  body[data-g12-learning-print="exam"] .g12-learning-print-summary{display:none!important}
+  .g12-learning-print-summary header,.g12-learning-print-exam header{text-align:center;border-bottom:2px solid #222;padding-bottom:12px;margin-bottom:16px}
+  .g12-learning-print-summary header>b,.g12-learning-print-exam header>b{font-size:13px}
+  .g12-learning-print-summary header>span,.g12-learning-print-exam header>span{display:block;margin-top:5px;font-size:10px}
+  .g12-learning-print-summary h1,.g12-learning-print-exam h1{font-size:19px;margin:11px 0 5px}
+  .g12-learning-print-summary h2{font-size:14px;margin:16px 0 7px}
+  .g12-learning-print-summary h3{font-size:12px;margin:10px 0 5px}
+  .g12-learning-print-summary p,.g12-learning-print-summary li{font-size:10px;line-height:1.8}
+  .g12-learning-print-summary ul,.g12-learning-print-summary ol{padding-right:20px}
+  .g12-learning-print-summary section{break-inside:avoid;margin:0 0 12px}
+  .g12-learning-print-summary footer,.g12-learning-print-exam footer{text-align:center;border-top:1px solid #aaa;margin-top:20px;padding-top:8px;font-size:9px}
+  .g12-learning-print-student{display:flex;justify-content:space-between;margin:14px 0 20px;font-size:10px}
+  .g12-learning-print-exam article{break-inside:avoid;margin:0 0 16px;font-size:10px;line-height:1.8}
+  .g12-learning-print-exam article ol{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin:6px 0;padding-right:24px}
+}
+.g12-learning-summary-head p{margin:5px 0 0;color:#8393a2;font-size:9px;line-height:1.7}
+.g12-revision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g12-revision-grid>section{padding:14px 15px;border:1px solid #e2eaf0;background:#fff;min-width:0}
+.g12-revision-grid h4,.g12-learning-summary-quick h4{margin:0 0 9px;color:#345772;font-size:11px;line-height:1.7}
+.g12-revision-grid ul,.g12-revision-grid ol{margin:0;padding-right:18px}
+.g12-revision-grid li{padding:3px 0;color:#5b7184;font-size:9px;line-height:1.9}
+.g12-learning-summary-quick{margin-top:12px;padding:14px 15px;border:1px solid #dce6ed;background:#f9fbfc}
+.g12-learning-summary-quick ol{margin:0;padding-right:19px}
+.g12-learning-summary-quick li{padding:3px 0;color:#526a7f;font-size:9px;line-height:1.85}
+.g12-print-revision h3{margin-top:12px}
+.g12-print-revision ul,.g12-print-revision ol{margin-top:4px}
+.g12-print-revision li{margin:2px 0}
+@media(max-width:650px){.g12-revision-grid{grid-template-columns:1fr}}
+@media print{
+  .g12-learning-print-summary section.g12-print-revision{break-inside:auto!important}
+  .g12-learning-print-summary section.g12-print-revision h3{break-after:avoid}
+  .g12-learning-print-summary section.g12-print-revision li{break-inside:avoid}
+}
