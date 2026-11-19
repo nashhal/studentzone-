@@ -593,7 +593,7 @@ function AdminPage() {
         summary: lessonForm.summary.trim(), content_md: lessonForm.content_md,
         objectives, estimated_minutes: Math.max(1, Number(lessonForm.estimated_minutes) || 15),
         sort_order: lessons.length + 1, status: "draft", access_level: "free",
-      });
+      }).select("id").single();
       if (error) throw error;
       const lessonReferences = [
         {
