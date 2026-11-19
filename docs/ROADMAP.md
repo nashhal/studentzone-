@@ -98,3 +98,15 @@ This repository contains a working product prototype. It is not yet a complete Y
 - [ ] Author, independently solve, teacher-review and publish every unit and lesson in verified batches.
 
 The source framework does not mean the library is complete. The only lesson currently authored in the frontend remains an unverified demonstration lesson.
+
+
+## In-site content delivery
+
+- [x] Render published lessons inside Yemen Study instead of sending students to external pages.
+- [x] Add an internal Markdown lesson reader for headings, paragraphs, lists, worked steps and formula blocks.
+- [x] Display units and published lessons on each matching in-site subject page.
+- [x] Keep source attribution non-clickable in the student view; source URLs remain editorial metadata.
+- [x] Seed the database with the provisional Grades 1–12 subject/track navigation index.
+- [ ] Apply migrations 0002 and 0003 in Supabase and verify the provisional index against the intended education authority and region.
+- [ ] Complete database question, flashcard and exam rendering; implement trusted grading before exposing correct answers.
+- [ ] Author the actual grade-level lesson library in reviewed batches. The internal reader and catalogue do not mean every grade-level lesson has been written yet.
