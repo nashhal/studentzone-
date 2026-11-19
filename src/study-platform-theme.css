@@ -12,7 +12,7 @@
   --soft: #f8f8fa;
   --surface: #ffffff;
   --shadow-soft: 0 12px 36px rgba(20, 24, 34, .055);
-  font-family: "Dialogue Variable Trial", "RTL-Bushra", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+  font-family: "IBM Plex Sans Arabic", "IBM Plex Sans", "Segoe UI", Tahoma, Arial, sans-serif;
   color: var(--ink);
   background: #fff;
   font-size: 16px;
