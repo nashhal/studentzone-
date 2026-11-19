@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2, ChevronLeft,
+  ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2, ChevronLeft, FileText,
   RotateCcw, ShieldCheck, Sparkles, Target, Timer, Trophy, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
