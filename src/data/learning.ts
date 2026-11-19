@@ -9,9 +9,9 @@ export type Question = {
 
 export type Flashcard = { front: string; back: string };
 export type LessonSource = {
+  id: string;
   title: string;
   publisher: string;
-  url: string;
   locator: string;
   role: string;
   note: string;
@@ -75,7 +75,7 @@ export const demoLesson: Lesson = {
     {
       title: "University Physics Volume 1 — Section 2.1: Scalars and Vectors",
       publisher: "OpenStax, Rice University",
-      url: "https://openstax.org/books/university-physics-volume-1/pages/2-1-scalars-and-vectors",
+      id: "openstax-university-physics-1-2-1",
       locator: "Section 2.1",
       role: "مرجع للتحقق من المفاهيم الأساسية والتمييز بين الكميات القياسية والمتجهة.",
       note: "استُخدم للتحقق العلمي فقط؛ الشرح والأمثلة والأسئلة في هذا النموذج مكتوبة بصورة مستقلة، ولا يُدّعى أن الدرس مطابق لطبعة يمنية."
@@ -83,7 +83,7 @@ export const demoLesson: Lesson = {
     {
       title: "SI Units",
       publisher: "National Institute of Standards and Technology (NIST)",
-      url: "https://www.nist.gov/pml/owm/metric-si/si-units",
+      id: "nist-si-units",
       locator: "Base and Derived Units",
       role: "مرجع للتحقق من أسماء وحدات النظام الدولي ورموزها.",
       note: "مرجع معياري للوحدات، وليس مصدراً لتحديد ترتيب المنهج اليمني."
