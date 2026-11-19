@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
@@ -11,7 +11,12 @@ import { useAuth } from "./lib/auth";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
-import { GuidedPracticePage, GuidedStudyPage, SmartMarkPage, StrengthsWeaknessesPage, TargetTestPage, TestBuilderPage } from "./StudyTools";
+const TargetTestPage = lazy(() => import("./StudyTools").then(({ TargetTestPage }) => ({ default: TargetTestPage })));
+const StrengthsWeaknessesPage = lazy(() => import("./StudyTools").then(({ StrengthsWeaknessesPage }) => ({ default: StrengthsWeaknessesPage })));
+const GuidedStudyPage = lazy(() => import("./StudyTools").then(({ GuidedStudyPage }) => ({ default: GuidedStudyPage })));
+const GuidedPracticePage = lazy(() => import("./StudyTools").then(({ GuidedPracticePage }) => ({ default: GuidedPracticePage })));
+const SmartMarkPage = lazy(() => import("./StudyTools").then(({ SmartMarkPage }) => ({ default: SmartMarkPage })));
+const TestBuilderPage = lazy(() => import("./StudyTools").then(({ TestBuilderPage }) => ({ default: TestBuilderPage })));
 import "./study-tools.css";
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
@@ -60,6 +65,17 @@ function Header() {
   const [toolsOpen, setToolsOpen] = useState(false);
   const navigate = useNavigate();
   const logout = async () => { await signOut(); navigate("/"); setMenuOpen(false); };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setToolsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   return <>
     <div className="announcement"><span><Sparkles size={13}/> منصة مراجعة للمناهج اليمنية</span><span>ملاحظات · تدريب · اختبارات · تقدّمك في مكان واحد</span></div>
     <header className="site-header">
@@ -68,8 +84,8 @@ function Header() {
           <span className="brand-mark"><BookOpenCheck size={23}/></span>
           <span className="brand-copy"><b>Yemen Study</b><small>تعلّم. تدرّب. أتقن.</small></span>
         </Link>
-        <button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="القائمة">{menuOpen ? <X/> : <Menu/>}</button>
-        <nav className={menuOpen ? "main-nav open" : "main-nav"}>
+        <button className="mobile-menu" type="button" aria-controls="primary-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}>{menuOpen ? <X/> : <Menu/>}</button>
+        <nav id="primary-navigation" className={menuOpen ? "main-nav open" : "main-nav"}>
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>الرئيسية</NavLink>
           <NavLink to="/curriculum" onClick={() => setMenuOpen(false)}>المواد الدراسية</NavLink>
           <NavLink to="/past-papers" onClick={() => setMenuOpen(false)}>أوراق الامتحانات</NavLink>
@@ -103,7 +119,7 @@ function SearchBox({ large = false }: { large?: boolean }) {
     <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة الدراسية..." aria-label="ابحث في المنهج"/>
     {query && <button className="search-clear" onClick={() => setQuery("")} aria-label="مسح"><X size={15}/></button>}
     <button className="search-action" onClick={() => navigate("/curriculum?q=" + encodeURIComponent(query))}>ابحث <ArrowLeft size={15}/></button>
-    {matches.length > 0 && <div className="search-results">{matches.map(({ grade, track, subject }) =>
+    {query.trim().length > 0 && matches.length > 0 && <div className="search-results">{matches.map(({ grade, track, subject }) =>
       <Link key={grade.slug + track.slug + subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
         <span>{subject.name}</span><small>{grade.name} · {track.name}</small><ChevronLeft size={15}/>
       </Link>)}</div>}
@@ -689,7 +705,7 @@ export default function App() {
   const { loading, role } = useAuth();
   const { progress, complete, toggleSaved, addScore } = useStudyProgress();
   if (loading) return <div className="app-loading"><BookOpenCheck/> Yemen Study</div>;
-  return <div className="app-shell"><Header/><Routes>
+  return <div className="app-shell"><Header/><Suspense fallback={<div className="route-loading" role="status" aria-live="polite"><span/>جارٍ فتح الصفحة...</div>}><Routes>
     <Route path="/" element={<HomePage/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
@@ -708,5 +724,5 @@ export default function App() {
     <Route path="/admin" element={<AdminPage/>}/>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="*" element={<NotFound/>}/>
-  </Routes><footer className="site-footer"><div className="container footer-inner"><Link to="/" className="footer-brand"><span className="brand-mark"><BookOpenCheck size={19}/></span><b>Yemen Study</b></Link><span>منصة مراجعة للمناهج اليمنية</span><div><Link to="/curriculum">المواد الدراسية</Link><Link to="/study-plan">خطة المذاكرة</Link><Link to="/dashboard">مساحة الطالب</Link></div><small>© {new Date().getFullYear()} Yemen Study</small></div></footer></div>;
+  </Routes></Suspense><footer className="site-footer"><div className="container footer-inner"><Link to="/" className="footer-brand"><span className="brand-mark"><BookOpenCheck size={19}/></span><b>Yemen Study</b></Link><span>منصة مراجعة للمناهج اليمنية</span><div><Link to="/curriculum">المواد الدراسية</Link><Link to="/study-plan">خطة المذاكرة</Link><Link to="/dashboard">مساحة الطالب</Link></div><small>© {new Date().getFullYear()} Yemen Study</small></div></footer></div>;
 }
