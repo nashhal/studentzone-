@@ -21,6 +21,7 @@ const TestBuilderPage = lazy(() => import("./StudyTools").then(({ TestBuilderPag
 import "./study-tools.css";
 const Grade12PhysicsStudyPage = lazy(() => import("./Grade12Study").then(({ default: Page }) => ({ default: Page })));
 const Grade12BooksPage = lazy(() => import("./Grade12Books").then(({ default: Page }) => ({ default: Page })));
+const Grade12LearningHubPage = lazy(() => import("./Grade12LearningHub").then(({ default: Page }) => ({ default: Page })));
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
 type AttemptSummary = { id?: string; createdAt?: string; score: number; total: number; source?: string };
@@ -236,7 +237,7 @@ function GradePage() {
   return <main className="container page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد</Link><ChevronLeft size={14}/><b>{grade.name}</b></div>
     <div className="page-title-row"><div><span className="eyebrow">{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"}</span><h1>{grade.name}</h1><p>{grade.description}</p></div><div className="catalog-count"><b>{getSubjectCount(grade)}</b><span>مادة / مسار</span></div></div>
-    {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب حسب المسار والمنطقة والطبعة</span><Link className="btn btn-primary" to="/grade-12-books"><BookOpen size={16}/> فتح مكتبة الكتب <ArrowLeft size={15}/></Link></div>}
+    {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب ومركز الشرح والاختبارات — منهج عدن</span><div className="g12-grade-actions"><Link className="btn btn-outline" to="/grade-12-books"><BookOpen size={16}/> مكتبة الكتب</Link><Link className="btn btn-primary" to="/grade-12-learning"><BookOpenCheck size={16}/> الشرح والملخصات والاختبارات <ArrowLeft size={15}/></Link></div></div>}
     {grade.tracks.length > 1 && <div className="filter-pills track-pills">{grade.tracks.map((item) => <button key={item.slug} className={track.slug === item.slug ? "filter-pill active" : "filter-pill"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="subject-list-heading"><h2>المواد الدراسية</h2><span>{track.name}</span></div>
     <div className="subject-grid">{track.subjects.map((subject, index) => <Link className="subject-tile" key={subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
@@ -1050,6 +1051,7 @@ export default function App() {
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/grade-12-study" element={<Grade12PhysicsStudyPage/>}/>
     <Route path="/grade-12-books" element={<Grade12BooksPage/>}/>
+    <Route path="/grade-12-learning" element={<Grade12LearningHubPage/>}/>
     <Route path="/mock-exam" element={<StudyToolLayout><MockExamPage addScore={addScore}/></StudyToolLayout>}/>
     <Route path="/target-test" element={<StudyToolLayout><TargetTestPage/></StudyToolLayout>}/>
     <Route path="/strengths-weaknesses" element={<StudyToolLayout><StrengthsWeaknessesPage/></StudyToolLayout>}/>
