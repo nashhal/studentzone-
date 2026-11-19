@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
@@ -250,6 +250,22 @@ const tabs: { id: StudyTab; label: string; icon: typeof BookOpen }[] = [
   { id: "papers", label: "أوراق الامتحانات", icon: FileText },
 ];
 
+type PublishedLessonSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  estimated_minutes: number;
+  unit_id: string;
+};
+type PublishedUnit = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  lessons: PublishedLessonSummary[];
+};
+
 function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSaved: (id: string) => void }) {
   const { gradeSlug = "", trackSlug = "", subjectSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
@@ -257,18 +273,108 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const subject = track?.subjects.find((item) => item.slug === subjectSlug);
   const [activeTab, setActiveTab] = useState<StudyTab>("notes");
   const [expanded, setExpanded] = useState(true);
+  const [publishedUnits, setPublishedUnits] = useState<PublishedUnit[]>([]);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [contentError, setContentError] = useState("");
   const isDemo = gradeSlug === "grade-12" && trackSlug === "scientific" && subjectSlug === "physics";
+
+  useEffect(() => {
+    let active = true;
+    const loadPublishedContent = async () => {
+      if (isDemo) {
+        setPublishedUnits([]);
+        setContentError("");
+        setContentLoading(false);
+        return;
+      }
+      if (!supabase) {
+        setPublishedUnits([]);
+        setContentError("مكتبة الدروس ستظهر هنا بعد ربط قاعدة بيانات المحتوى. لن نحيل الطالب إلى مواقع أو ملفات خارجية.");
+        setContentLoading(false);
+        return;
+      }
+      setContentLoading(true);
+      setContentError("");
+      try {
+        const [subjectResult, gradeResult, trackResult] = await Promise.all([
+          supabase.from("subjects").select("id").eq("slug", subjectSlug).maybeSingle(),
+          supabase.from("grades").select("id").eq("slug", gradeSlug).maybeSingle(),
+          supabase.from("tracks").select("id").eq("slug", trackSlug).maybeSingle(),
+        ]);
+        const firstError = [subjectResult, gradeResult, trackResult].find((item) => item.error);
+        if (firstError?.error) throw firstError.error;
+        if (!subjectResult.data || !gradeResult.data || !trackResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const gradeTrackResult = await supabase.from("grade_tracks").select("id")
+          .eq("grade_id", gradeResult.data.id).eq("track_id", trackResult.data.id).maybeSingle();
+        if (gradeTrackResult.error) throw gradeTrackResult.error;
+        if (!gradeTrackResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const curriculumResult = await supabase.from("curriculum_subjects").select("id")
+          .eq("grade_track_id", gradeTrackResult.data.id)
+          .eq("subject_id", subjectResult.data.id).eq("is_active", true).maybeSingle();
+        if (curriculumResult.error) throw curriculumResult.error;
+        if (!curriculumResult.data) {
+          if (active) setPublishedUnits([]);
+          return;
+        }
+        const unitsResult = await supabase.from("units")
+          .select("id,title,slug,description")
+          .eq("curriculum_subject_id", curriculumResult.data.id)
+          .eq("status", "published").order("sort_order");
+        if (unitsResult.error) throw unitsResult.error;
+        const unitRows = unitsResult.data ?? [];
+        const lessonRows = unitRows.length
+          ? await supabase.from("lessons")
+              .select("id,title,slug,summary,estimated_minutes,unit_id")
+              .in("unit_id", unitRows.map((unit) => unit.id))
+              .eq("status", "published").order("sort_order")
+          : { data: [], error: null };
+        if (lessonRows.error) throw lessonRows.error;
+        const lessonsByUnit = new Map<string, PublishedLessonSummary[]>();
+        for (const lesson of lessonRows.data ?? []) {
+          const current = lessonsByUnit.get(lesson.unit_id) ?? [];
+          current.push(lesson as PublishedLessonSummary);
+          lessonsByUnit.set(lesson.unit_id, current);
+        }
+        const mapped = unitRows
+          .map((unit) => ({ ...unit, lessons: lessonsByUnit.get(unit.id) ?? [] }))
+          .filter((unit) => unit.lessons.length > 0) as PublishedUnit[];
+        if (active) setPublishedUnits(mapped);
+      } catch (error) {
+        if (active) setContentError(error instanceof Error ? error.message : "تعذّر تحميل الدروس المنشورة.");
+      } finally {
+        if (active) setContentLoading(false);
+      }
+    };
+    void loadPublishedContent();
+    return () => { active = false; };
+  }, [gradeSlug, trackSlug, subjectSlug, isDemo]);
+
   if (!grade || !track || !subject) return <NotFound/>;
   const lessonDone = progress.completed.includes(demoLesson.slug);
+  const allPublishedLessons = publishedUnits.flatMap((unit) => unit.lessons);
+  const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
+  const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
+
   return <main className="container page subject-page">
-    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={"/grade/" + grade.slug}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : "0%"}</b><div className="progress-track"><i style={{ width: isDemo && lessonDone ? "100%" : "0%" }}/></div></div></div>
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div></div>
     <div className="course-shell">
       <aside className="course-sidebar">
         <div className="sidebar-title"><span>محتويات المادة</span><button onClick={() => setExpanded(!expanded)} aria-label="توسيع/طي"><ChevronDown className={expanded ? "" : "collapsed"} size={16}/></button></div>
         {expanded && <div className="sidebar-tree">
-          <div className="tree-unit"><span className="tree-unit-dot"/> {isDemo ? demoCourse.unitTitle : "الوحدات والموضوعات"}</div>
-          {isDemo ? <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={14}/>}</Link> : <div className="tree-placeholder">تُضاف الموضوعات بعد توثيق فهرس الطبعة الدراسية المعتمدة.</div>}
+          {isDemo ? <>
+            <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
+            <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={14}/>}</Link>
+          </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
+            <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
+            {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span>{progress.completed.includes(lesson.id) && <Check size={14}/>}</Link>)}
+          </div>) : <div className="tree-placeholder">لا توجد وحدات منشورة لهذه المادة بعد.</div>}
         </div>}
         <div className="sidebar-tools">
           <Link to="/study-plan"><CalendarDays size={16}/> خطة المذاكرة</Link>
@@ -277,12 +383,23 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
       </aside>
       <section className="course-main">
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
-        {!isDemo ? <div className="content-coming">
-          <span className="content-icon"><BookOpen size={26}/></span><span className="content-status">قيد إعداد المحتوى</span>
-          <h2>مساحة {subject.name} جاهزة لاستقبال مواردها.</h2>
-          <p>ستظهر هنا ملاحظات الدروس والأسئلة والبطاقات والاختبارات بعد توثيق وحدات الكتاب والطبعة المعتمدة. لم نضع دروساً عشوائية أو عناوين غير مؤكدة.</p>
-          <div className="coming-feature-grid"><span><BookOpen/> ملاحظات المراجعة</span><span><Target/> الأسئلة والإجابات</span><span><Layers3/> البطاقات التعليمية</span><span><Timer/> الاختبارات التجريبية</span></div>
-        </div> : <>
+        {!isDemo ? <>
+          {activeTab === "notes" && <div className="resource-list">
+            <div className="resource-toolbar"><div><span className="content-status">مكتبة المادة</span><h2>الدروس والمراجعة</h2><p>تظهر هنا الدروس المنشورة بعد مراجعتها. افتح الدرس واقرأ الشرح وحل أمثلته داخل الموقع.</p></div></div>
+            {contentLoading ? <div className="content-loading" role="status">جارٍ تحميل الدروس المنشورة...</div> : contentError ? <div className="content-coming"><span className="content-status">المكتبة الداخلية</span><h2>محتوى المادة داخل Yemen Study</h2><p>{contentError}</p></div> : publishedUnits.length ? publishedUnits.map((unit) => <section className="published-unit" key={unit.id}>
+              <div className="published-unit-heading"><span className="eyebrow">وحدة دراسية</span><h3>{unit.title}</h3>{unit.description && <p>{unit.description}</p>}</div>
+              {unit.lessons.map((lesson) => <Link className="lesson-row" key={lesson.id} to={`/library-lesson/${lesson.id}`}>
+                <span className="lesson-row-icon"><FileText size={19}/></span>
+                <span className="lesson-row-copy"><b>{lesson.title}</b><small>{lesson.estimated_minutes} دقيقة{lesson.summary ? " · " + lesson.summary : ""}</small></span>
+                <span className="lesson-row-state">{progress.completed.includes(lesson.id) ? <><CheckCircle2 size={15}/> مكتمل</> : "افتح الدرس"}</span><ChevronLeft size={17}/>
+              </Link>)}
+            </section>) : <div className="content-coming"><span className="content-icon"><BookOpen size={26}/></span><span className="content-status">لا توجد دروس منشورة بعد</span><h2>ستجد شروحات المادة هنا.</h2><p>سيظهر كل شرح وأمثلة ومسائل وتدريبات داخل هذه الصفحة. لا نعتمد على روابط خارجية كبديل عن الدرس.</p><div className="coming-feature-grid"><span><BookOpen/> شرح كامل</span><span><Target/> مسائل محلولة</span><span><Layers3/> بطاقات مراجعة</span><span><Timer/> اختبارات داخلية</span></div></div>}
+          </div>}
+          {activeTab === "questions" && <div className="content-coming"><span className="content-status">تدريب داخل الموقع</span><h2>أسئلة الموضوع</h2><p>ستظهر الأسئلة المرتبطة بالدروس المنشورة هنا بعد تفعيل التصحيح الآمن. لن نرسل إجابات الطالب إلى موقع خارجي.</p></div>}
+          {activeTab === "flashcards" && <div className="content-coming"><span className="content-status">مراجعة داخل الموقع</span><h2>بطاقات المادة</h2><p>ستُنشأ البطاقات من مفاهيم الدروس المنشورة وتظهر داخل هذه الصفحة.</p></div>}
+          {activeTab === "exams" && <div className="content-coming"><span className="content-status">اختبارات داخل الموقع</span><h2>اختبارات المادة</h2><p>سيُبنى الاختبار من بنك الأسئلة المعتمد، وتظهر النتيجة والتفسيرات داخل Yemen Study.</p></div>}
+          {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>ستُعرض أوراق الامتحانات التي يسمح باستخدامها داخل المكتبة، أو تُبنى اختبارات تدريبية أصلية داخل الموقع.</p></div>}
+        </> : <>
           {activeTab === "notes" && <div className="resource-list">
             <div className="resource-toolbar"><div><span className="content-status">نموذج تفاعلي</span><h2>ملاحظات المراجعة</h2><p>ملاحظات تعليمية منظمة مع أمثلة وتلخيص سريع.</p></div><button className={progress.saved.includes(demoLesson.slug) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(demoLesson.slug)}><Bookmark size={16}/>{progress.saved.includes(demoLesson.slug) ? "محفوظ" : "احفظ الدرس"}</button></div>
             <Link className="lesson-row" to="/lesson/scalars-and-vectors"><span className="lesson-row-icon"><FileText size={19}/></span><span className="lesson-row-copy"><b>{demoLesson.title}</b><small>{demoLesson.duration} دقيقة · {demoLesson.sections.length} أقسام · مثال محلول</small></span><span className="lesson-row-state">{lessonDone ? <><CheckCircle2 size={15}/> مكتمل</> : "ابدأ الدرس"}</span><ChevronLeft size={17}/></Link>
@@ -295,6 +412,181 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
         </>}
       </section>
     </div>
+  </main>;
+}
+
+
+type PublishedLessonRecord = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  content_md: string;
+  objectives: string[];
+  estimated_minutes: number;
+  unit_id: string;
+};
+type LessonReferenceRecord = {
+  reference_role: string;
+  source_locator: string | null;
+  content_sources: { title: string; publisher: string | null } | null;
+};
+
+function InlineLessonText({ value }: { value: string }) {
+  const parts = value.split(/(\\*\\*[^*]+\\*\\*|\\*[^*]+\\*|\`[^\`]+\`)/g);
+  return <>{parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
+    if (part.startsWith("\`") && part.endsWith("\`")) return <code key={index}>{part.slice(1, -1)}</code>;
+    return part;
+  })}</>;
+}
+
+function LessonMarkdown({ content }: { content: string }) {
+  const lines = content.replace(/\\r/g, "").split("\\n");
+  const blocks: ReactNode[] = [];
+  let paragraph: string[] = [];
+  let list: string[] = [];
+  let listType: "ul" | "ol" | null = null;
+  const flushParagraph = () => {
+    if (paragraph.length) {
+      blocks.push(<p key={`p-${blocks.length}`}><InlineLessonText value={paragraph.join(" ")}/></p>);
+      paragraph = [];
+    }
+  };
+  const flushList = () => {
+    if (list.length && listType) {
+      const ListTag = listType;
+      blocks.push(<ListTag key={`list-${blocks.length}`}>{list.map((item, index) => <li key={index}><InlineLessonText value={item}/></li>)}</ListTag>);
+    }
+    list = [];
+    listType = null;
+  };
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (!line) { flushParagraph(); flushList(); continue; }
+    if (line.startsWith("```")) {
+      flushParagraph(); flushList();
+      const codeLines: string[] = [];
+      while (index + 1 < lines.length && !lines[index + 1].trim().startsWith("```")) {
+        index += 1; codeLines.push(lines[index]);
+      }
+      if (index + 1 < lines.length) index += 1;
+      blocks.push(<pre className="lesson-code-block" key={`code-${blocks.length}`}><code>{codeLines.join("\\n")}</code></pre>);
+      continue;
+    }
+    if (line === "$" || (line.startsWith("$") && line.endsWith("$") && line.length > 4)) {
+      flushParagraph(); flushList();
+      if (line.length > 4) blocks.push(<div className="lesson-formula" dir="ltr" key={`math-${blocks.length}`}>{line.slice(2, -2).trim()}</div>);
+      else {
+        const mathLines: string[] = [];
+        while (index + 1 < lines.length && lines[index + 1].trim() !== "$") {
+          index += 1; mathLines.push(lines[index].trim());
+        }
+        if (index + 1 < lines.length) index += 1;
+        blocks.push(<div className="lesson-formula" dir="ltr" key={`math-${blocks.length}`}>{mathLines.join(" ")}</div>);
+      }
+      continue;
+    }
+    const heading = line.match(/^(#{1,3})\\s+(.+)$/);
+    if (heading) {
+      flushParagraph(); flushList();
+      const level = heading[1].length;
+      const text = <InlineLessonText value={heading[2]}/>;
+      if (level === 1) blocks.push(<h2 key={`h-${blocks.length}`}>{text}</h2>);
+      else if (level === 2) blocks.push(<h3 key={`h-${blocks.length}`}>{text}</h3>);
+      else blocks.push(<h4 key={`h-${blocks.length}`}>{text}</h4>);
+      continue;
+    }
+    if (line.startsWith(">")) {
+      flushParagraph(); flushList();
+      blocks.push(<blockquote key={`q-${blocks.length}`}><InlineLessonText value={line.slice(1).trim()}/></blockquote>);
+      continue;
+    }
+    if (/^[-*]\\s+/.test(line) || /^\\d+[.)]\\s+/.test(line)) {
+      flushParagraph();
+      const nextType = /^\\d+[.)]\\s+/.test(line) ? "ol" : "ul";
+      if (listType && listType !== nextType) flushList();
+      listType = nextType;
+      list.push(line.replace(/^([-*]|\\d+[.)])\\s+/, ""));
+      continue;
+    }
+    if (/^---+$/.test(line)) {
+      flushParagraph(); flushList();
+      blocks.push(<hr key={`hr-${blocks.length}`}/>);
+      continue;
+    }
+    flushList();
+    paragraph.push(line);
+  }
+  flushParagraph(); flushList();
+  return <div className="lesson-markdown">{blocks}</div>;
+}
+
+function PublishedLessonPage() {
+  const { lessonId = "" } = useParams();
+  const [lesson, setLesson] = useState<PublishedLessonRecord | null>(null);
+  const [unitTitle, setUnitTitle] = useState("");
+  const [references, setReferences] = useState<LessonReferenceRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      if (!supabase) {
+        setError("مكتبة الدروس تحتاج إلى ربط قاعدة البيانات. سيبقى محتوى الدروس داخل Yemen Study عند تفعيلها.");
+        setLoading(false);
+        return;
+      }
+      setLoading(true); setError("");
+      try {
+        const result = await supabase.from("lessons")
+          .select("id,title,slug,summary,content_md,objectives,estimated_minutes,unit_id")
+          .eq("id", lessonId).eq("status", "published").maybeSingle();
+        if (result.error) throw result.error;
+        if (!result.data) {
+          if (active) { setLesson(null); setError("هذا الدرس غير موجود أو لم يُنشر بعد."); }
+          return;
+        }
+        const [unitResult, sourceResult] = await Promise.all([
+          supabase.from("units").select("id,title").eq("id", result.data.unit_id).maybeSingle(),
+          supabase.from("lesson_sources")
+            .select("reference_role,source_locator,content_sources(title,publisher)")
+            .eq("lesson_id", lessonId),
+        ]);
+        if (unitResult.error) throw unitResult.error;
+        if (sourceResult.error) throw sourceResult.error;
+        if (active) {
+          setLesson(result.data as PublishedLessonRecord);
+          setUnitTitle(unitResult.data?.title ?? "");
+          setReferences((sourceResult.data ?? []) as unknown as LessonReferenceRecord[]);
+        }
+      } catch (loadError) {
+        if (active) setError(loadError instanceof Error ? loadError.message : "تعذّر تحميل الدرس.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void load();
+    return () => { active = false; };
+  }, [lessonId]);
+
+  if (loading) return <main className="container page"><div className="content-loading" role="status">جارٍ فتح الدرس داخل الموقع...</div></main>;
+  if (!lesson) return <main className="container page"><div className="content-coming"><span className="content-status">مكتبة Yemen Study</span><h1>تعذّر فتح الدرس</h1><p>{error || "الدرس غير متاح حالياً."}</p><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد الدراسية</Link></div></main>;
+
+  return <main className="container page lesson-page published-lesson-page">
+    <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد الدراسية</Link><ChevronLeft size={14}/>{unitTitle && <><span>{unitTitle}</span><ChevronLeft size={14}/></>}<b>{lesson.title}</b></div>
+    <article className="lesson-main published-lesson-main">
+      <span className="content-status">درس منشور داخل Yemen Study</span>
+      <h1>{lesson.title}</h1>
+      {lesson.summary && <p className="lesson-lead">{lesson.summary}</p>}
+      <div className="lesson-meta"><span><Clock3 size={15}/>{lesson.estimated_minutes} دقيقة</span><span><BookOpen size={15}/>شرح ومراجعة</span></div>
+      {lesson.objectives?.length > 0 && <section className="lesson-objectives"><h2><Target size={19}/> أهداف التعلّم</h2><ul>{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></section>}
+      <LessonMarkdown content={lesson.content_md}/>
+      {references.length > 0 && <section className="lesson-sources"><h2><FileText size={18}/> توثيق المحتوى</h2><p>هذه المراجع استُخدمت للتحقق من المنهج والمعلومات. الشرح المعروض والأسئلة والأنشطة التعليمية متاحة داخل Yemen Study.</p><div>{references.map((reference, index) => <article key={index}><div><b>{reference.content_sources?.title ?? "مرجع موثق"}</b><small>{reference.content_sources?.publisher ?? "جهة النشر غير محددة"}{reference.source_locator ? " · " + reference.source_locator : ""}</small><p>{reference.reference_role === "curriculum_alignment" ? "مرجع مطابقة المنهج" : reference.reference_role === "fact_check" ? "مرجع للتحقق العلمي" : "مرجع إضافي"}</p></div></article>)}</div></section>}
+      <div className="lesson-next"><div><span className="eyebrow">انتهيت من القراءة؟</span><h2>راجع الأفكار وحل التدريب.</h2><p>تظهر الأنشطة المرتبطة بهذا الدرس ضمن مكتبة المادة.</p></div><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد <ArrowLeft size={16}/></Link></div>
+    </article>
   </main>;
 }
 
@@ -733,6 +1025,7 @@ export default function App() {
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
+    <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/mock-exam" element={<MockExamPage addScore={addScore}/>}/>
     <Route path="/target-test" element={<TargetTestPage/>}/>
