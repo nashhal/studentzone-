@@ -36,6 +36,7 @@ function make(name, instructions, role, reportRoot, options = {}) {
   return new Agent({
     name, instructions: base, model: options.model || MODEL,
     outputType: options.outputType || Report,
+    modelSettings: { store: false, maxTokens: 1800 },
     tools: options.tools(reportRoot, role),
   });
 }
