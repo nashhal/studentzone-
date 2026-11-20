@@ -1,0 +1,17 @@
+{
+  "name": "yemen-study-academic-agents",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "run": "node run.mjs",
+    "check": "node run.mjs --check"
+  },
+  "dependencies": {
+    "@openai/agents": "latest",
+    "zod": "^4.0.0"
+  }
+}
