@@ -1692,3 +1692,141 @@ main.container.page {
     transform: none !important;
   }
 }
+
+
+/* Grade 12 learning, book library and practice views share the same surfaces. */
+:where(.g12-learning-panel,.g12-learning-nav,.g12-books-sourcebar,.g12-book-card,
+.g12-books-bottom,.g12-panel,.g12-worked-example,.g12-summary-box,
+.g12-reference-note,.tool-workspace,.mock-workspace,.plan-card,.plan-side,
+.login-card,.paper-library-empty) {
+  border-color: #e0e8f0 !important;
+  border-radius: 12px;
+}
+
+:where(.g12-learning-panel,.g12-learning-nav,.g12-book-card,.g12-panel,
+.tool-workspace,.mock-workspace,.plan-card,.plan-side,.login-card) {
+  background: #fff;
+  box-shadow: 0 5px 17px rgba(20,43,67,.035);
+}
+
+:where(.g12-learning-header h1,.g12-books-heading h1,.g12-study-heading h1,
+.g12-learning-course-head h2,.g12-learning-panel-title h2,
+.g12-panel-title h2,.g12-book-card h2) {
+  color: var(--ys-navy);
+  font-weight: 800;
+}
+
+:where(.g12-learning-notice,.g12-books-notice,.g12-learning-outcomes,
+.g12-learning-example,.g12-learning-summary,.g12-worked-example,.g12-summary-box) {
+  border-radius: 9px;
+  background: #f7f9fd;
+  border-color: #e3eaf3;
+}
+
+:where(.g12-learning-nav-card,.g12-books-filters button,
+.g12-tier-switch button,.g12-learning-tier-switch button,
+.g12-options button,.answer-option) {
+  border-radius: 8px;
+  transition: border-color 170ms ease, background-color 170ms ease, transform 170ms ease;
+}
+
+:where(.g12-learning-nav-card:hover,.g12-book-card:hover,.g12-options button:hover:not(:disabled),
+.g12-tier-switch button:hover,.g12-learning-tier-switch button:hover) {
+  border-color: #bdcde2;
+}
+
+:where(.g12-learning-nav-card.active,.g12-tier-switch button.active,
+.g12-learning-tier-switch button.active,.g12-books-filters button.active) {
+  border-color: var(--ys-blue);
+  background: #eef3ff;
+  color: var(--ys-blue-deep);
+}
+
+.g12-learning-nav-icon,.g12-book-icon,.g12-panel-title>span {
+  border: 1px solid #dce7f7;
+  border-radius: 9px;
+  background: #edf3ff;
+  color: var(--ys-blue);
+}
+
+:where(.g12-books-search,.g12-books-selects select,.g12-options button,
+.g12-learning-tier-switch button,.g12-tier-switch button) {
+  border-color: #dfe7f0;
+}
+
+:where(.g12-books-search:focus-within,.g12-books-selects select:focus,
+.g12-options button:focus-visible) {
+  outline-color: rgba(53,104,232,.25);
+  border-color: #a8bff5;
+}
+
+:where(.g12-books-bottom,.g12-learning-source,.g12-learning-pending) {
+  border-radius: 9px;
+  background: #f9fbfe;
+}
+
+:where(.tool-page-intro h1,.tool-workspace-head h2,.tool-result>h2,
+.mock-intro h1,.mock-start h2,.plan-card h2,.plan-side h3) {
+  color: var(--ys-navy);
+  font-weight: 800;
+}
+
+:where(.tool-workspace,.g12-panel,.g12-learning-panel,.g12-books-sourcebar) {
+  padding: clamp(16px,2vw,24px);
+}
+
+:where(.g12-learning-layout,.g12-study-layout) {
+  align-items: start;
+}
+
+.g12-learning-formula,.g12-formula {
+  border-radius: 8px;
+  border-color: #e0e8f0;
+  background: #f7f9fd;
+  color: #254b70;
+}
+
+.g12-learning-tier-switch button.active,.g12-tier-switch button.active {
+  box-shadow: inset 0 0 0 1px var(--ys-blue);
+}
+
+:where(.g12-learning-panel-title>span,.g12-panel-title>span,
+.g12-learning-nav-icon,.g12-book-icon,.tool-result-icon) {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+@media (max-width: 760px) {
+  :where(.g12-learning-panel,.g12-panel,.tool-workspace,.mock-workspace) {
+    padding: 15px;
+  }
+  :where(.g12-learning-header,.g12-books-heading,.g12-study-heading,.tool-page-intro) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  :where(.g12-learning-layout,.g12-study-layout) {
+    grid-template-columns: minmax(0,1fr);
+  }
+  :where(.g12-learning-nav,.g12-study-layout aside) {
+    position: static;
+  }
+  :where(.g12-books-grid,.g12-learning-outcomes ul,.g12-options,.g12-example-grid) {
+    grid-template-columns: minmax(0,1fr);
+  }
+  :where(.g12-quiz-footer,.g12-books-toolbar,.g12-books-bottom) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  :where(.g12-quiz-footer .btn,.g12-books-bottom .btn) {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.g12-learning-nav-card,.g12-books-filters button,.g12-tier-switch button,
+  .g12-learning-tier-switch button,.g12-options button,.answer-option) {
+    transition: none !important;
+  }
+}
