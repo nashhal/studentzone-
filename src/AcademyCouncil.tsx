@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   Activity, Archive, ArrowLeft, BookOpenCheck, Bot, Check, CheckCircle2,
   ClipboardList, FileCheck2, FlaskConical, Gauge, ListChecks, Plus,
-  ShieldAlert, ShieldCheck, Target, Trash2, Users, WandSparkles
+  ShieldAlert, ShieldCheck, Trash2, Users
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "./lib/auth";
