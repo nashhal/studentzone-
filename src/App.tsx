@@ -9,7 +9,6 @@ import {
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
-import { FadeContent } from "./components/animations/FadeContent";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
@@ -83,7 +82,7 @@ function Header() {
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [menuOpen]);
-  return <header className="site-header">
+  return <header className="site-header ys-site-header">
     <div className="container header-inner">
       <div className="header-brand-group">
         <Link to="/" className="brand" aria-label="Yemen Study">
@@ -143,10 +142,15 @@ function GradeCard({ grade }: { grade: GradeEntry }) {
 }
 
 function ToolCard({ icon: Icon, title, description, to, tag }: { icon: typeof BookOpen; title: string; description: string; to: string; tag?: string }) {
-  return <Link className="tool-card" to={to}>
-    <span className="tool-icon"><Icon size={22}/></span>
-    {tag && <small className="tool-tag">{tag}</small>}
-    <h3>{title}</h3><p>{description}</p><span className="tool-link">ابدأ الآن <ArrowLeft size={15}/></span>
+  return <Link className="tool-card ys-tool-card" to={to}>
+    <span className="ys-tool-number" aria-hidden="true"/>
+    <span className="tool-icon"><Icon size={21}/></span>
+    <span className="ys-tool-copy">
+      {tag && <small className="ys-tool-tag">{tag}</small>}
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </span>
+    <span className="ys-tool-arrow" aria-hidden="true"><ArrowLeft size={17}/></span>
   </Link>;
 }
 
@@ -154,64 +158,117 @@ function HomePage() {
   const demoGrade = getGrade("grade-12");
   const demoTrack = demoGrade?.tracks.find((item) => item.slug === "scientific");
   const demoPhysics = demoTrack?.subjects.find((item) => item.slug === "physics");
-  return <main>
-    <section className="hero">
-      <div className="container hero-inner">
-        <div className="hero-copy">
-          <span className="hero-kicker"><span/> منصة المراجعة للمناهج اليمنية</span>
-          <h1>كل ما تحتاجه<br/><em>لتستعد لامتحاناتك.</em></h1>
-          <p>ملاحظات مراجعة مرتبة، أسئلة حسب الموضوع، بطاقات تعليمية واختبارات تدريبية. اختر صفك ومادتك وابدأ من حيث أنت.</p>
-          <div className="hero-buttons"><Link className="btn btn-primary" to="/curriculum">استكشف المواد <ArrowLeft size={17}/></Link><Link className="btn btn-outline" to="/study-plan">أنشئ خطة مذاكرتك</Link></div>
-          <div className="hero-trust"><ShieldCheck size={16}/> محتوى تعليمي أصلي، مرتبط بالمنهج ويُراجع قبل اعتماده.</div>
+
+  return <main className="ys-home-page">
+    <section className="ys-hero">
+      <div className="container ys-hero-grid">
+        <div className="ys-hero-copy">
+          <span className="ys-eyebrow"><span/> منصة المراجعة للمناهج اليمنية</span>
+          <h1>تعلّم بتركيز.<br/><em>وتقدّم بثقة.</em></h1>
+          <p>مساحة منظّمة تجمع شرح الدروس، والتدريب حسب الموضوع، والاختبارات ومتابعة التقدّم. ابدأ من صفك وانتقل إلى مادتك بخطوات واضحة.</p>
+          <div className="ys-hero-actions">
+            <Link className="btn btn-primary" to="/curriculum">استكشف المنهج <ArrowLeft size={17}/></Link>
+            <Link className="btn btn-outline" to="/study-plan">أنشئ خطة مذاكرة</Link>
+          </div>
+          <div className="ys-hero-assurance"><ShieldCheck size={16}/> محتوى المراجعة والاختبارات يظهر داخل المنصة.</div>
         </div>
-        <FadeContent className="hero-visual-motion" delay={0.08}>
-          <div className="hero-visual" aria-label="أدوات المراجعة">
-          <div className="hero-visual-top"><span>مساحة المراجعة</span><span className="live-dot"/> <small>ابدأ التعلّم</small></div>
-          <div className="hero-visual-title">خطوة صغيرة<br/>كل يوم تصنع فرقاً.</div>
-          <div className="hero-visual-list">
-            <div><span className="visual-icon"><BookOpen size={18}/></span><span><b>ملاحظات منظمة</b><small>افهم الفكرة قبل حفظها</small></span><span className="visual-index">01</span></div>
-            <div><span className="visual-icon"><Target size={18}/></span><span><b>تدريب حسب الموضوع</b><small>اختبر فهمك مباشرة</small></span><span className="visual-index">02</span></div>
-            <div><span className="visual-icon"><Trophy size={18}/></span><span><b>تابع تقدّمك</b><small>اعرف ما أتقنته وما يحتاج مراجعة</small></span><span className="visual-index">03</span></div>
+        <figure className="ys-hero-figure">
+          <img
+            className="ys-hero-image"
+            src="https://images.pexels.com/photos/16420237/pexels-photo-16420237.jpeg?auto=compress&cs=tinysrgb&w=1800"
+            alt="طالب يراجع دراسته باستخدام الحاسوب والكتب في مكتبة"
+            loading="eager"
+            fetchPriority="high"
+          />
+          <figcaption>
+            <span>التعلّم المستمر يبدأ بخطوة</span>
+            <small>Photo: Ludovic Delot / Pexels</small>
+          </figcaption>
+          <div className="ys-photo-note">
+            <span className="ys-photo-note-icon"><BookOpenCheck size={18}/></span>
+            <span><b>مسار دراسي متكامل</b><small>افهم · طبّق · راجع</small></span>
           </div>
-          <div className="hero-visual-bottom"><span>YEMEN STUDY</span><span>LEARN · PRACTISE · MASTER</span></div>
-          </div>
-        </FadeContent>
+        </figure>
       </div>
     </section>
-    <section className="container search-section">
-      <div><span className="eyebrow">ابدأ المراجعة</span><h2>ماذا تدرس اليوم؟</h2><p>ابحث باسم صفك أو مادتك الدراسية.</p></div>
+
+    <section className="container ys-search-section">
+      <div>
+        <span className="eyebrow">ابدأ من هنا</span>
+        <h2>ما المادة التي تراجعها اليوم؟</h2>
+        <p>ابحث باسم الصف أو المادة للوصول إلى صفحة الدراسة.</p>
+      </div>
       <SearchBox large/>
     </section>
-    <section className="container section">
-      <div className="section-heading"><div><span className="eyebrow">أدوات التعلّم</span><h2>كل طريقة للمراجعة، في مكان واحد.</h2></div><p>انتقل بسلاسة من فهم الدرس إلى التدريب ثم قياس مستواك.</p></div>
-      <div className="tools-grid">
-        <ToolCard icon={BookOpen} title="ملاحظات المراجعة" description="شروحات منظمة، مفاهيم أساسية، قوانين ورسوم وأمثلة محلولة." to="/curriculum" tag="افهم"/>
-        <ToolCard icon={Target} title="أسئلة حسب الموضوع" description="تدرّب على أسئلة متدرجة واكشف سبب صحة الإجابة." to="/curriculum" tag="تدرّب"/>
-        <ToolCard icon={Brain} title="البطاقات التعليمية" description="اختبر تذكّرك للمفاهيم والتعاريف في جلسات قصيرة." to="/subject/grade-12/scientific/physics" tag="تذكّر"/>
-        <ToolCard icon={Timer} title="الاختبارات التجريبية" description="حاكي أجواء الاختبار وتعرّف على نتيجتك ونقاط ضعفك." to="/mock-exam" tag="اختبر"/>
-        <ToolCard icon={FileText} title="أوراق الامتحانات" description="مساحة للامتحانات السابقة ونماذج الإجابة المعتمدة." to="/past-papers" tag="استعد"/>
-        <ToolCard icon={CalendarDays} title="خطة المذاكرة" description="قسّم وقتك إلى مهام يومية وتابع ما أنجزته." to="/study-plan" tag="نظّم"/>
-        <ToolCard icon={Target} title="الاختبار المستهدف" description="اختر مستوى الصعوبة والوقت وركّز على موضوع محدد." to="/target-test" tag="ركّز"/>
-        <ToolCard icon={Brain} title="نقاط القوة والضعف" description="اعرف الأسئلة التي تتقنها والتي تحتاج إلى مراجعة." to="/strengths-weaknesses" tag="حلّل"/>
-        <ToolCard icon={BookOpen} title="الدراسة الموجّهة" description="تعلّم الموضوع خطوة بخطوة مع تلميحات توضيحية." to="/guided-study" tag="تعلّم"/>
-        <ToolCard icon={Target} title="التدريب الموجّه" description="حل سؤالاً في كل مرة وتابع تفسير الإجابة." to="/guided-practice" tag="تدرّب"/>
-        <ToolCard icon={Sparkles} title="مراجع الإجابة" description="راجع إجابتك وفق عناصر أساسية ونموذج للمقارنة." to="/smart-mark" tag="راجع"/>
+
+    <section className="container ys-skills-section">
+      <div className="ys-section-heading">
+        <div><span className="eyebrow">مهارات التعلّم</span><h2>ابنِ الفهم، لا تكتفِ بالحفظ.</h2></div>
+        <p>قسّم التعلّم إلى مهارات واضحة، ثم انتقل من المعرفة إلى التطبيق والتحليل.</p>
+      </div>
+      <div className="ys-skill-grid">
+        <Link className="ys-skill-card" to="/curriculum">
+          <div className="ys-skill-image"><img src="https://images.pexels.com/photos/6208709/pexels-photo-6208709.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="طلاب يجرون تجربة في مختبر للفيزياء" loading="lazy"/><span>01 / SCIENCE</span></div>
+          <div className="ys-skill-body"><small>الفهم والاستكشاف</small><h3>افهم المفاهيم العلمية</h3><p>اربط التعريفات والقوانين بالأمثلة والتجارب التوضيحية.</p><span className="ys-skill-cta">استكشف المواد <ArrowLeft size={15}/></span></div>
+        </Link>
+        <Link className="ys-skill-card" to="/curriculum">
+          <div className="ys-skill-image"><img src="https://images.pexels.com/photos/6281016/pexels-photo-6281016.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="طالبان يتعاونان على الدراسة في المكتبة" loading="lazy"/><span>02 / PRACTICE</span></div>
+          <div className="ys-skill-body"><small>التطبيق وحل المسائل</small><h3>درّب مهارة الحل</h3><p>تدرّج في الأسئلة، وراجع خطوات الحل وسبب صحة الإجابة.</p><span className="ys-skill-cta">ابدأ التدريب <ArrowLeft size={15}/></span></div>
+        </Link>
+        <Link className="ys-skill-card" to="/study-plan">
+          <div className="ys-skill-image"><img src="https://images.pexels.com/photos/8199659/pexels-photo-8199659.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="طلاب يدرسون في مكتبة جامعية" loading="lazy"/><span>03 / REVIEW</span></div>
+          <div className="ys-skill-body"><small>التنظيم والمراجعة</small><h3>حوّل المذاكرة إلى عادة</h3><p>خطّط للجلسات القصيرة، وراجع تقدمك وعد إلى ما حفظته.</p><span className="ys-skill-cta">أنشئ خطتك <ArrowLeft size={15}/></span></div>
+        </Link>
       </div>
     </section>
-    <section className="grade-band">
-      <div className="container">
-        <div className="section-heading"><div><span className="eyebrow">اختر مرحلتك وصفك</span><h2>ابدأ من المنهج الذي تدرسه.</h2></div><Link className="text-link" to="/curriculum">عرض جميع الصفوف <ArrowLeft size={16}/></Link></div>
-        <div className="grades-grid">{grades.map((grade) => <GradeCard key={grade.slug} grade={grade}/>)}</div>
+
+    <section className="ys-tools-band">
+      <div className="container ys-tools-layout">
+        <div className="ys-tools-intro">
+          <span className="eyebrow">أدوات الدراسة</span>
+          <h2>من الدرس<br/>إلى الاختبار.</h2>
+          <p>أدوات متصلة تساعدك على فهم المادة ثم تطبيقها وقياس ما تعلمته.</p>
+          <Link to="/curriculum" className="ys-inline-link">تصفّح جميع الصفوف <ArrowLeft size={16}/></Link>
+          <div className="ys-tools-total"><b>11</b><span>أداة للتعلّم<br/>والمراجعة</span></div>
+        </div>
+        <div className="ys-tool-list">
+          <ToolCard icon={BookOpen} title="ملاحظات المراجعة" description="شروحات منظمة، مفاهيم أساسية، قوانين وأمثلة محلولة." to="/curriculum" tag="افهم"/>
+          <ToolCard icon={Target} title="أسئلة حسب الموضوع" description="تدرّب على أسئلة متدرجة وافهم سبب صحة الإجابة." to="/curriculum" tag="تدرّب"/>
+          <ToolCard icon={Brain} title="البطاقات التعليمية" description="راجع التعاريف والمفاهيم في جلسات قصيرة." to="/subject/grade-12/scientific/physics" tag="تذكّر"/>
+          <ToolCard icon={Timer} title="الاختبارات التجريبية" description="اختبر فهمك وتعرّف على الموضوعات التي تحتاج مراجعة." to="/mock-exam" tag="اختبر"/>
+          <ToolCard icon={FileText} title="أوراق الامتحانات" description="نماذج وأوراق تدريبية ضمن مكتبة المنصة." to="/past-papers" tag="استعد"/>
+          <ToolCard icon={CalendarDays} title="خطة المذاكرة" description="قسّم وقتك إلى مهام وتابع ما أنجزته." to="/study-plan" tag="نظّم"/>
+          <ToolCard icon={Target} title="الاختبار المستهدف" description="اختر موضوعاً ومستوى صعوبة محدداً." to="/target-test" tag="ركّز"/>
+          <ToolCard icon={Brain} title="نقاط القوة والضعف" description="راجع أداءك وحدد ما يحتاج إلى تدريب إضافي." to="/strengths-weaknesses" tag="حلّل"/>
+          <ToolCard icon={BookOpen} title="الدراسة الموجّهة" description="تعلّم الموضوع خطوة بخطوة مع تلميحات." to="/guided-study" tag="تعلّم"/>
+          <ToolCard icon={Target} title="التدريب الموجّه" description="حل سؤالاً في كل مرة وتابع تفسير الإجابة." to="/guided-practice" tag="طبّق"/>
+          <ToolCard icon={Sparkles} title="مراجع الإجابة" description="قارن إجابتك بعناصر التقييم الأساسية." to="/smart-mark" tag="راجع"/>
+        </div>
       </div>
     </section>
-    <section className="container section featured-section">
-      <div className="section-heading"><div><span className="eyebrow">جرّب تجربة المذاكرة</span><h2>ادخل إلى مساحة الدرس التفاعلية.</h2></div></div>
-      <Link className="featured-course" to={demoGrade && demoTrack && demoPhysics ? "/subject/" + demoGrade.slug + "/" + demoTrack.slug + "/" + demoPhysics.slug : "/curriculum"}>
-        <div className="featured-course-art"><span>PHYSICS</span><BookOpenCheck size={58}/><small>YEMEN STUDY · DEMO LESSON</small></div>
-        <div className="featured-course-copy"><span className="course-status">نموذج تفاعلي للتجربة</span><h3>الفيزياء · الثالث الثانوي العلمي</h3><p>شاهد كيف ستعمل ملاحظات الدروس والأسئلة والبطاقات والاختبارات داخل المنصة.</p><span className="tool-link">افتح المادة التجريبية <ArrowLeft size={15}/></span></div>
+
+    <section className="container ys-grade-section">
+      <div className="ys-section-heading">
+        <div><span className="eyebrow">فهرس المنهج</span><h2>اختر صفك ومسارك الدراسي.</h2><p>تصفّح الصفوف والمواد حسب المرحلة التعليمية.</p></div>
+        <Link to="/curriculum" className="ys-inline-link">جميع الصفوف <ArrowLeft size={16}/></Link>
+      </div>
+      <div className="ys-grade-grid">{grades.map((grade) => <GradeCard key={grade.slug} grade={grade}/>)}</div>
+    </section>
+
+    <section className="container ys-featured-section">
+      <div className="ys-section-heading">
+        <div><span className="eyebrow">تجربة داخل المنصة</span><h2>ابدأ من صفحة مادة تفاعلية.</h2><p>استكشف تجربة الدرس والموارد والأسئلة والبطاقات التعليمية.</p></div>
+      </div>
+      <Link className="ys-featured-course" to={demoGrade && demoTrack && demoPhysics ? "/subject/" + demoGrade.slug + "/" + demoTrack.slug + "/" + demoPhysics.slug : "/curriculum"}>
+        <img src="https://images.pexels.com/photos/6208709/pexels-photo-6208709.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="طلاب يعملون في مختبر للفيزياء" loading="lazy"/>
+        <span className="ys-featured-overlay"><small>GRADE 12 · SCIENTIFIC TRACK</small><b>الفيزياء · الثالث الثانوي العلمي</b><em>افتح المادة التجريبية <ArrowLeft size={15}/></em></span>
       </Link>
     </section>
-    <section className="bottom-cta"><div className="container bottom-cta-inner"><div><span className="eyebrow">خطوتك التالية</span><h2>ابدأ بمادة واحدة، وتقدّم بثبات.</h2><p>اختر صفك وابنِ عادة مراجعة تناسب وقتك.</p></div><Link className="btn btn-light" to="/curriculum">اختر المادة <ArrowLeft size={17}/></Link></div></section>
+
+    <section className="ys-bottom-cta">
+      <div className="container"><span className="eyebrow">ابدأ الآن</span><h2>اختر مادة واحدة، وابدأ بخطوة واضحة.</h2><p>المراجعة المنظمة تبدأ من مكان تعرف كيف تعود إليه.</p><Link className="btn btn-light" to="/curriculum">اختر صفك <ArrowLeft size={17}/></Link></div>
+    </section>
+    <p className="ys-photo-credits">الصور: Ludovic Delot، cottonbro studio، Yaroslav Shuraev، عبر <a href="https://www.pexels.com/license/" target="_blank" rel="noreferrer">ترخيص Pexels</a>.</p>
   </main>;
 }
 
@@ -220,7 +277,7 @@ function CurriculumPage() {
   const [query, setQuery] = useState(new URLSearchParams(window.location.search).get("q") || "");
   const filtered = grades.filter((grade) => (stage === "all" || grade.stage === stage) &&
     (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim())))));
-  return <main className="container page">
+  return <main className="container page ys-curriculum-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>المواد الدراسية</b></div>
     <div className="page-title-row"><div><span className="eyebrow">فهرس المنهج</span><h1>اختر صفك الدراسي.</h1><p>تصفّح المواد حسب الصف والمسار، ثم افتح موارد كل مادة.</p></div><div className="catalog-count"><b>{countAllSubjectEntries()}</b><span>مادة/مسار في الفهرس الأولي</span></div></div>
     <div className="catalog-toolbar"><div className="filter-pills">
@@ -240,7 +297,7 @@ function GradePage() {
   const [trackSlug, setTrackSlug] = useState(grade?.tracks[0]?.slug || "general");
   if (!grade) return <NotFound/>;
   const track = grade.tracks.find((item) => item.slug === trackSlug) || grade.tracks[0];
-  return <main className="container page">
+  return <main className="container page ys-grade-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد</Link><ChevronLeft size={14}/><b>{grade.name}</b></div>
     <div className="page-title-row"><div><span className="eyebrow">{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"}</span><h1>{grade.name}</h1><p>{grade.description}</p></div><div className="catalog-count"><b>{getSubjectCount(grade)}</b><span>مادة / مسار</span></div></div>
     {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب ومركز الشرح والاختبارات — منهج عدن</span><div className="g12-grade-actions"><Link className="btn btn-outline" to="/grade-12-books"><BookOpen size={16}/> مكتبة الكتب</Link><Link className="btn btn-primary" to="/grade-12-learning"><BookOpenCheck size={16}/> الشرح والملخصات والاختبارات <ArrowLeft size={15}/></Link></div></div>}
@@ -373,7 +430,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
   const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
 
-  return <main className="page subject-page">
+  return <main className="page subject-page ys-subject-page">
     <div className={sidebarOpen ? "subject-layout" : "subject-layout sidebar-collapsed"}>
       {sidebarOpen && <aside className="course-sidebar">
         <div className="sidebar-hide-row">
@@ -413,6 +470,16 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
     <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div>{isDemo && <Link className="btn btn-primary g12-subject-cta" to="/grade-12-study">ملخصات واختبارات متدرجة <ArrowLeft size={15}/></Link>}</div>
 
+
+        <section className="ys-subject-feature">
+          <img src={isDemo ? "https://images.pexels.com/photos/6208709/pexels-photo-6208709.jpeg?auto=compress&cs=tinysrgb&w=1200" : "https://images.pexels.com/photos/6281016/pexels-photo-6281016.jpeg?auto=compress&cs=tinysrgb&w=1200"} alt={isDemo ? "طلاب يجرون تجربة علمية في المختبر" : "طلاب يتعاونون في الدراسة داخل المكتبة"} loading="lazy"/>
+          <div className="ys-subject-feature-copy">
+            <small>مسار التعلّم · {grade.name} · {track.name}</small>
+            <h2>تعلّم المفهوم، ثم طبّقه، ثم اختبر فهمك.</h2>
+            <div className="ys-subject-skill-tags"><span>01 الفهم</span><span>02 التطبيق</span><span>03 التقييم</span></div>
+          </div>
+          <small className="ys-subject-photo-credit">Photo: cottonbro studio / Yaroslav Shuraev · Pexels</small>
+        </section>
         <div className="course-shell">
       <section className="course-main">
         {!sidebarOpen && <button type="button" className="sidebar-show-button" onClick={() => setSidebarOpen(true)}><Menu size={17}/> إظهار القائمة</button>}
@@ -755,7 +822,7 @@ function DashboardPage({ progress }: { progress: Progress }) {
   const correctAnswers = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
   const accuracy = totalQuestions ? Math.round(correctAnswers / totalQuestions * 100) : undefined;
   const attemptCount = attempts.length + progress.quizScores.length;
-  return <main className="container page">
+  return <main className="container page ys-dashboard-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>مساحة الطالب</b></div>
     <div className="page-title-row"><div><span className="eyebrow">مساحة الطالب</span><h1>تقدّمك الدراسي.</h1><p>مكان واحد لمتابعة الدروس المحفوظة والاختبارات والموضوعات التي تحتاج إلى مراجعة.</p></div><Link className="btn btn-primary" to="/curriculum">واصل التعلّم <ArrowLeft size={16}/></Link></div>
     <div className="dashboard-stats">
@@ -764,6 +831,29 @@ function DashboardPage({ progress }: { progress: Progress }) {
       <article><span className="dash-icon"><Trophy/></span><span>اختبارات مكتملة</span><b>{attemptCount}</b><small>محاولات مسجلة على هذا الجهاز</small></article>
       <article><span className="dash-icon"><Award/></span><span>دقة الإجابات</span><b>{accuracy === undefined ? (latestScore === undefined ? "—" : latestScore + "/3") : accuracy + "%"}</b><small>{totalQuestions ? correctAnswers + " من " + totalQuestions + " إجابات صحيحة" : "تظهر بعد أول اختبار"}</small></article>
     </div>
+    <section className="ys-performance-panel" aria-labelledby="ys-performance-title">
+      <div className="ys-performance-heading">
+        <div><span className="eyebrow">مقاييس التعلّم</span><h2 id="ys-performance-title">مؤشرات أدائك المسجّلة.</h2><p>تُحدّث هذه المؤشرات من الدروس والاختبارات المحفوظة على هذا الجهاز.</p></div>
+        <span className="ys-performance-mark"><Award size={18}/> متابعة شخصية</span>
+      </div>
+      <div className="ys-performance-grid">
+        <div className="ys-performance-item"><span>الدروس المكتملة</span><b>{progress.completed.length}</b><small>دروس تم تسجيل إكمالها</small></div>
+        <div className="ys-performance-item"><span>المحاولات المسجلة</span><b>{attemptCount}</b><small>اختبارات وتدريبات محفوظة</small></div>
+        <div className="ys-performance-item ys-performance-accuracy">
+          <span>دقة الإجابات</span>
+          <b>{accuracy === undefined ? "—" : accuracy + "%"}</b>
+          <div className="ys-accuracy-track" role="progressbar" aria-label="دقة الإجابات المسجلة" aria-valuemin={0} aria-valuemax={100} aria-valuenow={accuracy ?? 0}><i style={{ width: (accuracy ?? 0) + "%" }}/></div>
+          <small>{totalQuestions ? correctAnswers + " إجابة صحيحة من " + totalQuestions : "تظهر النسبة بعد أول اختبار مسجل"}</small>
+        </div>
+        <div className="ys-performance-item"><span>الدروس المحفوظة</span><b>{progress.saved.length}</b><small>موارد أضفتها إلى محفوظاتك</small></div>
+      </div>
+      <div className="ys-mastery-guide">
+        <div><span className="ys-mastery-index">01</span><span><b>تعرّف</b><small>اقرأ الشرح وحدد المفاهيم الأساسية.</small></span></div>
+        <div><span className="ys-mastery-index">02</span><span><b>تدرّب</b><small>حل الأسئلة وراجع خطوات الحل.</small></span></div>
+        <div><span className="ys-mastery-index">03</span><span><b>أتقن</b><small>تحقق من فهمك عبر اختبار جديد.</small></span></div>
+      </div>
+      <p className="ys-metric-note">ملاحظة: دقة الإجابات مؤشر إجمالي للمحاولات المحفوظة، وليست درجة إتقان مستقلة لكل مهارة أو مادة.</p>
+    </section>
     <div className="dashboard-columns">
       <section className="dashboard-panel"><div className="panel-heading"><h2>متابعة المراجعة</h2><span>آخر نشاط</span></div>{progress.completed.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><CheckCircle2/><span><b>{demoLesson.title}</b><small>الفيزياء · الثالث الثانوي العلمي</small></span><span className="done-label">مكتمل</span></Link> : <div className="dashboard-empty"><BookOpen/><b>ابدأ أول درس لك</b><p>ستظهر هنا الدروس التي أكملتها وتقدّمك فيها.</p><Link to="/subject/grade-12/scientific/physics" className="text-link">افتح الدرس التجريبي <ArrowLeft size={15}/></Link></div>}</section>
       <section className="dashboard-panel"><div className="panel-heading"><h2>المحفوظات</h2><span>{progress.saved.length} عناصر</span></div>{progress.saved.length ? <Link className="dashboard-row" to="/lesson/scalars-and-vectors"><Bookmark/><span><b>{demoLesson.title}</b><small>الفيزياء · ملاحظات المراجعة</small></span><ChevronLeft/></Link> : <div className="dashboard-empty"><Bookmark/><b>لم تحفظ أي درس بعد</b><p>استخدم زر الحفظ في صفحة الدرس للرجوع إلى ملاحظاتك.</p></div>}</section>
