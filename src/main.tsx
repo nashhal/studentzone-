@@ -10,6 +10,7 @@ import "./fonts.css";
 import "./study-platform-theme.css";
 import "./professional-system.css";
 import "./interface-refresh.css";
+import "./visual-redesign.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
