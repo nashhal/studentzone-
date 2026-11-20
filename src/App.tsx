@@ -185,10 +185,80 @@ function SearchBox({ large = false, header = false }: { large?: boolean; header?
   </div>;
 }
 
+
+type EducationStageId = "primary" | "basic" | "secondary";
+type EducationStageConfig = {
+  id: EducationStageId;
+  title: string;
+  description: string;
+  range: string;
+  from: number;
+  to: number;
+  icon: typeof BookOpen;
+};
+
+const educationStages: EducationStageConfig[] = [
+  {
+    id: "primary",
+    title: "المرحلة الابتدائية",
+    description: "بناء مهارات القراءة والكتابة والحساب والمعرفة الأساسية.",
+    range: "الصفوف الأول إلى السادس",
+    from: 1,
+    to: 6,
+    icon: BookOpen,
+  },
+  {
+    id: "basic",
+    title: "المرحلة الأساسية",
+    description: "توسيع المعارف والمهارات والاستعداد للمرحلة الثانوية.",
+    range: "الصفوف السابع إلى التاسع",
+    from: 7,
+    to: 9,
+    icon: Layers3,
+  },
+  {
+    id: "secondary",
+    title: "المرحلة الثانوية",
+    description: "المقررات الثانوية والمسارات العلمية والأدبية.",
+    range: "الصفوف الأول إلى الثالث الثانوي",
+    from: 10,
+    to: 12,
+    icon: GraduationCap,
+  },
+];
+
+function getEducationStage(grade: GradeEntry): EducationStageId {
+  if (grade.number <= 6) return "primary";
+  if (grade.number <= 9) return "basic";
+  return "secondary";
+}
+
+function getEducationStageLabel(grade: GradeEntry): string {
+  const stage = educationStages.find((item) => item.id === getEducationStage(grade));
+  return stage?.title || "المرحلة الدراسية";
+}
+
+function EducationStageCard({ stage }: { stage: EducationStageConfig }) {
+  const Icon = stage.icon;
+  const gradeCount = grades.filter((grade) => grade.number >= stage.from && grade.number <= stage.to).length;
+  return (
+    <Link className="ys-stage-card" to={"/curriculum?stage=" + stage.id}>
+      <span className="ys-stage-icon"><Icon size={25}/></span>
+      <span className="ys-stage-index">{String(educationStages.findIndex((item) => item.id === stage.id) + 1).padStart(2, "0")}</span>
+      <span className="ys-stage-card-copy">
+        <b>{stage.title}</b>
+        <small>{stage.description}</small>
+        <span className="ys-stage-range">{stage.range} · {gradeCount} صفوف</span>
+      </span>
+      <span className="ys-stage-arrow"><ChevronLeft size={19}/></span>
+    </Link>
+  );
+}
+
 function GradeCard({ grade }: { grade: GradeEntry }) {
   return <Link className="grade-card" to={"/grade/" + grade.slug}>
     <span className="grade-card-num">{String(grade.number).padStart(2, "0")}</span>
-    <span className="grade-card-copy"><b>{grade.name}</b><small>{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"} · {getSubjectCount(grade)} مواد/مسارات</small></span>
+    <span className="grade-card-copy"><b>{grade.name}</b><small>{getEducationStageLabel(grade)} · {getSubjectCount(grade)} مواد/مسارات</small></span>
     <ChevronLeft className="grade-card-arrow" size={17}/>
   </Link>;
 }
@@ -301,10 +371,10 @@ function HomePage() {
 
     <section className="container ys-grade-section">
       <div className="ys-section-heading">
-        <div><span className="eyebrow">فهرس المنهج</span><h2>اختر صفك ومسارك الدراسي.</h2><p>تصفّح الصفوف والمواد حسب المرحلة التعليمية.</p></div>
+        <div><span className="eyebrow">فهرس المنهج</span><h2>اختر مرحلتك الدراسية.</h2><p>ابدأ بالمرحلة المناسبة، ثم اختر الصف والمادة.</p></div>
         <Link to="/curriculum" className="ys-inline-link">جميع الصفوف <ArrowLeft size={16}/></Link>
       </div>
-      <div className="ys-grade-grid">{grades.map((grade) => <GradeCard key={grade.slug} grade={grade}/>)}</div>
+      <div className="ys-stage-grid">{educationStages.map((stage) => <EducationStageCard key={stage.id} stage={stage}/>)}</div>
     </section>
 
     <section className="container ys-featured-section">
@@ -325,20 +395,47 @@ function HomePage() {
 }
 
 function CurriculumPage() {
-  const [stage, setStage] = useState<"all" | "basic" | "secondary">("all");
+  const requestedStage = new URLSearchParams(window.location.search).get("stage");
+  const validStage = educationStages.some((item) => item.id === requestedStage);
+  const [stage, setStage] = useState<EducationStageId | null>(validStage ? requestedStage as EducationStageId : null);
   const [query, setQuery] = useState(new URLSearchParams(window.location.search).get("q") || "");
-  const filtered = grades.filter((grade) => (stage === "all" || grade.stage === stage) &&
-    (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim())))));
+  const activeStage = educationStages.find((item) => item.id === stage) || null;
+  const filtered = grades.filter((grade) =>
+    (!stage || getEducationStage(grade) === stage) &&
+    (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim()))))
+  );
+  const showStageChooser = !stage && !query.trim();
+
   return <main className="container page ys-curriculum-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>المواد الدراسية</b></div>
-    <div className="page-title-row"><div><span className="eyebrow">فهرس المنهج</span><h1>اختر صفك الدراسي.</h1><p>تصفّح المواد حسب الصف والمسار، ثم افتح موارد كل مادة.</p></div><div className="catalog-count"><b>{countAllSubjectEntries()}</b><span>مادة/مسار في الفهرس الأولي</span></div></div>
-    <div className="catalog-toolbar"><div className="filter-pills">
-      <button className={stage === "all" ? "filter-pill active" : "filter-pill"} onClick={() => setStage("all")}>كل الصفوف</button>
-      <button className={stage === "basic" ? "filter-pill active" : "filter-pill"} onClick={() => setStage("basic")}>التعليم الأساسي</button>
-      <button className={stage === "secondary" ? "filter-pill active" : "filter-pill"} onClick={() => setStage("secondary")}>التعليم الثانوي</button>
-    </div><label className="inline-search"><Search size={16}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة"/></label></div>
-    <div className="grades-grid curriculum-grid">{filtered.map((grade) => <GradeCard key={grade.slug} grade={grade}/>)}</div>
-    {filtered.length === 0 && <div className="empty-panel"><Search/><h3>لا توجد نتائج</h3><p>جرّب كلمة بحث أخرى.</p></div>}
+    <div className="page-title-row">
+      <div>
+        <span className="eyebrow">فهرس المنهج</span>
+        <h1>{activeStage ? activeStage.title : query.trim() ? "نتائج البحث في المنهج" : "اختر مرحلتك الدراسية."}</h1>
+        <p>{activeStage ? activeStage.description + " اختر الصف للوصول إلى مواده ودروسه." : query.trim() ? "نتائج البحث في جميع المراحل الدراسية." : "اختر المرحلة أولاً، ثم تصفح الصفوف والمواد التابعة لها."}</p>
+      </div>
+      <div className="catalog-count"><b>{activeStage ? filtered.length : countAllSubjectEntries()}</b><span>{activeStage ? "صفوف في هذه المرحلة" : "مادة/مسار في الفهرس الأولي"}</span></div>
+    </div>
+
+    <div className="catalog-toolbar">
+      <div className="ys-stage-toolbar">
+        {stage ? <button className="filter-pill active" onClick={() => setStage(null)}>المراحل الدراسية</button> : <span className="ys-stage-hint">التصنيف حسب المرحلة</span>}
+        {activeStage && <span className="ys-stage-current">{activeStage.range}</span>}
+      </div>
+      <label className="inline-search"><Search size={16}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة"/></label>
+    </div>
+
+    {showStageChooser ? (
+      <section className="ys-stage-grid ys-stage-grid-page" aria-label="المراحل الدراسية">
+        {educationStages.map((item) => <EducationStageCard key={item.id} stage={item}/>)}
+      </section>
+    ) : (
+      <>
+        {!stage && query.trim() && <div className="ys-search-results-note">يتم البحث في الصفوف والمواد عبر المراحل الثلاث.</div>}
+        <div className="grades-grid curriculum-grid">{filtered.map((grade) => <GradeCard key={grade.slug} grade={grade}/>)}</div>
+        {filtered.length === 0 && <div className="empty-panel"><Search/><h3>لا توجد نتائج</h3><p>جرّب كلمة بحث أخرى.</p></div>}
+      </>
+    )}
     <p className="data-note"><ShieldCheck size={15}/> فهرس أولي للصفوف والمواد. يجب تأكيد المنطقة الدراسية والطبعة قبل نشر الدروس بوصفها معتمدة.</p>
   </main>;
 }
@@ -351,7 +448,7 @@ function GradePage() {
   const track = grade.tracks.find((item) => item.slug === trackSlug) || grade.tracks[0];
   return <main className="container page ys-grade-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to="/curriculum">المواد</Link><ChevronLeft size={14}/><b>{grade.name}</b></div>
-    <div className="page-title-row"><div><span className="eyebrow">{grade.stage === "basic" ? "التعليم الأساسي" : "التعليم الثانوي"}</span><h1>{grade.name}</h1><p>{grade.description}</p></div><div className="catalog-count"><b>{getSubjectCount(grade)}</b><span>مادة / مسار</span></div></div>
+    <div className="page-title-row"><div><span className="eyebrow">{getEducationStageLabel(grade)}</span><h1>{grade.name}</h1><p>{grade.description}</p></div><div className="catalog-count"><b>{getSubjectCount(grade)}</b><span>مادة / مسار</span></div></div>
     {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب ومركز الشرح والاختبارات — منهج عدن</span><div className="g12-grade-actions"><Link className="btn btn-outline" to="/grade-12-books"><BookOpen size={16}/> مكتبة الكتب</Link><Link className="btn btn-primary" to="/grade-12-learning"><BookOpenCheck size={16}/> الشرح والملخصات والاختبارات <ArrowLeft size={15}/></Link></div></div>}
     {grade.tracks.length > 1 && <div className="filter-pills track-pills">{grade.tracks.map((item) => <button key={item.slug} className={track.slug === item.slug ? "filter-pill active" : "filter-pill"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="subject-list-heading"><h2>المواد الدراسية</h2><span>{track.name}</span></div>
