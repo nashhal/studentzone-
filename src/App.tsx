@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
   Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
@@ -63,6 +63,58 @@ function useStudyProgress() {
   }));
   const addScore = (score: number) => setProgress((old) => ({ ...old, quizScores: [...old.quizScores, score] }));
   return { progress, complete, toggleSaved, addScore };
+}
+
+
+const studyBackgroundPhotos = [
+  "https://images.pexels.com/photos/37816454/pexels-photo-37816454.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/6333739/pexels-photo-6333739.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/18471485/pexels-photo-18471485.jpeg?auto=compress&cs=tinysrgb&w=1600",
+  "https://images.pexels.com/photos/18471523/pexels-photo-18471523.jpeg?auto=compress&cs=tinysrgb&w=1600",
+];
+
+function SitePhotoBackground() {
+  const [activePhoto, setActivePhoto] = useState(0);
+  const [previousPhoto, setPreviousPhoto] = useState<number | null>(null);
+  const activePhotoRef = useRef(0);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    const interval = window.setInterval(() => {
+      const nextPhoto = (activePhotoRef.current + 1) % studyBackgroundPhotos.length;
+      setPreviousPhoto(activePhotoRef.current);
+      activePhotoRef.current = nextPhoto;
+      setActivePhoto(nextPhoto);
+    }, 9000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const nextPhoto = (activePhoto + 1) % studyBackgroundPhotos.length;
+    const preload = new window.Image();
+    preload.src = studyBackgroundPhotos[nextPhoto];
+  }, [activePhoto]);
+
+  return (
+    <div className="ys-photo-background" aria-hidden="true">
+      {previousPhoto !== null && (
+        <div
+          key={`previous-${previousPhoto}`}
+          className="ys-photo-background-layer is-previous"
+          style={{ backgroundImage: `url("${studyBackgroundPhotos[previousPhoto]}")` }}
+        />
+      )}
+      <div
+        key={`active-${activePhoto}`}
+        className="ys-photo-background-layer is-active"
+        style={{ backgroundImage: `url("${studyBackgroundPhotos[activePhoto]}")` }}
+      />
+      <div className="ys-photo-background-wash" />
+    </div>
+  );
 }
 
 function Header() {
@@ -1138,7 +1190,7 @@ export default function App() {
   const { loading, role } = useAuth();
   const { progress, complete, toggleSaved, addScore } = useStudyProgress();
   if (loading) return <div className="app-loading"><BookOpenCheck/> Yemen Study</div>;
-  return <div className="app-shell"><Header/><Suspense fallback={<div className="route-loading" role="status" aria-live="polite"><span/>جارٍ فتح الصفحة...</div>}><Routes>
+  return <div className="app-shell"><SitePhotoBackground/><Header/><Suspense fallback={<div className="route-loading" role="status" aria-live="polite"><span/>جارٍ فتح الصفحة...</div>}><Routes>
     <Route path="/" element={<HomePage/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>

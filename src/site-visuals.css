@@ -1,0 +1,194 @@
+/* Yemen Study — calm photo backdrop, high-contrast typography and accessible motion. */
+:root {
+  --font-arabic: "Noto Sans Arabic", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-latin: "IBM Plex Sans", "Noto Sans Arabic", "Segoe UI", Arial, sans-serif;
+  --ys-ink: #172b43;
+  --ys-body: #344b62;
+  --ys-muted-strong: #52677c;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: transparent !important;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-arabic);
+}
+
+body {
+  color: var(--ys-ink);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+.ys-photo-background {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #f3f7fb;
+}
+
+.ys-photo-background-layer {
+  position: absolute;
+  inset: -1.5%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: saturate(.62) contrast(.92);
+  opacity: 0;
+  transform: scale(1.025);
+  transition: opacity 1.8s cubic-bezier(.2,.7,.2,1);
+}
+
+.ys-photo-background-layer.is-active {
+  opacity: .78;
+  animation:
+    ys-photo-fade-in 1.8s cubic-bezier(.2,.7,.2,1) both,
+    ys-photo-drift 24s ease-in-out infinite alternate;
+}
+
+.ys-photo-background-layer.is-previous {
+  opacity: 0;
+  animation: ys-photo-fade-out 1.8s cubic-bezier(.2,.7,.2,1) both;
+}
+
+@keyframes ys-photo-fade-in {
+  from { opacity: 0; }
+  to { opacity: .78; }
+}
+
+@keyframes ys-photo-fade-out {
+  from { opacity: .78; }
+  to { opacity: 0; }
+}
+
+.ys-photo-background-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(112deg, rgba(247,250,253,.62), rgba(249,251,253,.54) 48%, rgba(245,249,252,.66)),
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(239,245,250,.32));
+}
+
+@keyframes ys-photo-drift {
+  from { transform: scale(1.025) translate3d(0, 0, 0); }
+  to { transform: scale(1.075) translate3d(-.5%, .3%, 0); }
+}
+
+/* Let the photographic layer show through open page areas, never through learning cards. */
+.ys-home-page {
+  background: rgba(255,255,255,.24) !important;
+}
+
+.ys-hero {
+  background: rgba(241,247,252,.64) !important;
+  border-bottom-color: rgba(206,220,232,.82);
+}
+
+.ys-search-section,
+.ys-skills-section {
+  background: transparent !important;
+}
+
+.ys-tools-band {
+  background: rgba(16,43,73,.96);
+}
+
+main.page,
+main.container.page {
+  background: rgba(248,251,254,.48);
+}
+
+.subject-page,
+.study-tool-layout-main {
+  background: rgba(249,251,253,.68) !important;
+}
+
+/* Keep cards and reading surfaces clean and opaque for uninterrupted study. */
+.grade-card,
+.ys-skill-card,
+.tool-card,
+.card,
+.lesson-card,
+.subject-card,
+.study-tool-card,
+.admin-form,
+.admin-list,
+.search-results,
+.nav-dropdown-panel {
+  background-color: #fff;
+}
+
+.ys-hero-copy > p,
+.ys-section-heading > p,
+.ys-search-section p,
+.ys-hero-assurance,
+.page-title-row p,
+.tool-page-intro p,
+.lesson-lead {
+  color: #40566c;
+}
+
+.ys-eyebrow,
+.eyebrow {
+  color: #285f89;
+}
+
+.ys-site-header .main-nav {
+  color: #40566c;
+}
+
+:where(.subject-page, .study-tool-layout-main, main.page) :where(p, label, small) {
+  color: #43596e;
+}
+
+:where(input, select, textarea) {
+  color: #172b43;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-arabic);
+  text-wrap: pretty;
+}
+
+@media (max-width: 760px) {
+  .ys-photo-background-layer {
+    background-position: 55% center;
+  }
+
+  .ys-photo-background-wash {
+    background:
+      linear-gradient(112deg, rgba(247,250,253,.72), rgba(249,251,253,.65)),
+      linear-gradient(180deg, rgba(255,255,255,.2), rgba(239,245,250,.34));
+  }
+
+  .ys-home-page,
+  main.page {
+    background: rgba(255,255,255,.40) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ys-photo-background-layer,
+  .ys-photo-background-layer.is-active {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
