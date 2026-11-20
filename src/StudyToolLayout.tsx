@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from "react";
 import {
-  Activity, Award, BookOpen, BookOpenCheck, Bookmark, CalendarDays,
+  Award, BookOpen, BookOpenCheck, Bookmark, CalendarDays,
   ChevronDown, ChevronLeft, ClipboardCheck, ClipboardList, FileText,
-  Layers3, Menu, Target, Timer,
+  Layers3, Menu, Timer,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 
