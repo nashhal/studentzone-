@@ -6,7 +6,7 @@ import {
   LogOut, Menu, Play, RotateCcw, Search, ShieldCheck, Sparkles,
   Target, Timer, Trophy, X, Zap
 } from "lucide-react";
-import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
@@ -395,16 +395,19 @@ function HomePage() {
 }
 
 function CurriculumPage() {
-  const requestedStage = new URLSearchParams(window.location.search).get("stage");
-  const validStage = educationStages.some((item) => item.id === requestedStage);
-  const [stage, setStage] = useState<EducationStageId | null>(validStage ? requestedStage as EducationStageId : null);
-  const [query, setQuery] = useState(new URLSearchParams(window.location.search).get("q") || "");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedStage = searchParams.get("stage");
+  const stage = educationStages.some((item) => item.id === requestedStage)
+    ? requestedStage as EducationStageId
+    : null;
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const activeStage = educationStages.find((item) => item.id === stage) || null;
   const filtered = grades.filter((grade) =>
     (!stage || getEducationStage(grade) === stage) &&
     (!query.trim() || grade.name.includes(query.trim()) || grade.tracks.some((track) => track.subjects.some((subject) => subject.name.includes(query.trim()))))
   );
   const showStageChooser = !stage && !query.trim();
+  const returnToStages = () => setSearchParams(query.trim() ? { q: query.trim() } : {});
 
   return <main className="container page ys-curriculum-page">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>المواد الدراسية</b></div>
@@ -419,7 +422,7 @@ function CurriculumPage() {
 
     <div className="catalog-toolbar">
       <div className="ys-stage-toolbar">
-        {stage ? <button className="filter-pill active" onClick={() => setStage(null)}>المراحل الدراسية</button> : <span className="ys-stage-hint">التصنيف حسب المرحلة</span>}
+        {stage ? <button className="filter-pill active" onClick={returnToStages}>المراحل الدراسية</button> : <span className="ys-stage-hint">التصنيف حسب المرحلة</span>}
         {activeStage && <span className="ys-stage-current">{activeStage.range}</span>}
       </div>
       <label className="inline-search"><Search size={16}/><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن الصف أو المادة"/></label>
@@ -439,7 +442,6 @@ function CurriculumPage() {
     <p className="data-note"><ShieldCheck size={15}/> فهرس أولي للصفوف والمواد. يجب تأكيد المنطقة الدراسية والطبعة قبل نشر الدروس بوصفها معتمدة.</p>
   </main>;
 }
-
 function GradePage() {
   const { gradeSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
