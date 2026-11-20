@@ -9,6 +9,7 @@ import {
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
+import { FadeContent } from "./components/animations/FadeContent";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
@@ -163,7 +164,8 @@ function HomePage() {
           <div className="hero-buttons"><Link className="btn btn-primary" to="/curriculum">استكشف المواد <ArrowLeft size={17}/></Link><Link className="btn btn-outline" to="/study-plan">أنشئ خطة مذاكرتك</Link></div>
           <div className="hero-trust"><ShieldCheck size={16}/> محتوى تعليمي أصلي، مرتبط بالمنهج ويُراجع قبل اعتماده.</div>
         </div>
-        <div className="hero-visual" aria-label="أدوات المراجعة">
+        <FadeContent className="hero-visual-motion" delay={0.08}>
+          <div className="hero-visual" aria-label="أدوات المراجعة">
           <div className="hero-visual-top"><span>مساحة المراجعة</span><span className="live-dot"/> <small>ابدأ التعلّم</small></div>
           <div className="hero-visual-title">خطوة صغيرة<br/>كل يوم تصنع فرقاً.</div>
           <div className="hero-visual-list">
@@ -172,7 +174,8 @@ function HomePage() {
             <div><span className="visual-icon"><Trophy size={18}/></span><span><b>تابع تقدّمك</b><small>اعرف ما أتقنته وما يحتاج مراجعة</small></span><span className="visual-index">03</span></div>
           </div>
           <div className="hero-visual-bottom"><span>YEMEN STUDY</span><span>LEARN · PRACTISE · MASTER</span></div>
-        </div>
+          </div>
+        </FadeContent>
       </div>
     </section>
     <section className="container search-section">
