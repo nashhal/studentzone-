@@ -8,7 +8,32 @@ test.describe("Yemen Study public learning journey", () => {
     const curriculumLink = page.getByRole("link", { name: /استكشف المنهج/ });
     await expect(curriculumLink).toBeVisible();
     await curriculumLink.click();
-    await expect(page.getByRole("heading", { level: 1, name: /اختر صفك الدراسي/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /اختر مرحلتك الدراسية/ })).toBeVisible();
+  });
+
+  test("curriculum opens with three stages and reveals only the selected grades", async ({ page }) => {
+    await page.goto("./#/curriculum");
+    await expect(page.getByRole("heading", { level: 1, name: /اختر مرحلتك الدراسية/ })).toBeVisible();
+    await expect(page.locator(".ys-stage-grid-page .ys-stage-card")).toHaveCount(3);
+    await expect(page.locator(".curriculum-grid .grade-card")).toHaveCount(0);
+
+    await page.getByRole("link", { name: /المرحلة الابتدائية/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "المرحلة الابتدائية" })).toBeVisible();
+    await expect(page.locator(".curriculum-grid .grade-card")).toHaveCount(6);
+    await expect(page.locator(".curriculum-grid")).toContainText("الصف السادس الأساسي");
+    await expect(page.locator(".curriculum-grid")).not.toContainText("الصف السابع الأساسي");
+
+    await page.getByRole("button", { name: "المراحل الدراسية" }).click();
+    await page.getByRole("link", { name: /المرحلة الأساسية/ }).click();
+    await expect(page.locator(".curriculum-grid .grade-card")).toHaveCount(3);
+    await expect(page.locator(".curriculum-grid")).toContainText("الصف السابع الأساسي");
+    await expect(page.locator(".curriculum-grid")).not.toContainText("الصف السادس الأساسي");
+
+    await page.getByRole("button", { name: "المراحل الدراسية" }).click();
+    await page.getByRole("link", { name: /المرحلة الثانوية/ }).click();
+    await expect(page.locator(".curriculum-grid .grade-card")).toHaveCount(3);
+    await expect(page.locator(".curriculum-grid")).toContainText("الصف الثالث الثانوي");
+    await expect(page.locator(".curriculum-grid")).not.toContainText("الصف التاسع الأساسي");
   });
 
   test("a dedicated in-site lesson action opens the lesson", async ({ page }) => {
@@ -37,7 +62,7 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(menuButton).toHaveAttribute("aria-expanded", "true");
     await expect(menuButton).toHaveAttribute("aria-label", "إغلاق القائمة");
     await navigation.getByRole("link", { name: /ابدأ الدراسة/ }).click();
-    await expect(page.getByRole("heading", { level: 1, name: /اختر صفك الدراسي/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /اختر مرحلتك الدراسية/ })).toBeVisible();
   });
 
   test("the home page does not overflow at common desktop and mobile widths", async ({ page }) => {
