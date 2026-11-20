@@ -83,7 +83,6 @@ a svg.lucide {
 }
 
 .ys-site-header .mobile-menu {
-  display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
@@ -367,6 +366,11 @@ textarea {
 @media (max-width: 760px) {
   .ys-site-header .header-inner {
     gap: 10px;
+  }
+
+  .ys-site-header .mobile-menu {
+    display: grid;
+    place-items: center;
   }
 
   .ys-site-header .main-nav.open {
