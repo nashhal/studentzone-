@@ -3057,6 +3057,14 @@ export default function Grade12LearningHubPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedSlug = searchParams.get("subject") || "physics";
   const current = modules.find((module) => module.slug === requestedSlug) || modules[0];
+  const requestedLessonIndex = Number.parseInt(searchParams.get("lesson") || "0", 10);
+  const lessonSections = current.sections.filter((section) => section.title.startsWith("تفصيل الملخص:"));
+  const availableLessons = lessonSections.length > 0 ? lessonSections : current.sections;
+  const selectedLessonIndex = Number.isFinite(requestedLessonIndex)
+    ? Math.min(Math.max(requestedLessonIndex, 0), Math.max(availableLessons.length - 1, 0))
+    : 0;
+  const selectedLesson = availableLessons[selectedLessonIndex] || current.sections[0];
+  const selectedLessonTitle = selectedLesson?.title.replace(/^تفصيل الملخص:\\s*/, "") || current.title;
   const [tier, setTier] = useState<Tier>("good");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<string[]>([]);
@@ -3069,11 +3077,18 @@ export default function Grade12LearningHubPage() {
   const score = questions.filter((question) => answers[question.id] === question.answer).length;
 
   const chooseModule = (slug: string) => {
-    setSearchParams({ subject: slug });
+    setSearchParams({ subject: slug, lesson: "0" });
     setTier("good");
     setAnswers({});
     setRevealed([]);
     setSubmitted(false);
+  };
+  const chooseLesson = (index: number) => {
+    setSearchParams({ subject: current.slug, lesson: String(index) });
+  };
+  const moveLesson = (direction: -1 | 1) => {
+    const nextIndex = selectedLessonIndex + direction;
+    if (nextIndex >= 0 && nextIndex < availableLessons.length) chooseLesson(nextIndex);
   };
   const chooseTier = (next: Tier) => {
     setTier(next);
@@ -3142,20 +3157,43 @@ export default function Grade12LearningHubPage() {
             <span className="g12-learning-badge">شرح وملخص واختبار</span>
           </div>
           <div className="g12-learning-outcomes"><b>أهداف التعلم</b><ul>{current.outcomes.map((item) => <li key={item}>{item}</li>)}</ul></div>
-          <div className="g12-learning-section-list">
-            {current.sections.map((section) => <article key={section.title} className="g12-learning-section">
-              <h3>{section.title}</h3><p>{section.body}</p>
-              {section.formula && <div className="g12-learning-formula" dir="ltr">{section.formula}</div>}
-              {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
-            </article>)}
+          <section className="g12-learning-lesson-picker" aria-label="دروس الوحدة">
+            <div className="g12-learning-lesson-picker-head">
+              <div><b>دروس الوحدة — كل درس مستقل</b><span>{availableLessons.length} دروس مرتبة حسب الملخص</span></div>
+              <small>اختر عنوان الدرس لفتحه منفرداً</small>
+            </div>
+            <div className="g12-learning-lesson-grid">
+              {availableLessons.map((section, index) => {
+                const title = section.title.replace(/^تفصيل الملخص:\\s*/, "");
+                return <button key={section.title} type="button" onClick={() => chooseLesson(index)} className={selectedLessonIndex === index ? "active" : ""} aria-current={selectedLessonIndex === index ? "page" : undefined}>
+                  <i>{String(index + 1).padStart(2, "0")}</i><span>{title}</span>
+                </button>;
+              })}
+            </div>
+          </section>
+          <div className="g12-learning-lesson-position">
+            <span>الدرس {selectedLessonIndex + 1} من {availableLessons.length}</span>
+            <b>{selectedLessonTitle}</b>
           </div>
+          <div className="g12-learning-section-list">
+            <article className="g12-learning-section g12-learning-section-active">
+              <h3>{selectedLessonTitle}</h3>
+              <p>{selectedLesson?.body}</p>
+              {selectedLesson?.formula && <div className="g12-learning-formula" dir="ltr">{selectedLesson.formula}</div>}
+              {selectedLesson?.bullets && <ul>{selectedLesson.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
+            </article>
+          </div>
+          <nav className="g12-learning-lesson-pager" aria-label="التنقل بين الدروس">
+            <button type="button" onClick={() => moveLesson(-1)} disabled={selectedLessonIndex === 0}>الدرس السابق</button>
+            <button type="button" onClick={() => moveLesson(1)} disabled={selectedLessonIndex === availableLessons.length - 1}>الدرس التالي</button>
+          </nav>
           <div className="g12-learning-example">
-            <span>تطبيق محلول</span><h3>{current.example.title}</h3><p>{current.example.prompt}</p>
+            <span>مثال تطبيقي من الوحدة</span><h3>{current.example.title}</h3><p>{current.example.prompt}</p>
             <ol>{current.example.steps.map((step) => <li key={step}>{step}</li>)}</ol>
             <b>{current.example.result}</b>
           </div>
           <div className="g12-learning-summary">
-            <div className="g12-learning-summary-head"><div><span className="eyebrow">ورقة المراجعة · ملخص تفصيلي</span><h3>مذكرة مراجعة الدرس</h3><p>تعريفات أساسية، قواعد وقوانين، خطوات حل، وتنبيهات على الأخطاء الشائعة.</p></div><button className="btn btn-outline g12-no-print" type="button" onClick={() => printDocument("summary")}><Download size={16}/> حفظ الملخص PDF</button></div>
+            <div className="g12-learning-summary-head"><div><span className="eyebrow">مراجعة عامة للوحدة</span><h3>مذكرة مراجعة الوحدة</h3><p>مرجع سريع يجمع المصطلحات والقوانين وخطوات الحل والأخطاء الشائعة في دروس الوحدة.</p></div><button className="btn btn-outline g12-no-print" type="button" onClick={() => printDocument("summary")}><Download size={16}/> حفظ الملخص PDF</button></div>
             <div className="g12-revision-grid">
               <section><h4>المصطلحات والتعريفات</h4><ul>{revisionGuideFor(current.slug).terms.map((item) => <li key={item}>{item}</li>)}</ul></section>
               <section><h4>القواعد والعلاقات المهمة</h4><ul>{revisionGuideFor(current.slug).rules.map((item) => <li key={item}>{item}</li>)}</ul></section>
@@ -3168,7 +3206,7 @@ export default function Grade12LearningHubPage() {
         </section>
 
         <section className="g12-learning-panel g12-learning-quiz">
-          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>اختبر فهمك</h2><p>ثلاث درجات من الصعوبة، مع التصحيح وتفسير الإجابات.</p></div></div>
+          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>اختبار شامل للوحدة</h2><p>تدريب يغطي موضوعات الوحدة بثلاث درجات من الصعوبة، مع التصحيح وتفسير الإجابات.</p></div></div>
           <div className="g12-learning-tier-switch">
             {(["good", "hard", "hardest"] as Tier[]).map((value) => <button key={value} type="button" onClick={() => chooseTier(value)} className={tier === value ? "active" : ""}><b>{tierDetails[value].label}</b><small>{tierDetails[value].subtitle}</small></button>)}
           </div>
@@ -3193,18 +3231,9 @@ export default function Grade12LearningHubPage() {
     </div>
 
     <section className="g12-learning-print-summary">
-      <header><b>Yemen Study</b><span>منهج عدن 2026 · الصف الثالث الثانوي · {current.name}</span><h1>{current.title}</h1><p>{current.coverage} · مذكرة مراجعة تفصيلية</p></header>
-      <h2>أهداف التعلم</h2><ul>{current.outcomes.map((item) => <li key={item}>{item}</li>)}</ul>
-      {current.sections.map((section) => <section key={section.title}><h3>{section.title}</h3><p>{section.body}</p>{section.formula && <p dir="ltr">{section.formula}</p>}{section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}</section>)}
-      <section><h2>مثال محلول</h2><h3>{current.example.title}</h3><p>{current.example.prompt}</p><ol>{current.example.steps.map((step) => <li key={step}>{step}</li>)}</ol><b>{current.example.result}</b></section>
-      <section className="g12-print-revision"><h2>مذكرة مراجعة مركزة</h2>
-        <h3>المصطلحات والتعريفات</h3><ul>{revisionGuideFor(current.slug).terms.map((item) => <li key={item}>{item}</li>)}</ul>
-        <h3>القواعد والعلاقات المهمة</h3><ul>{revisionGuideFor(current.slug).rules.map((item) => <li key={item}>{item}</li>)}</ul>
-        <h3>خطوات التعامل مع الأسئلة</h3><ol>{revisionGuideFor(current.slug).method.map((item) => <li key={item}>{item}</li>)}</ol>
-        <h3>أخطاء شائعة</h3><ul>{revisionGuideFor(current.slug).pitfalls.map((item) => <li key={item}>{item}</li>)}</ul>
-      </section>
-      <section><h2>خلاصة للحفظ</h2><ol>{current.summary.map((item) => <li key={item}>{item}</li>)}</ol></section>
-      <footer>فهرس الموضوع: {current.curriculumSource.title}. مرجع التحقق العلمي: {current.source.title}. مذكرة أصلية للمراجعة وليست نشرة رسمية صادرة عن الوزارة.</footer>
+      <header><b>Yemen Study</b><span>منهج عدن 2026 · الصف الثالث الثانوي · {current.name}</span><h1>{selectedLessonTitle}</h1><p>{current.coverage} · مذكرة درس مستقلة</p></header>
+      <section><h2>{selectedLessonTitle}</h2><p>{selectedLesson?.body}</p>{selectedLesson?.formula && <p dir="ltr">{selectedLesson.formula}</p>}{selectedLesson?.bullets && <ul>{selectedLesson.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}</section>
+      <footer>هذا الملخص خاص بهذا الدرس فقط. مرجع الوحدة: {current.curriculumSource.title}. المادة التعليمية أعيدت صياغتها بصورة مستقلة.</footer>
     </section>
 
     <section className="g12-learning-print-exam">
