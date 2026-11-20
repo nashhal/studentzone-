@@ -114,12 +114,17 @@ export function changedFiles() {
   const untracked = git(["ls-files", "--others", "--exclude-standard"]).trim().split(/\r?\n/).filter(Boolean);
   return [...new Set([...tracked, ...untracked])];
 }
-export function validateChanges(files, reportRoot) {
+export async function validateChanges(files, reportRoot) {
   const prefix = reportRoot.replaceAll("\\", "/") + "/";
   const invalid = files.filter((file) => !SOURCE_FILES.has(file) && !file.startsWith(prefix));
   if (invalid.length) throw new Error("Changes outside the council's permitted scope: " + invalid.join(", "));
-  const diff = git(["diff", "--"]);
   const patterns = [/sk-[A-Za-z0-9_-]{20,}/, /gh[pousr]_[A-Za-z0-9_]{20,}/, /AKIA[0-9A-Z]{16}/, /-----BEGIN [A-Z ]*PRIVATE KEY-----/];
-  if (patterns.some((pattern) => pattern.test(diff))) throw new Error("Secret-like string detected in the proposed diff.");
+  for (const file of files) {
+    let content = "";
+    try { content = await readFile(path.resolve(ROOT, file), "utf8"); } catch { continue; }
+    if (patterns.some((pattern) => pattern.test(content))) {
+      throw new Error("Secret-like string detected in a changed file: " + file);
+    }
+  }
   return files;
 }
