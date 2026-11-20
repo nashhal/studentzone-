@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import {
-  Award, BookOpen, Bookmark, Brain, CalendarDays, ChevronDown, ChevronLeft,
-  CircleHelp, FileText, Layers3, Menu, Target, Timer,
+  Activity, Award, BookOpen, BookOpenCheck, Bookmark, CalendarDays,
+  ChevronDown, ChevronLeft, ClipboardCheck, ClipboardList, FileText,
+  Layers3, Menu, Target, Timer,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -19,14 +20,14 @@ export function StudyToolLayout({ children }: { children: ReactNode }) {
         <ChevronDown size={17}/>
       </Link>
       <div className="sidebar-section-label">موارد المقرر</div>
-      <NavLink to="/curriculum" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><BookOpen size={20}/><span>موارد المواد</span></NavLink>
-      <NavLink to="/strengths-weaknesses" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><Brain size={20}/><span>نقاط القوة والضعف</span></NavLink>
+      <NavLink to="/curriculum" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><BookOpenCheck size={20}/><span>موارد المواد</span></NavLink>
+      <NavLink to="/strengths-weaknesses" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><Activity size={20}/><span>نقاط القوة والضعف</span></NavLink>
       <div className="sidebar-section-label">المراجعة</div>
       <NavLink to="/curriculum" className="course-nav-item"><Bookmark size={20}/><span>ملاحظات المراجعة</span></NavLink>
       <NavLink to="/curriculum" className="course-nav-item"><Layers3 size={20}/><span>البطاقات التعليمية</span></NavLink>
       <div className="sidebar-section-label">الاختبارات والتدريب</div>
-      <NavLink to="/curriculum" className="course-nav-item"><CircleHelp size={20}/><span>أسئلة الامتحان</span></NavLink>
-      <NavLink to="/target-test" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><Target size={20}/><span>الاختبار المستهدف</span></NavLink>
+      <NavLink to="/curriculum" className="course-nav-item"><ClipboardList size={20}/><span>أسئلة الامتحان</span></NavLink>
+      <NavLink to="/target-test" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><ClipboardCheck size={20}/><span>الاختبار المستهدف</span></NavLink>
       <NavLink to="/past-papers" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><FileText size={20}/><span>أوراق الامتحانات</span></NavLink>
       <NavLink to="/mock-exam" className={({isActive}) => isActive ? "course-nav-item active" : "course-nav-item"}><Timer size={20}/><span>الاختبارات التجريبية</span></NavLink>
       <div className="sidebar-section-label">مساحة الطالب</div>
