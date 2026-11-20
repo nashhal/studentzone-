@@ -194,3 +194,19 @@
   .g12-learning-lesson-position{align-items:flex-start;flex-direction:column;gap:4px}
   .g12-learning-lesson-pager button{flex:1;min-width:0}
 }
+
+
+/* Expanded exam bank and exam-scope controls */
+.g12-learning-exam-scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 15px}
+.g12-learning-exam-scope button{display:grid;gap:4px;padding:11px 13px;text-align:right;border:1px solid #dfe7ed;background:#fff;color:#49677f;font-size:10px}
+.g12-learning-exam-scope button.active{border-color:#7597b0;background:#f1f6f9;color:#2f5673}
+.g12-learning-exam-scope small{color:#8797a4;font-size:8px}
+.g12-learning-question-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.g12-learning-question-kind{display:inline-flex;align-items:center;padding:4px 7px;border:1px solid #e3eaf0;background:#fafcfd;color:#71889a;font-size:8px;white-space:nowrap}
+.g12-learning-question h3{margin-top:8px}
+.g12-learning-quiz-meta span{white-space:nowrap}
+@media(max-width:560px){
+  .g12-learning-exam-scope{grid-template-columns:1fr}
+  .g12-learning-question-heading{align-items:flex-start;flex-direction:column;gap:4px}
+  .g12-learning-question-kind{white-space:normal}
+}
