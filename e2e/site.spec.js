@@ -112,6 +112,17 @@ test.describe("Yemen Study public learning journey", () => {
     expect(iconAudit.every((item) => Number.parseFloat(item.strokeWidth) <= 2)).toBeTruthy();
   });
 
+
+  test("brand identity and personalised learning snapshot render", async ({ page }) => {
+    await page.goto("./");
+    await expect(page.locator(".ys-site-header .ys-brand-mark")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "خطوتك التالية تبدأ من هنا." })).toBeVisible();
+    await expect(page.locator(".ys-learning-stat")).toHaveCount(3);
+    await expect(page.locator(".ys-learning-shortcuts a")).toHaveCount(3);
+    const logo = await page.locator(".ys-site-header .ys-brand-mark svg").getAttribute("viewBox");
+    expect(logo).toBe("0 0 48 48");
+  });
+
   test("student dashboard exposes metrics derived from recorded activity", async ({ page }) => {
     await page.goto("./#/dashboard");
     await expect(page.locator(".ys-performance-panel")).toBeVisible();

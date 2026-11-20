@@ -66,6 +66,22 @@ function useStudyProgress() {
 }
 
 
+function BrandMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className={compact ? "brand-mark ys-brand-mark is-compact" : "brand-mark ys-brand-mark"} aria-hidden="true">
+      <svg viewBox="0 0 48 48" focusable="false">
+        <path d="M6.5 14.8c6.6-2.9 12.4-2.3 17.5 1.4v23.1c-5.1-3.4-10.9-4-17.5-1.5z" fill="#F8FBFF"/>
+        <path d="M41.5 14.8C34.9 11.9 29.1 12.5 24 16.2v23.1c5.1-3.4 10.9-4 17.5-1.5z" fill="#D9E8F8"/>
+        <path d="M24 16.3v22.8" fill="none" stroke="#6FD0C1" strokeWidth="1.7" strokeLinecap="round"/>
+        <path d="M11.2 22.4c3.2-.9 6.1-.6 9.1.8M11.2 28.3c3.2-.9 6.1-.6 9.1.8M36.8 22.4c-3.2-.9-6.1-.6-9.1.8M36.8 28.3c-3.2-.9-6.1-.6-9.1.8" fill="none" stroke="#7899B6" strokeWidth="1.55" strokeLinecap="round"/>
+        <path d="m25.7 31.5 5.1-5.2 4.1 2.1 6.2-8.1" fill="none" stroke="#2DAA98" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="m37.8 20.4 3.3-.3-.2 3.5" fill="none" stroke="#2DAA98" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="10.2" cy="11" r="2" fill="#DAB46A"/>
+      </svg>
+    </span>
+  );
+}
+
 const studyBackgroundPhotos = [
   "https://images.pexels.com/photos/37816454/pexels-photo-37816454.jpeg?auto=compress&cs=tinysrgb&w=1600",
   "https://images.pexels.com/photos/6333739/pexels-photo-6333739.jpeg?auto=compress&cs=tinysrgb&w=1600",
@@ -138,7 +154,7 @@ function Header() {
     <div className="container header-inner">
       <div className="header-brand-group">
         <Link to="/" className="brand" aria-label="Yemen Study">
-          <span className="brand-mark"><BookOpenCheck size={23}/></span>
+          <BrandMark/>
           <span className="brand-copy"><b>Yemen Study</b><small>تعلّم. تدرّب. أتقن.</small></span>
         </Link>
         <button className="mobile-menu" type="button" aria-controls="primary-navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}>{menuOpen ? <X/> : <Menu/>}</button>
@@ -276,7 +292,8 @@ function ToolCard({ icon: Icon, title, description, to, tag }: { icon: typeof Bo
   </Link>;
 }
 
-function HomePage() {
+function HomePage({ progress }: { progress: Progress }) {
+  const registeredQuizCount = readAttemptSummaries().length + progress.quizScores.length;
   const demoGrade = getGrade("grade-12");
   const demoTrack = demoGrade?.tracks.find((item) => item.slug === "scientific");
   const demoPhysics = demoTrack?.subjects.find((item) => item.slug === "physics");
@@ -311,6 +328,40 @@ function HomePage() {
             <span><b>مسار دراسي متكامل</b><small>افهم · طبّق · راجع</small></span>
           </div>
         </figure>
+      </div>
+    </section>
+
+    <section className="container ys-learning-overview" aria-labelledby="ys-learning-overview-title">
+      <div className="ys-learning-overview-intro">
+        <span className="eyebrow">مساحة تعلّمك</span>
+        <h2 id="ys-learning-overview-title">خطوتك التالية تبدأ من هنا.</h2>
+        <p>ملخص نشاطك المسجّل على هذا الجهاز، مع اختصارات مباشرة لمتابعة الدراسة.</p>
+        <Link className="ys-overview-link" to="/dashboard">افتح لوحة الطالب <ArrowLeft size={16}/></Link>
+      </div>
+      <div className="ys-learning-overview-content">
+        <div className="ys-learning-overview-stats">
+          <article className="ys-learning-stat">
+            <span className="ys-learning-stat-icon is-blue"><BookOpenCheck size={19}/></span>
+            <b>{progress.completed.length}</b>
+            <small>دروس مكتملة</small>
+          </article>
+          <article className="ys-learning-stat">
+            <span className="ys-learning-stat-icon is-teal"><Bookmark size={19}/></span>
+            <b>{progress.saved.length}</b>
+            <small>دروس محفوظة</small>
+          </article>
+          <article className="ys-learning-stat">
+            <span className="ys-learning-stat-icon is-amber"><Trophy size={19}/></span>
+            <b>{registeredQuizCount}</b>
+            <small>نتائج اختبارات</small>
+          </article>
+        </div>
+        <div className="ys-learning-shortcuts" aria-label="اختصارات الدراسة">
+          <Link to="/curriculum"><span className="ys-shortcut-number">01</span><span><b>اختر صفك</b><small>تصفّح المراحل والمواد</small></span><ChevronLeft size={17}/></Link>
+          <Link to="/study-plan"><span className="ys-shortcut-number">02</span><span><b>نظّم مذاكرتك</b><small>افتح خطة الدراسة</small></span><ChevronLeft size={17}/></Link>
+          <Link to="/target-test"><span className="ys-shortcut-number">03</span><span><b>اختبر فهمك</b><small>ابدأ اختباراً مستهدفاً</small></span><ChevronLeft size={17}/></Link>
+        </div>
+        <p className="ys-learning-local-note"><ShieldCheck size={14}/> هذه المؤشرات محلية على جهازك في النسخة الحالية.</p>
       </div>
     </section>
 
@@ -1288,9 +1339,9 @@ function NotFound() {
 export default function App() {
   const { loading, role } = useAuth();
   const { progress, complete, toggleSaved, addScore } = useStudyProgress();
-  if (loading) return <div className="app-loading"><BookOpenCheck/> Yemen Study</div>;
+  if (loading) return <div className="app-loading"><BrandMark/> Yemen Study</div>;
   return <div className="app-shell"><SitePhotoBackground/><Header/><Suspense fallback={<div className="route-loading" role="status" aria-live="polite"><span/>جارٍ فتح الصفحة...</div>}><Routes>
-    <Route path="/" element={<HomePage/>}/>
+    <Route path="/" element={<HomePage progress={progress}/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
     <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
@@ -1313,5 +1364,5 @@ export default function App() {
     <Route path="/academy-council" element={<AcademyCouncilPage/>}/>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="*" element={<NotFound/>}/>
-  </Routes></Suspense><footer className="site-footer"><div className="container footer-inner"><Link to="/" className="footer-brand"><span className="brand-mark"><BookOpenCheck size={19}/></span><b>Yemen Study</b></Link><span>منصة مراجعة للمناهج اليمنية</span><div><Link to="/curriculum">المواد الدراسية</Link><Link to="/study-plan">خطة المذاكرة</Link><Link to="/dashboard">مساحة الطالب</Link></div><small>© {new Date().getFullYear()} Yemen Study</small></div></footer></div>;
+  </Routes></Suspense><footer className="site-footer"><div className="container footer-inner"><Link to="/" className="footer-brand"><BrandMark compact/><b>Yemen Study</b></Link><span>منصة مراجعة للمناهج اليمنية</span><div><Link to="/curriculum">المواد الدراسية</Link><Link to="/study-plan">خطة المذاكرة</Link><Link to="/dashboard">مساحة الطالب</Link></div><small>© {new Date().getFullYear()} Yemen Study</small></div></footer></div>;
 }
