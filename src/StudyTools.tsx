@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  Activity, ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2,
+  Activity, ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2,
   ChevronLeft, ClipboardCheck, FileText, RotateCcw, ShieldCheck, Sparkles,
-  Target, Timer, Trophy, X
+  Timer, Trophy, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { demoLesson, type Question } from "./data/learning";
