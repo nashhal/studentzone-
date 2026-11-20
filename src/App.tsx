@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
-  Activity, Archive, ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
-  Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
+  Activity, ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
+  CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
   CircleHelp, ClipboardCheck, ClipboardList, Clock3, FileCheck2, FileText,
   GraduationCap, Layers3, ListChecks, LogOut, Menu, Play, RotateCcw,
   Search, ShieldCheck, Sparkles, Target, Timer, Trophy, X, Zap
