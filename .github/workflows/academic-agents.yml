@@ -1,0 +1,63 @@
+name: Yemen Study — Academic Agent Council
+
+on:
+  issues:
+    types: [opened, reopened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Existing [AI Council] issue number to process
+        required: true
+        type: number
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: yemen-study-agent-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  run-academic-agents:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        startsWith(github.event.issue.title, '[AI Council]') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout stable project source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install project dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install the Agents SDK
+        run: npm install --prefix agents --no-audit --no-fund
+
+      - name: Validate the eight-agent configuration
+        run: node agents/run.mjs --check
+
+      - name: Run the eight independent agents
+        run: node agents/run.mjs
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_AGENT_MODEL: ${{ vars.OPENAI_AGENT_MODEL || 'gpt-6-luna' }}
+          OPENAI_AGENT_CODING_MODEL: ${{ vars.OPENAI_AGENT_CODING_MODEL || 'gpt-6.1-sol' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
