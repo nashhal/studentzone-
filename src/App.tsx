@@ -22,6 +22,7 @@ import "./study-tools.css";
 const Grade12PhysicsStudyPage = lazy(() => import("./Grade12Study").then(({ default: Page }) => ({ default: Page })));
 const Grade12BooksPage = lazy(() => import("./Grade12Books").then(({ default: Page }) => ({ default: Page })));
 const Grade12LearningHubPage = lazy(() => import("./Grade12LearningHub").then(({ default: Page }) => ({ default: Page })));
+const AcademyCouncilPage = lazy(() => import("./AcademyCouncil").then(({ default: Page }) => ({ default: Page })));
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
 type AttemptSummary = { id?: string; createdAt?: string; score: number; total: number; source?: string };
@@ -104,6 +105,7 @@ function Header() {
         </div>
         <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>لوحة الطالب</NavLink>
         {(role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>إدارة المحتوى</NavLink>}
+        {(role === "admin" || role === "editor") && <NavLink to="/academy-council" onClick={() => setMenuOpen(false)}>مجلس البوتات الأكاديمي</NavLink>}
       </nav>
       <div className="header-search-wrap"><SearchBox header/></div>
       <div className="header-actions">
@@ -1063,6 +1065,7 @@ export default function App() {
     <Route path="/study-plan" element={<StudyToolLayout><StudyPlanPage/></StudyToolLayout>}/>
     <Route path="/dashboard" element={<StudyToolLayout><DashboardPage progress={progress}/></StudyToolLayout>}/>
     <Route path="/admin" element={<AdminPage/>}/>
+    <Route path="/academy-council" element={<AcademyCouncilPage/>}/>
     <Route path="/login" element={<LoginPage/>}/>
     <Route path="*" element={<NotFound/>}/>
   </Routes></Suspense><footer className="site-footer"><div className="container footer-inner"><Link to="/" className="footer-brand"><span className="brand-mark"><BookOpenCheck size={19}/></span><b>Yemen Study</b></Link><span>منصة مراجعة للمناهج اليمنية</span><div><Link to="/curriculum">المواد الدراسية</Link><Link to="/study-plan">خطة المذاكرة</Link><Link to="/dashboard">مساحة الطالب</Link></div><small>© {new Date().getFullYear()} Yemen Study</small></div></footer></div>;
