@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { BookOpen, Calculator, CheckCircle2, Clock3, Download, FileText, FlaskConical, RotateCcw, ShieldCheck, Trophy } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import "./grade12-learning.css";
+import { extraPhysicsQuestions } from "./data/grade12-physics-extra-questions";
 
 type Tier = "good" | "hard" | "hardest";
-type Question = { id: string; prompt: string; options: string[]; answer: number; explanation: string };
+type Question = { id: string; prompt: string; options: string[]; answer: number; explanation: string; kind?: string };
 type Section = { title: string; body: string; bullets?: string[]; formula?: string };
 type LearningModule = {
   slug: string;
@@ -3068,18 +3069,33 @@ export default function Grade12LearningHubPage() {
   const selectedLesson = availableLessons[selectedLessonIndex] || current.sections[0];
   const selectedLessonTitle = selectedLesson?.title.replace(/^تفصيل الملخص:\s*/, "") || current.title;
   const [tier, setTier] = useState<Tier>("good");
+  const [examScope, setExamScope] = useState<"unit" | "all-physics">("unit");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [moduleTrackFilter, setModuleTrackFilter] = useState("الكل");
   const [moduleQuery, setModuleQuery] = useState("");
   
-  const questions = useMemo(() => current.questions[tier], [current, tier]);
+  const physicsModules = modules.filter((module) => module.slug === "physics" || module.slug.startsWith("physics-"));
+  const isPhysicsModule = physicsModules.some((module) => module.slug === current.slug);
+  const questions = useMemo(() => {
+    const selectedModules = examScope === "all-physics" && isPhysicsModule ? physicsModules : [current];
+    return selectedModules.flatMap((module) => [
+      ...module.questions[tier],
+      ...(extraPhysicsQuestions[module.slug]?.[tier] ?? []),
+    ]);
+  }, [current, tier, examScope, isPhysicsModule]);
+  const questionKindCount = new Set(questions.map((question) => question.kind || "اختيار من متعدد")).size;
+  const suggestedMinutes = Math.max(
+    tierDetails[tier].minutes,
+    Math.ceil(questions.length * (tier === "good" ? 1.2 : tier === "hard" ? 1.8 : 2.4)),
+  );
   const answered = questions.filter((question) => answers[question.id] !== undefined).length;
   const score = questions.filter((question) => answers[question.id] === question.answer).length;
 
   const chooseModule = (slug: string) => {
     setSearchParams({ subject: slug, lesson: "0" });
+    setExamScope("unit");
     setTier("good");
     setAnswers({});
     setRevealed([]);
@@ -3106,7 +3122,7 @@ export default function Grade12LearningHubPage() {
   const checkOne = (id: string) => setRevealed((old) => old.includes(id) ? old : [...old, id]);
   const submitQuiz = () => {
     if (submitted || answered !== questions.length) return;
-    saveAttempt(current.slug, tier, score, questions.length);
+    saveAttempt(examScope === "all-physics" && isPhysicsModule ? "physics-comprehensive" : current.slug, tier, score, questions.length);
     setSubmitted(true);
   };
   const printDocument = (kind: "summary" | "exam") => {
@@ -3208,14 +3224,18 @@ export default function Grade12LearningHubPage() {
         </section>
 
         <section className="g12-learning-panel g12-learning-quiz">
-          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>اختبار شامل للوحدة</h2><p>تدريب يغطي موضوعات الوحدة بثلاث درجات من الصعوبة، مع التصحيح وتفسير الإجابات.</p></div></div>
+          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>{examScope === "all-physics" && isPhysicsModule ? "اختبار شامل لوحدات الفيزياء" : "اختبار شامل للوحدة"}</h2><p>بنك أسئلة موسع ومتنوع بين الحساب والتفسير والصح والخطأ واختيار العلاقة والتطبيق.</p></div></div>
+          {isPhysicsModule && <div className="g12-learning-exam-scope" role="group" aria-label="نطاق الاختبار">
+            <button type="button" className={examScope === "unit" ? "active" : ""} onClick={() => { setExamScope("unit"); resetQuiz(); }}>اختبار الوحدة الحالية <small>24 سؤالاً في البنك</small></button>
+            <button type="button" className={examScope === "all-physics" ? "active" : ""} onClick={() => { setExamScope("all-physics"); resetQuiz(); }}>اختبار شامل للفيزياء <small>144 سؤالاً في البنك</small></button>
+          </div>}
           <div className="g12-learning-tier-switch">
             {(["good", "hard", "hardest"] as Tier[]).map((value) => <button key={value} type="button" onClick={() => chooseTier(value)} className={tier === value ? "active" : ""}><b>{tierDetails[value].label}</b><small>{tierDetails[value].subtitle}</small></button>)}
           </div>
-          <div className="g12-learning-quiz-meta"><span><FileText size={14}/>{questions.length} أسئلة</span><span><Clock3 size={14}/>{tierDetails[tier].minutes} دقيقة</span><span>الدرجة {questions.length}</span></div>
+          <div className="g12-learning-quiz-meta"><span><FileText size={14}/>{questions.length} سؤالاً في هذا النموذج</span><span><Clock3 size={14}/>{suggestedMinutes} دقيقة مقترحة</span><span>الدرجة {questions.length}</span><span>{questionKindCount} أنواع أسئلة</span></div>
           <div className="g12-learning-questions">
             {questions.map((question, index) => <article key={question.id} className="g12-learning-question">
-              <div className="g12-learning-question-num">السؤال {index + 1}</div>
+              <div className="g12-learning-question-heading"><div className="g12-learning-question-num">السؤال {index + 1}</div><span className="g12-learning-question-kind">{question.kind || "اختيار من متعدد"}</span></div>
               <h3>{question.prompt}</h3>
               <div className="g12-learning-options">{question.options.map((option, optionIndex) => {
                 const selected = answers[question.id] === optionIndex;
@@ -3239,9 +3259,9 @@ export default function Grade12LearningHubPage() {
     </section>
 
     <section className="g12-learning-print-exam">
-      <header><b>Yemen Study</b><span>الصف الثالث الثانوي · {current.name}</span><h1>اختبار: {current.title}</h1><p>المستوى: {tierDetails[tier].label} · الزمن المقترح: {tierDetails[tier].minutes} دقيقة</p></header>
+      <header><b>Yemen Study</b><span>الصف الثالث الثانوي · {current.name}</span><h1>اختبار: {current.title}</h1><p>المستوى: {tierDetails[tier].label} · عدد الأسئلة: {questions.length} · الزمن المقترح: {suggestedMinutes} دقيقة</p></header>
       <div className="g12-learning-print-student"><span>اسم الطالب: ........................................</span><span>التاريخ: .... / .... / ........</span></div>
-      {questions.map((question, index) => <article key={question.id}><b>{index + 1}. {question.prompt}</b><ol type="A">{question.options.map((option) => <li key={option}>{option}</li>)}</ol></article>)}
+      {questions.map((question, index) => <article key={question.id}><b>{index + 1}. {question.prompt}</b><small>نوع السؤال: {question.kind || "اختيار من متعدد"}</small><ol type="A">{question.options.map((option) => <li key={option}>{option}</li>)}</ol></article>)}
       <footer>اختبار تدريبي أصلي داخل Yemen Study، وليس امتحاناً وزارياً رسمياً.</footer>
     </section>
 
