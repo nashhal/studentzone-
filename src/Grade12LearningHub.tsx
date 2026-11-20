@@ -3,6 +3,7 @@ import { BookOpen, Calculator, CheckCircle2, Clock3, Download, FileText, FlaskCo
 import { Link, useSearchParams } from "react-router-dom";
 import "./grade12-learning.css";
 import { extraPhysicsQuestions } from "./data/grade12-physics-extra-questions";
+import { grade12QuestionFormatExtras } from "./data/grade12-question-format-extras";
 
 type Tier = "good" | "hard" | "hardest";
 type Question = { id: string; prompt: string; options: string[]; answer: number; explanation: string; kind?: string };
@@ -3044,6 +3045,17 @@ const pendingSubjects = [
   "التدقيق النهائي مقابل الطبعة المدرسية",
 ];
 
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const shuffled = [...items];
+  let state = (seed >>> 0) || 1;
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    const swapIndex = state % (index + 1);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
 function saveAttempt(slug: string, tier: Tier, score: number, total: number) {
   try {
     const key = "yemen-study-grade12-learning-attempts";
@@ -3069,22 +3081,42 @@ export default function Grade12LearningHubPage() {
   const selectedLesson = availableLessons[selectedLessonIndex] || current.sections[0];
   const selectedLessonTitle = selectedLesson?.title.replace(/^تفصيل الملخص:\s*/, "") || current.title;
   const [tier, setTier] = useState<Tier>("good");
-  const [examScope, setExamScope] = useState<"unit" | "all-physics">("unit");
+  const [examScope, setExamScope] = useState<"unit" | "all-subject">("unit");
+  const [examVersion, setExamVersion] = useState(1);
+  const [testSize, setTestSize] = useState(15);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [moduleTrackFilter, setModuleTrackFilter] = useState("الكل");
   const [moduleQuery, setModuleQuery] = useState("");
-  
-  const physicsModules = modules.filter((module) => module.slug === "physics" || module.slug.startsWith("physics-"));
-  const isPhysicsModule = physicsModules.some((module) => module.slug === current.slug);
-  const questions = useMemo(() => {
-    const selectedModules = examScope === "all-physics" && isPhysicsModule ? physicsModules : [current];
+
+  const subjectModules = modules.filter(
+    (module) => module.name === current.name && module.track === current.track,
+  );
+  const currentUnitQuestionCount =
+    current.questions[tier].length +
+    (extraPhysicsQuestions[current.slug]?.[tier]?.length ?? 0) +
+    (grade12QuestionFormatExtras[current.slug]?.[tier]?.length ?? 0);
+  const subjectQuestionBankCount = subjectModules.reduce(
+    (total, module) =>
+      total +
+      module.questions[tier].length +
+      (extraPhysicsQuestions[module.slug]?.[tier]?.length ?? 0) +
+      (grade12QuestionFormatExtras[module.slug]?.[tier]?.length ?? 0),
+    0,
+  );
+  const questionPool = useMemo(() => {
+    const selectedModules = examScope === "all-subject" ? subjectModules : [current];
     return selectedModules.flatMap((module) => [
       ...module.questions[tier],
       ...(extraPhysicsQuestions[module.slug]?.[tier] ?? []),
+      ...(grade12QuestionFormatExtras[module.slug]?.[tier] ?? []),
     ]);
-  }, [current, tier, examScope, isPhysicsModule]);
+  }, [current, subjectModules, tier, examScope]);
+  const questions = useMemo(() => {
+    if (examScope !== "all-subject") return questionPool;
+    return seededShuffle(questionPool, examVersion).slice(0, testSize);
+  }, [questionPool, examScope, examVersion, testSize]);
   const questionKindCount = new Set(questions.map((question) => question.kind || "اختيار من متعدد")).size;
   const suggestedMinutes = Math.max(
     tierDetails[tier].minutes,
@@ -3097,6 +3129,8 @@ export default function Grade12LearningHubPage() {
     setSearchParams({ subject: slug, lesson: "0" });
     setExamScope("unit");
     setTier("good");
+    setExamVersion(1);
+    setTestSize(15);
     setAnswers({});
     setRevealed([]);
     setSubmitted(false);
@@ -3110,6 +3144,13 @@ export default function Grade12LearningHubPage() {
   };
   const chooseTier = (next: Tier) => {
     setTier(next);
+    setExamVersion((version) => version + 1);
+    setAnswers({});
+    setRevealed([]);
+    setSubmitted(false);
+  };
+  const buildNewExam = () => {
+    setExamVersion((version) => version + 1);
     setAnswers({});
     setRevealed([]);
     setSubmitted(false);
@@ -3122,7 +3163,7 @@ export default function Grade12LearningHubPage() {
   const checkOne = (id: string) => setRevealed((old) => old.includes(id) ? old : [...old, id]);
   const submitQuiz = () => {
     if (submitted || answered !== questions.length) return;
-    saveAttempt(examScope === "all-physics" && isPhysicsModule ? "physics-comprehensive" : current.slug, tier, score, questions.length);
+    saveAttempt(examScope === "all-subject" ? `subject-${current.slug}-comprehensive` : current.slug, tier, score, questions.length);
     setSubmitted(true);
   };
   const printDocument = (kind: "summary" | "exam") => {
@@ -3224,10 +3265,14 @@ export default function Grade12LearningHubPage() {
         </section>
 
         <section className="g12-learning-panel g12-learning-quiz">
-          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>{examScope === "all-physics" && isPhysicsModule ? "اختبار شامل لوحدات الفيزياء" : "اختبار شامل للوحدة"}</h2><p>بنك أسئلة موسع ومتنوع بين الحساب والتفسير والصح والخطأ واختيار العلاقة والتطبيق.</p></div></div>
-          {isPhysicsModule && <div className="g12-learning-exam-scope" role="group" aria-label="نطاق الاختبار">
-            <button type="button" className={examScope === "unit" ? "active" : ""} onClick={() => { setExamScope("unit"); resetQuiz(); }}>اختبار الوحدة الحالية <small>24 سؤالاً في البنك</small></button>
-            <button type="button" className={examScope === "all-physics" ? "active" : ""} onClick={() => { setExamScope("all-physics"); resetQuiz(); }}>اختبار شامل للفيزياء <small>144 سؤالاً في البنك</small></button>
+          <div className="g12-learning-panel-title"><span><FileText size={20}/></span><div><h2>{examScope === "all-subject" ? `اختبار شامل للمادة · ${current.name}` : "اختبار الدرس الحالي"}</h2><p>كوّن نموذجاً من بنك المادة، مع مستويات مختلفة وصيغ أسئلة متنوعة بحسب الموضوع.</p></div></div>
+          <div className="g12-learning-exam-scope" role="group" aria-label="نطاق الاختبار">
+            <button type="button" className={examScope === "unit" ? "active" : ""} onClick={() => { setExamScope("unit"); resetQuiz(); }}>اختبار الدرس الحالي <small>{currentUnitQuestionCount} أسئلة في هذا المستوى</small></button>
+            <button type="button" className={examScope === "all-subject" ? "active" : ""} onClick={() => { setExamScope("all-subject"); setExamVersion((version) => version + 1); resetQuiz(); }}>اختبار شامل للمادة <small>{subjectQuestionBankCount} سؤالاً متاحاً في هذا المستوى</small></button>
+          </div>
+          {examScope === "all-subject" && <div className="g12-learning-exam-scope" role="group" aria-label="إعداد نموذج الاختبار">
+            {[10, 15, 20].map((size) => <button key={size} type="button" className={testSize === size ? "active" : ""} onClick={() => { setTestSize(size); resetQuiz(); }}>{size} أسئلة</button>)}
+            <button type="button" onClick={buildNewExam}>توليد نموذج جديد</button>
           </div>}
           <div className="g12-learning-tier-switch">
             {(["good", "hard", "hardest"] as Tier[]).map((value) => <button key={value} type="button" onClick={() => chooseTier(value)} className={tier === value ? "active" : ""}><b>{tierDetails[value].label}</b><small>{tierDetails[value].subtitle}</small></button>)}
