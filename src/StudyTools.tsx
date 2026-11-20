@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2, ChevronLeft, FileText,
-  RotateCcw, ShieldCheck, Sparkles, Target, Timer, Trophy, X
+  Activity, ArrowLeft, ArrowRight, BookOpen, Brain, Check, CheckCircle2,
+  ChevronLeft, ClipboardCheck, FileText, RotateCcw, ShieldCheck, Sparkles,
+  Target, Timer, Trophy, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { demoLesson, type Question } from "./data/learning";
@@ -141,7 +142,7 @@ export function TargetTestPage() {
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><b>الاختبار المستهدف</b></div>
     <PageIntro eyebrow="تدريب مخصص لنقاطك" title="الاختبار المستهدف" description="اختر الموضوع ومستوى الصعوبة والوقت، ثم أكمل اختباراً قصيراً يكشف لك ما يحتاج إلى مراجعة."/>
     {!started && <section className="tool-workspace">
-      <div className="tool-workspace-head"><span className="tool-icon"><Target size={24}/></span><div><h2>أنشئ اختبارك</h2><p>المحتوى التجريبي المتاح الآن: {demoLesson.title}</p></div></div>
+      <div className="tool-workspace-head"><span className="tool-icon"><ClipboardCheck size={24}/></span><div><h2>أنشئ اختبارك</h2><p>المحتوى التجريبي المتاح الآن: {demoLesson.title}</p></div></div>
       <div className="builder-grid">
         <label><span>الموضوع</span><select value="vectors" disabled><option value="vectors">{demoLesson.title}</option></select></label>
         <label><span>مستوى الصعوبة</span><select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}><option value="all">كل المستويات</option><option value="سهل">سهل</option><option value="متوسط">متوسط</option><option value="متقدم">متقدم</option></select></label>
@@ -192,7 +193,7 @@ export function StrengthsWeaknessesPage() {
     <div className="performance-summary"><article><span>دقة الإجابات</span><b>{totalAnswers ? accuracy + "%" : "—"}</b><small>{correctAnswers} إجابات صحيحة من {totalAnswers}</small></article><article><span>المحاولات</span><b>{attempts.length}</b><small>اختبارات محفوظة محلياً</small></article><article><span>الموضوعات المتتبعة</span><b>{totalAnswers ? 1 : 0}</b><small>من محتوى النموذج التجريبي</small></article></div>
     <section className="tool-workspace">
       <div className="panel-heading"><h2>تحليل الموضوع</h2><span className="content-status">الفيزياء · نموذج تجريبي</span></div>
-      {totalAnswers ? <div className="topic-performance-list">{byQuestion.map(({ question, count, accuracy: value }) => <article key={question.id}><div><b>{question.prompt}</b><small>{count ? count + " محاولات مسجلة" : "لم تتم الإجابة بعد"}</small></div><div className="topic-meter"><span><i style={{ width: (value ?? 0) + "%" }}/></span><b>{value === null ? "—" : value + "%"}</b></div></article>)}</div> : <div className="dashboard-empty"><Brain/><b>لا توجد بيانات كافية بعد</b><p>أكمل اختباراً مستهدفاً حتى يظهر تحليل إجاباتك.</p><Link className="btn btn-primary" to="/target-test">إنشاء اختبار مستهدف <ArrowLeft size={15}/></Link></div>}
+      {totalAnswers ? <div className="topic-performance-list">{byQuestion.map(({ question, count, accuracy: value }) => <article key={question.id}><div><b>{question.prompt}</b><small>{count ? count + " محاولات مسجلة" : "لم تتم الإجابة بعد"}</small></div><div className="topic-meter"><span><i style={{ width: (value ?? 0) + "%" }}/></span><b>{value === null ? "—" : value + "%"}</b></div></article>)}</div> : <div className="dashboard-empty"><Activity/><b>لا توجد بيانات كافية بعد</b><p>أكمل اختباراً مستهدفاً حتى يظهر تحليل إجاباتك.</p><Link className="btn btn-primary" to="/target-test">إنشاء اختبار مستهدف <ArrowLeft size={15}/></Link></div>}
     </section>
     <div className="next-revision"><span className="tool-icon"><BookOpen size={22}/></span><div><b>خطوتك التالية</b><p>عد إلى ملاحظات الدرس وراجع الفكرة قبل المحاولة القادمة.</p></div><Link className="text-link" to="/lesson/scalars-and-vectors">مراجعة الدرس <ArrowLeft size={15}/></Link></div>
     <ToolNotice>هذا التحليل مبدئي ويعتمد على سجل هذا المتصفح فقط. التحليل الكامل عبر المواد والأجهزة يحتاج حفظ النتائج في قاعدة بيانات مرتبطة بحساب الطالب.</ToolNotice>
