@@ -58,11 +58,24 @@ body {
 
 .ys-photo-background-layer.is-active {
   opacity: .78;
-  animation: ys-photo-drift 24s ease-in-out infinite alternate;
+  animation:
+    ys-photo-fade-in 1.8s cubic-bezier(.2,.7,.2,1) both,
+    ys-photo-drift 24s ease-in-out infinite alternate;
 }
 
 .ys-photo-background-layer.is-previous {
   opacity: 0;
+  animation: ys-photo-fade-out 1.8s cubic-bezier(.2,.7,.2,1) both;
+}
+
+@keyframes ys-photo-fade-in {
+  from { opacity: 0; }
+  to { opacity: .78; }
+}
+
+@keyframes ys-photo-fade-out {
+  from { opacity: .78; }
+  to { opacity: 0; }
 }
 
 .ys-photo-background-wash {
