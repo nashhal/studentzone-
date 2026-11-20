@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  Award, BookOpen, BookOpenCheck, Bookmark, CalendarDays,
+  Activity, Award, BookOpen, BookOpenCheck, Bookmark, CalendarDays,
   ChevronDown, ChevronLeft, ClipboardCheck, ClipboardList, FileText,
   Layers3, Menu, Timer,
 } from "lucide-react";
