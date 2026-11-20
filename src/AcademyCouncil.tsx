@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "./lib/auth";
+import { isSupabaseConfigured } from "./lib/supabase";
 import "./academy-council.css";
 
 type AgentId = "director" | "curriculum" | "content" | "assessment" | "review" | "experience" | "quality" | "release";
@@ -152,7 +153,7 @@ export default function AcademyCouncilPage() {
     setNotice("أُعيدت قائمة المهام الابتدائية.");
   };
 
-  if (role !== "admin" && role !== "editor") {
+  if (isSupabaseConfigured && role !== "admin" && role !== "editor") {
     return <main className="container page council-page"><div className="council-denied"><ShieldAlert size={25}/><h1>مجلس تطوير المنصة</h1><p>هذه المساحة مخصصة للمدير والمحررين المعتمدين. سجّل الدخول بحساب لديه صلاحية إدارة المحتوى.</p><Link className="btn btn-primary" to="/login">تسجيل الدخول <ArrowLeft size={16}/></Link></div></main>;
   }
 
@@ -168,7 +169,7 @@ export default function AcademyCouncilPage() {
       <div className="council-hero-mark"><Bot size={34}/><span>YEMEN STUDY</span><small>ACADEMIC COUNCIL</small></div>
     </header>
 
-    <div className="council-status-note"><ShieldCheck size={17}/><p><b>وضع التشغيل الحالي:</b> المجلس يوفّر أدواراً متخصصة ولوحة مهام ومحاضر قرارات محفوظة محلياً. لم يتم ربط وكلاء ذكاء اصطناعي ينفذون العمل تلقائياً بعد؛ ذلك يحتاج خدمة خلفية آمنة وربط نماذج ومخزناً مشتركاً.</p></div>
+    <div className="council-status-note"><ShieldCheck size={17}/><p><b>وضع التشغيل الحالي:</b> المجلس يوفّر أدواراً متخصصة ولوحة مهام ومحاضر قرارات محفوظة محلياً. لم يتم ربط وكلاء ذكاء اصطناعي ينفذون العمل تلقائياً بعد؛ ذلك يحتاج خدمة خلفية آمنة وربط نماذج ومخزناً مشتركاً. {!isSupabaseConfigured && "إعداد الدخول وقاعدة البيانات السحابية غير مفعّل حالياً، لذلك هذه اللوحة شخصية ومحفوظة في هذا المتصفح فقط، ولا تتزامن مع الأجهزة الأخرى."}</p></div>
 
     <section className="council-stats">
       <article><span>إجمالي المهام</span><b>{stats.all}</b><small>في مساحة هذا المتصفح</small></article>
