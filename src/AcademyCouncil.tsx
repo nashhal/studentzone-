@@ -169,7 +169,11 @@ export default function AcademyCouncilPage() {
       <div className="council-hero-mark"><Bot size={34}/><span>YEMEN STUDY</span><small>ACADEMIC COUNCIL</small></div>
     </header>
 
-    <div className="council-status-note"><ShieldCheck size={17}/><p><b>وضع التشغيل الحالي:</b> المجلس يوفّر أدواراً متخصصة ولوحة مهام ومحاضر قرارات محفوظة محلياً. لم يتم ربط وكلاء ذكاء اصطناعي ينفذون العمل تلقائياً بعد؛ ذلك يحتاج خدمة خلفية آمنة وربط نماذج ومخزناً مشتركاً. {!isSupabaseConfigured && "إعداد الدخول وقاعدة البيانات السحابية غير مفعّل حالياً، لذلك هذه اللوحة شخصية ومحفوظة في هذا المتصفح فقط، ولا تتزامن مع الأجهزة الأخرى."}</p></div>
+    <div className="council-status-note"><ShieldCheck size={17}/><p><b>نظام الوكلاء المستقلين:</b> رُبطت ثمانية وكلاء منفصلين باستخدام OpenAI Agents SDK، ويعمل تشغيلهم من GitHub Actions عند إرسال مهمة من نموذج المجلس. لكل وكيل أدوات وصلاحيات ملفات محدودة. يجهزون تقارير وفرعاً وطلب دمج للمراجعة البشرية؛ لا يوجد دمج أو نشر تلقائي. يلزم إعداد سر <code>OPENAI_API_KEY</code> في GitHub Actions بواسطة مالك الحساب، مع تفعيل حدود الإنفاق ومراجعة إذن إنشاء طلبات الدمج. لا تضع المفتاح هنا أو في المتصفح.</p></div>
+    <section className="council-agent-launch">
+      <div><span className="eyebrow">تشغيل مهمة حقيقية</span><h2>إرسال مهمة إلى الوكلاء الثمانية</h2><p>افتح نموذج المهمة، اشرح المطلوب ومعايير النجاح، ثم ينطلق سير العمل بعد إنشاء الطلب إذا اكتملت إعدادات السر والصلاحيات.</p></div>
+      <a href="https://github.com/nashhal/studentzone-/issues/new?template=academic-agent-task.yml" target="_blank" rel="noreferrer">إنشاء مهمة للوكلاء <ArrowLeft size={15}/></a>
+    </section>
 
     <section className="council-stats">
       <article><span>إجمالي المهام</span><b>{stats.all}</b><small>في مساحة هذا المتصفح</small></article>
@@ -198,7 +202,7 @@ export default function AcademyCouncilPage() {
 
     <section className="council-work-grid">
       <div className="council-section council-create-task">
-        <div className="council-section-heading"><div><span className="eyebrow">02 · إدارة العمل</span><h2>تكليف جديد</h2><p>اكتب المهمة وحدد الوكيل والأولوية المطلوبة.</p></div><Plus size={20}/></div>
+        <div className="council-section-heading"><div><span className="eyebrow">02 · إدارة العمل</span><h2>مهمة تخطيط محلية</h2><p>هذه القائمة خاصة بهذا المتصفح؛ لإطلاق الوكلاء فعلياً استخدم نموذج إرسال المهمة أعلاه.</p></div><Plus size={20}/></div>
         <form id="council-task-form" className="council-form" onSubmit={addTask}>
           <label>عنوان المهمة<input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="مثال: تدقيق أسئلة الوحدة الثانية"/></label>
           <label>وصف المهمة والمطلوب<textarea rows={4} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="حدّد الصفحات أو الدروس والنتيجة التي يجب تسليمها."/></label>
@@ -206,7 +210,7 @@ export default function AcademyCouncilPage() {
             <label>الوكيل المسؤول<select value={agent} onChange={(event) => setAgent(event.target.value as AgentId)}>{agents.map((member) => <option key={member.id} value={member.id}>{member.name} — {member.role}</option>)}</select></label>
             <label>الأولوية<select value={priority} onChange={(event) => setPriority(event.target.value as Priority)}><option value="high">عالية</option><option value="normal">عادية</option><option value="low">منخفضة</option></select></label>
           </div>
-          <button className="btn btn-primary" type="submit" disabled={!title.trim()}>إضافة إلى المجلس <Plus size={15}/></button>
+          <button className="btn btn-primary" type="submit" disabled={!title.trim()}>حفظ في لوحة التخطيط <Plus size={15}/></button>
         </form>
       </div>
 
@@ -254,6 +258,6 @@ export default function AcademyCouncilPage() {
     </section>
 
     {notice && <div className="council-live-notice" role="status" aria-live="polite">{notice}</div>}
-    <div className="council-footer-note"><ShieldAlert size={16}/><p>هذه النسخة هي لوحة إدارة وتوزيع ومراجعة مهام. لا تتصل حالياً بموديلات ذكاء اصطناعي ولا تنفذ كود GitHub أو تنشره من تلقاء نفسها. لتحويل الأدوار إلى بوتات مستقلة فعلياً، يلزم إعداد خدمة خلفية آمنة، وربط كل وكيل بأدوات محددة، وإضافة سجل تدقيق وموافقة قبل الدمج والنشر.</p></div>
+    <div className="council-footer-note"><ShieldAlert size={16}/><p>حدود التشغيل: الوكلاء يعملون داخل GitHub Actions بطلبات متسلسلة ومحدودة بعد إعداد المفتاح. يمكنهم قراءة ملفات المنهج والواجهة المسموحة فقط، وتطبيق تعديلات على قائمة ملفات محددة. لا يستطيعون قراءة ملفات الدخول وقاعدة البيانات أو أسرار المستودع أو تعديل سير العمل. لوحة المهام والمحاضر الظاهرة أعلاه محلية لهذا المتصفح، أما مهام الوكلاء وتقاريرهم فتُحفظ في Issues وفروع GitHub.</p></div>
   </main>;
 }
