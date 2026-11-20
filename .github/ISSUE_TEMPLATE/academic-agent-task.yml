@@ -1,0 +1,64 @@
+name: Academic Agent Task
+description: Assign a platform-development task to the eight-agent academic council.
+title: "[AI Council] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The task will be handled by eight independent specialist agents. They can prepare changes and open a pull request, but a human must review and merge it. Do not include passwords, API keys, personal data, or private student information.
+  - type: input
+    id: objective
+    attributes:
+      label: Task title
+      description: State the outcome you want the council to achieve.
+      placeholder: Improve the physics question bank for Grade 12
+    validations:
+      required: true
+  - type: dropdown
+    id: work_mode
+    attributes:
+      label: Work mode
+      description: Choose the expected level of action.
+      options:
+        - Research and recommendations only
+        - Prepare content or assessments
+        - Implement a website change and prepare a pull request
+        - Full task — research, implement, test, and prepare a pull request
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Normal
+        - Low
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and requirements
+      description: Explain the problem, target page/module, and any constraints.
+      placeholder: Describe the current behaviour and the expected result.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance criteria
+      description: How should the council verify that the task is complete?
+      placeholder: |
+        - Expected behaviour...
+        - What must remain unchanged...
+        - Tests that should pass...
+    validations:
+      required: true
+  - type: textarea
+    id: source_material
+    attributes:
+      label: Source references (optional)
+      description: Add public URLs, repository paths, or page/section references. Do not paste copyrighted books in full.
+    validations:
+      required: false
