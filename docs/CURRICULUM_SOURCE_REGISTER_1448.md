@@ -1,85 +1,83 @@
-# Yemen Study — 1448 AH curriculum evidence register
+# Yemen Study — 2026–2027 curriculum evidence register
 
-Last checked: 19 November 2026
+Last checked: 20 November 2026
 
-## Purpose
+## Newly received primary curriculum documents
 
-This register separates evidence that a book exists from evidence that its units and lessons have been checked. It is not a substitute for inspecting the complete official book or confirming the applicable education authority and region.
+The project owner supplied the following Ministry of Education documents for the working Yemen Study scope (Grades 1–12, 2026–2027):
 
-## Current official-source evidence
+| Source file | Coverage | PDF pages | What it establishes | What it does not establish by itself |
+|---|---|---:|---|---|
+| الصفوف الاولية ( 1 - 3 ) 2026 -2027.pdf | Grades 1–3 | 32 | Weekly subject allocation and detailed subject plans/topics for the early grades | Full textbook explanations, complete textbook prose, or every exercise |
+| المقررات الدراسية ( 4-9 ) 2026 -2027.pdf | Grades 4–9 | 90 | Curriculum/subject plans and distribution of lessons and topics in basic education | Full textbook explanations, complete textbook prose, or every exercise |
+| المقررات الدراسية ( 10 - 12 )2026-2027.pdf | Grades 10–12 | 89 | Secondary subject plans, topic/lesson distribution, and track differentiation where shown | Full textbook explanations, complete textbook prose, or every exercise |
 
-The Yemeni Ministry of Education's e-learning portal is the primary place to verify books and edition details:
+All three PDFs show Ministry of Education / Sector of Curricula & Supervision / General Administration of Educational Supervision headings. The first file's page 3 contains the weekly subject allocation table across Grades 1–12. Its following pages include lesson-by-lesson tables for Qur'an in the early grades. The 4–9 and 10–12 files contain similar tabular plans with subject branches, lesson/topic titles, lesson numbers, periods and, in some tables, skills or notes. The secondary document includes tables explicitly labelled for the scientific and literary tracks.
+
+**Working curriculum decision:** these three supplied documents are the primary planning basis for this project and the 2026–2027 school year. The project scope is Aden, as explicitly selected by the project owner. The visible Ministry headers establish the issuing Ministry/sector and year; individual lesson records should retain the Aden project-scope label and a note where the relevant page or cover does not itself print a regional label. Do not silently replace these documents with a Sana'a catalogue or a previous-year textbook.
+
+### How to use these PDFs
+
+- Use the PDFs to determine the grade, subject, stream, lesson/topic title, order, weekly periods and official notes.
+- Use the exact page number in the relevant PDF as the curriculum citation for each topic.
+- Do not treat a topic distribution table as the full textbook or as permission to reproduce the textbook.
+- Do not infer missing titles from a different governorate, edition or school year.
+- The secondary files must be checked carefully for the scientific/literary split, and the listed exclusions/deletions must not be taught as examinable material unless the official plan says otherwise.
+- A course is only "mapped" after every applicable page/table for that grade and subject has been reviewed.
+
+## Earlier 1448 AH / public catalogue references
+
+The Yemeni Ministry of Education's e-learning portal remains a useful additional route for checking textbook titles and editions:
 
 - Main portal: https://e-learning-moe.edu.ye/index.php
 - Book catalogue: https://e-learning-moe.edu.ye/book.php
 - Official books-channel announcement: https://t.me/books_yemen_new/1316
+- Educational-media channel: https://t.me/s/YemenEducationC/27910
 
-On 6 July 2026, the books channel announced the availability of the 1448 AH curriculum on the Ministry e-learning portal. A separate educational-media channel displayed a partial list of 1448 AH books, including:
+Older public posts and third-party indexes are discovery aids only. They do not override the newly supplied 2026–2027 planning PDFs or prove that a different regional edition is current.
 
-| Grade | Book title shown in the 1448 announcement | Evidence status |
-|---|---|---|
-| Grade 1 Basic | Arabic language | Title identified; full book and lesson sequence still need review |
-| Grade 7 Basic | Arabic language; History | Titles identified; full books and lesson sequence still need review |
-| Grade 8 Basic | History; Islamic Education | Titles identified; full books and lesson sequence still need review |
-| Grade 9 Basic | Arabic language; Qur'an and its sciences | Titles identified; full books and lesson sequence still need review |
-| Grade 10 Secondary | Reading | Title identified; full book and lesson sequence still need review |
-| Grade 11 Secondary | Reading | Title identified; full book and lesson sequence still need review |
+## International explanation references
 
-Announcement channel page: https://t.me/s/YemenEducationC/27910
-
-This is partial evidence only. It does not verify every grade, every subject, all regional versions, or the exact lesson sequence. The Ministry catalogue did not respond during the latest automated check, so no inaccessible file is counted as inspected.
-
-## International verification references
-
-International resources are used to validate concepts, terminology, calculations, units and scientific context. They do not determine which topic belongs in a Yemeni grade.
-
-- Mathematics and science: OpenStax textbooks, with exact title and section recorded.
-- Units and measurement: National Institute of Standards and Technology (NIST).
-- Chemistry terminology: IUPAC Gold Book.
-- Biology: NCBI Bookshelf and relevant scientific institutions.
-- English language: British Council LearnEnglish and Cambridge Dictionary.
-- Earth and environmental science: NASA and NOAA educational/scientific resources.
-
-OpenStax content uses the CC BY-NC-SA licence. It is not suitable for commercial reuse under that licence; any reuse or adaptation must retain attribution and comply with the non-commercial and share-alike conditions. Yemen Study therefore writes original explanations and exercises by default and uses sources as fact-checking references, not as text to copy.
+International sources are used to verify concepts, terminology, calculations, units and explanatory methods. They do not determine which topic belongs in a Yemeni grade. See [INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md](./INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md) for the subject map, links, use limitations and rights rules.
 
 ## Student-facing delivery requirement
 
 The student must be able to complete the whole learning path inside Yemen Study:
 
-- lesson introduction, objectives and explanations;
-- formulas, tables and original diagrams;
+- lesson introduction, objectives and original Arabic explanation;
+- formulae, tables and original diagrams;
 - fully worked examples and practice problems;
-- quizzes, answer explanations and flashcards;
+- quizzes, explanatory feedback and flashcards;
 - summaries, timed tests and progress tracking.
 
-External websites are editorial evidence for authors and reviewers. They are not required reading for students and must not replace the actual lesson. The student interface may display a short source attribution, but the lesson, examples, questions and explanations remain in the site.
+External websites are editorial references for authors and reviewers. They are not required reading for students and must not replace the lesson in Yemen Study.
 
 ## Publication gate
 
 A lesson is counted as published only after all fields below are satisfied:
 
-1. The grade, track, subject, unit, school year, region and edition have been confirmed.
-2. Its unit and lesson order have been checked against the official source copy.
-3. The explanation is newly written in suitable Arabic and reviewed for age/grade level.
-4. Every formula, fact, definition and worked solution has a traceable reference and has been checked.
-5. Every question is original or has explicit reuse permission; every answer includes an explanation.
+1. Grade, track, subject, unit, school year and project region have been recorded.
+2. Its title and order have been checked against the applicable 2026–2027 source PDF page.
+3. The explanation is newly written in suitable Arabic and reviewed for grade level.
+4. Every formula, fact, definition and worked solution has traceable references and has been checked.
+5. Every question is original or expressly licensed; every answer includes an explanation.
 6. Media and diagrams have an author/rights record.
 7. A subject reviewer has approved the lesson.
 8. The complete student activity works inside Yemen Study.
 
 ## Current product status
 
-- The site currently contains a provisional grade/subject index for Grades 1–12.
-- The one complete interactive Physics lesson remains a demonstration, not a verified lesson for a named Yemeni edition.
+- The site contains a provisional grade/subject index for Grades 1–12.
+- The newly supplied 2026–2027 planning PDFs are now the project's primary planning sources, but the full page-by-page grade/subject maps have not yet all been extracted.
+- Existing Grade 12 sample modules and test banks are not automatically certified against these PDFs. Each module must be matched to the exact topic and exclusions before being labelled aligned.
 - No grade currently has a complete, verified lesson library.
-- The editorial schema and in-site lesson reader exist, but the production Supabase project and environment variables are not configured. Consequently, newly authored database lessons cannot yet be published to the live site.
-- Until those blockers are resolved, do not mark subjects or grade libraries as complete.
+- The editorial schema and in-site reader exist, but the production content backend is not fully configured. Newly authored database lessons cannot be assumed live until the backend and deployment are verified.
 
 ## Required delivery sequence
 
-1. Verify the 1448 AH / 2026–2027 syllabus and regional scope grade by grade.
-2. Build unit and lesson maps from each inspected contents page.
-3. Author the complete lesson set in batches, including practice and worked solutions.
-4. Independently check calculations and answers, then obtain subject review.
-5. Configure the content backend and publish reviewed batches to the in-site reader.
-6. Run student-facing checks on desktop and mobile before counting a batch as released.
+1. Extract every grade/subject/track topic from the three supplied 2026–2027 planning PDFs.
+2. Build the complete official lesson map with PDF file/page citations.
+3. Match each official topic to one or more reputable international explanation references.
+4. Write original Arabic explanations, local examples, worked solutions and assessments.
+5. Independently verify answers and obtain subject review.
+6. Publish reviewed batches in-site and verify the student experience on desktop and mobile.

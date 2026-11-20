@@ -1,54 +1,67 @@
 # Yemen Study — curriculum coverage and delivery register
 
-Last reviewed: 19 November 2026
+Last reviewed: 20 November 2026
 
 ## Scope
 
-Target scope: Grades 1–9 Basic Education and Grades 10–12 Secondary Education. Track separation is maintained wherever the applicable Yemeni syllabus specifies it. The catalogue currently separates scientific and literary tracks in Grades 11 and 12, but that catalogue itself remains provisional and must be checked against the selected school year, governorate/authority and edition.
+Project scope: Yemen / Aden 2026–2027 school year, Grades 1–9 Basic Education and Grades 10–12 Secondary Education. Track separation is maintained wherever the supplied Ministry plans specify it. In secondary education, Grade 10 is shown as the common first-secondary grade; Grade 11 and Grade 12 are maintained separately for Scientific and Literary tracks when indicated in the official plan.
+
+## Source-document status
+
+The project owner supplied three Ministry of Education planning PDFs:
+
+| Grades | Source file | Pages | Source status |
+|---|---|---:|---|
+| 1–3 | الصفوف الاولية ( 1 - 3 ) 2026 -2027.pdf | 32 | Received; page-by-page subject/topic mapping in progress |
+| 4–9 | المقررات الدراسية ( 4-9 ) 2026 -2027.pdf | 90 | Received; page-by-page subject/topic mapping in progress |
+| 10–12 | المقررات الدراسية ( 10 - 12 )2026-2027.pdf | 89 | Received; page-by-page subject/topic/track mapping in progress |
+
+These are official-looking Ministry planning documents with course/subject distribution tables. They establish the planning basis, lesson/topic names, sequencing, subject branches, periods and some skills/notes where present. They are **not complete textbooks** and do not contain all explanatory text, exercises or solutions. See [CURRICULUM_SOURCE_REGISTER_1448.md](./CURRICULUM_SOURCE_REGISTER_1448.md) for provenance and page-level handling rules.
 
 ## Current verified status
 
 - The repository contains a provisional grade and subject navigation index for Grades 1–12.
-- The index is not yet a verified national syllabus matrix. A regional source such as the Hadramout Education Office catalogue must not be treated as proof of nationwide applicability.
-- There is one full interactive Physics demonstration lesson (Scalars and Vectors). It is a product/content-format demonstration only; it is **not** confirmed against a named Yemeni textbook edition and must not be counted as an approved curriculum lesson.
-- There is no complete, verified unit/lesson library for any grade yet.
-- Past-paper and external-resource links do not count as authored lessons.
+- The three 2026–2027 planning PDFs have now been received and selected as the primary planning basis for this project.
+- Not all rows/tables across all 211 pages have yet been extracted into the structured subject → unit → lesson map.
+- The current index and older Grade 12 sample modules are not automatically certified against the newly supplied 2026–2027 plans. Match each lesson and any deletions/exclusions before marking it aligned.
+- There is one full interactive Physics demonstration lesson (Scalars and Vectors). It is a product/content-format demonstration only; it is **not** confirmed against a named 2026–2027 plan item and must not be counted as an approved curriculum lesson until matched and reviewed.
+- No grade currently has a complete, verified unit/lesson library.
+- International explanation sources have been registered in [INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md](./INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md). They are used to improve Arabic explanations and check facts, not to alter the Yemeni curriculum sequence or copy/translate protected content.
 
 ## Grade-level register
 
-| Grade | Stage | Track structure shown in the current provisional index | Syllabus verification | Published verified lessons |
-|---|---|---|---|---:|
-| 1 | Basic | General | Pending | 0 |
-| 2 | Basic | General | Pending | 0 |
-| 3 | Basic | General | Pending | 0 |
-| 4 | Basic | General | Pending | 0 |
-| 5 | Basic | General | Pending | 0 |
-| 6 | Basic | General | Pending | 0 |
-| 7 | Basic | General | Pending | 0 |
-| 8 | Basic | General | Pending | 0 |
-| 9 | Basic | General | Pending | 0 |
-| 10 | Secondary | General | Pending | 0 |
-| 11 | Secondary | Scientific / Literary | Pending | 0 |
-| 12 | Secondary | Scientific / Literary | Pending | 0 |
-
-The demonstration Physics lesson is excluded from the published count because it is not teacher-reviewed or matched to a verified Yemeni edition.
+| Grade | Stage | Track structure | 2026–2027 plan received | Lesson-map status | Published verified lessons |
+|---|---|---|---|---|---:|
+| 1 | Basic | General | Yes | Pending full extraction | 0 |
+| 2 | Basic | General | Yes | Pending full extraction | 0 |
+| 3 | Basic | General | Yes | Pending full extraction | 0 |
+| 4 | Basic | General | Yes | Pending full extraction | 0 |
+| 5 | Basic | General | Yes | Pending full extraction | 0 |
+| 6 | Basic | General | Yes | Pending full extraction | 0 |
+| 7 | Basic | General | Yes | Pending full extraction | 0 |
+| 8 | Basic | General | Yes | Pending full extraction | 0 |
+| 9 | Basic | General | Yes | Pending full extraction | 0 |
+| 10 | Secondary | Common | Yes | Pending full extraction | 0 |
+| 11 | Secondary | Scientific / Literary | Yes | Pending full extraction by track | 0 |
+| 12 | Secondary | Scientific / Literary | Yes | Pending full extraction by track | 0 |
 
 ## Required status fields per subject
 
-1. **Index provisional:** subject name appears in the current app index; no claim about edition coverage.
-2. **Edition verified:** authority, region, school year, title and edition have been checked.
-3. **Unit map verified:** unit and lesson headings have been transcribed/reviewed against the approved copy, with page references.
-4. **Draft authored:** original explanations, examples, practice and learning checks are authored.
-5. **Subject review:** subject teacher has checked curriculum alignment and accuracy.
-6. **Rights reviewed:** every included source, quotation, diagram, image, dataset and simulation has a reuse decision.
-7. **Published:** all release gates passed and lesson is visible to students.
+1. **Plan received:** the applicable source PDF is attached and identified.
+2. **Unit map in progress:** source pages are being reviewed; not yet complete.
+3. **Unit map verified:** all applicable lesson/topic headings and order have been reviewed against the source pages, with citations.
+4. **Draft authored:** original Arabic explanations, examples, practice and learning checks are authored.
+5. **Reference checked:** reliable external references have been consulted and cited by the exact section/page used.
+6. **Subject review:** a subject reviewer has checked curriculum alignment, accuracy, language and all worked answers.
+7. **Rights reviewed:** every included source, quotation, diagram, image, dataset and simulation has a reuse decision.
+8. **Published:** all release gates passed and lesson is visible to students.
 
 ## Batch delivery sequence
 
-- **Stage A — source and syllabus verification:** confirm the applicable Yemeni authority/edition for every grade and track; collect table-of-contents metadata only after checking the source copy.
-- **Stage B — unit mapping:** create subject → unit → lesson structure for every verified book, preserving local ordering and textbook terminology.
-- **Stage C — authored learning content:** write original Arabic explanations, examples, diagrams where needed, topic questions, worked solutions, flashcards and recaps.
-- **Stage D — teacher and rights review:** approve content against the local syllabus and the international references; record all decisions in the source registry.
-- **Stage E — release:** publish reviewed items and keep an auditable record of edition changes and corrections.
+- **Stage A — map the supplied plans:** extract all grades, subjects, streams, units, lesson/topic titles, periods, skills and exclusions from the 211 source pages. Preserve the original labels and order.
+- **Stage B — build the crosswalk:** map each Yemeni lesson to reputable subject references (see the international reference library). International resources must not create new examinable lessons.
+- **Stage C — author original Arabic learning content:** learning objectives, definitions, explanations, formulae, original diagrams, worked examples, misconceptions, questions, explanations and revision summary.
+- **Stage D — verify and review:** independently check factual claims, mathematics/science calculations, answer keys, age appropriateness and rights; obtain subject review.
+- **Stage E — release in the site:** publish reviewed batches, keep all core student learning inside Yemen Study, and maintain the source/correction record.
 
-Do not start by generating hundreds of unsourced lesson names. Build complete, traceable batches from actual syllabus evidence, and show students which subjects are ready versus in preparation.
+Do not mark all lessons complete merely because a plan PDF is uploaded. Do not create hundreds of unsourced topic labels from generic foreign courses. Build complete, traceable batches from the supplied 2026–2027 plan, and show students which subjects are ready versus in preparation.
