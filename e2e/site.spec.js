@@ -27,13 +27,15 @@ test.describe("Yemen Study public learning journey", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("./");
 
-    const menuButton = page.getByRole("button", { name: "فتح القائمة" });
+    const menuButton = page.locator('button[aria-controls="primary-navigation"]');
     await expect(menuButton).toBeVisible();
+    await expect(menuButton).toHaveAttribute("aria-label", "فتح القائمة");
     await menuButton.click();
 
     const navigation = page.locator("#primary-navigation");
     await expect(navigation).toBeVisible();
     await expect(menuButton).toHaveAttribute("aria-expanded", "true");
+    await expect(menuButton).toHaveAttribute("aria-label", "إغلاق القائمة");
     await navigation.getByRole("link", { name: /ابدأ الدراسة/ }).click();
     await expect(page.getByRole("heading", { level: 1, name: /اختر صفك الدراسي/ })).toBeVisible();
   });
