@@ -9,7 +9,6 @@ import {
 import { Link, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
-import { FadeContent } from "./components/animations/FadeContent";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoCourse, demoLesson, type Question } from "./data/learning";
