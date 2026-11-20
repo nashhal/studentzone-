@@ -3066,7 +3066,7 @@ export default function Grade12LearningHubPage() {
     ? Math.min(Math.max(requestedLessonIndex, 0), Math.max(availableLessons.length - 1, 0))
     : 0;
   const selectedLesson = availableLessons[selectedLessonIndex] || current.sections[0];
-  const selectedLessonTitle = selectedLesson?.title.replace(/^تفصيل الملخص:\\s*/, "") || current.title;
+  const selectedLessonTitle = selectedLesson?.title.replace(/^تفصيل الملخص:\s*/, "") || current.title;
   const [tier, setTier] = useState<Tier>("good");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<string[]>([]);
@@ -3166,7 +3166,7 @@ export default function Grade12LearningHubPage() {
             </div>
             <div className="g12-learning-lesson-grid">
               {availableLessons.map((section, index) => {
-                const title = section.title.replace(/^تفصيل الملخص:\\s*/, "");
+                const title = section.title.replace(/^تفصيل الملخص:\s*/, "");
                 return <button key={section.title} type="button" onClick={() => chooseLesson(index)} className={selectedLessonIndex === index ? "active" : ""} aria-current={selectedLessonIndex === index ? "page" : undefined}>
                   <i>{String(index + 1).padStart(2, "0")}</i><span>{title}</span>
                 </button>;
