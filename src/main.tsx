@@ -14,6 +14,7 @@ import "./visual-redesign.css";
 import "./site-visuals.css";
 import "./ui-polish.css";
 import "./learning-experience.css";
+import "./editorial-refresh-v2.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

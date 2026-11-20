@@ -1,0 +1,319 @@
+/* Yemen Study — editorial interface refresh, revision 2.
+   A visibly redesigned, restrained academic interface. */
+:root {
+  --ys-navy: #102b43;
+  --ys-blue: #245fe5;
+  --ys-blue-deep: #1746b6;
+  --ys-paper: #f5f7f5;
+  --ys-ink: #122b40;
+  --ys-text: #43586a;
+  --ys-muted: #768696;
+  --ys-line: #dce4e8;
+  --ys-green: #238d79;
+  --ys-accent-teal: #44b6a0;
+  --ys-accent-amber: #d7ac59;
+  --ys-radius-sm: 5px;
+  --ys-radius-md: 8px;
+  --ys-radius-lg: 10px;
+  --ys-shadow-card: 0 4px 14px rgba(16,43,67,.045);
+  --ys-shadow-float: 0 14px 34px rgba(16,43,67,.11);
+}
+html { background: var(--ys-paper); }
+body { background: var(--ys-paper); color: var(--ys-text); }
+button, input, select, textarea { font-family: inherit; }
+::selection { background: #dce8ff; color: #123d9e; }
+
+/* Navigation: compact, clear and recognisably branded. */
+.site-header.ys-site-header {
+  min-height: 82px;
+  background: rgba(250,252,251,.97);
+  border-bottom: 1px solid #d9e2e6;
+  box-shadow: 0 2px 10px rgba(16,43,67,.035);
+  backdrop-filter: blur(16px);
+}
+.ys-site-header .header-inner { min-height: 82px; gap: clamp(12px,1.5vw,22px); }
+.ys-brand-mark {
+  width: 48px; height: 48px; flex-basis: 48px;
+  border: 0; border-radius: 8px;
+  background: #102b43; box-shadow: none;
+}
+.ys-brand-mark svg { width: 39px; height: 39px; }
+.ys-brand-mark.is-compact { width: 38px; height: 38px; flex-basis: 38px; border-radius: 7px; }
+.ys-brand-mark.is-compact svg { width: 31px; height: 31px; }
+.ys-site-header .brand-copy b { color: #102b43; font-size: 18px; letter-spacing: -.035em; }
+.ys-site-header .brand-copy small { color: #75889a; font-size: 10px; letter-spacing: .01em; }
+.ys-site-header .main-nav > a,
+.ys-site-header .nav-dropdown-trigger { min-height: 44px; color: #41586c; font-size: 12px; }
+.ys-site-header .main-nav > a.active { color: #245fe5; }
+.ys-site-header .header-search-box { min-height: 40px; border-radius: 6px; background: #f1f4f5; }
+.ys-site-header .header-dashboard,
+.ys-site-header .header-upgrade,
+.ys-site-header .nav-account { min-height: 40px; border-radius: 6px; font-size: 11px; }
+.ys-site-header .header-upgrade { background: #245fe5; border-color: #245fe5; box-shadow: none; }
+.ys-site-header .mobile-menu { border-radius: 6px; }
+
+/* Home hero: large editorial typography and a strong photographic anchor. */
+.ys-home-page { background: #fbfcfb; }
+.ys-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid #dce4e8;
+  background: #eef3f2;
+}
+.ys-hero::before {
+  position: absolute; inset: 0 0 0 auto; z-index: -1;
+  width: 42%; height: 100%; content: "";
+  opacity: 1;
+  background: repeating-linear-gradient(0deg, transparent 0 47px, rgba(16,43,67,.035) 48px 49px);
+}
+.ys-hero-grid {
+  min-height: 610px;
+  grid-template-columns: minmax(0,.96fr) minmax(0,1.04fr);
+  gap: clamp(32px,5vw,78px);
+  align-items: center;
+  padding-block: 64px 72px;
+}
+.ys-hero-copy { max-width: 650px; animation: ys-rise-in .65s cubic-bezier(.2,.7,.25,1) both; }
+.ys-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border: 1px solid #d5e2df; border-radius: 4px;
+  background: rgba(255,255,255,.64); color: #1d756b;
+  font-size: 10px; font-weight: 800; letter-spacing: .02em;
+}
+.ys-eyebrow > span { width: 7px; height: 7px; background: #279580; box-shadow: none; }
+.ys-hero-copy h1 {
+  margin: 25px 0 18px; color: #102b43;
+  font-size: clamp(48px,5.4vw,74px); font-weight: 800;
+  line-height: 1.27; letter-spacing: -.055em;
+}
+.ys-hero-copy h1 em { color: #245fe5; font-style: normal; }
+.ys-hero-copy > p { max-width: 53ch; color: #52677a; font-size: 14px; line-height: 2.1; }
+.ys-hero-actions { gap: 11px; margin-top: 29px; }
+.ys-hero-actions .btn { min-height: 51px; padding-inline: 22px; border-radius: 6px; font-size: 12px; }
+.ys-hero-actions .btn-primary { background: #245fe5; border-color: #245fe5; box-shadow: none; }
+.ys-hero-actions .btn-primary:hover { background: #1746b6; box-shadow: none; }
+.ys-hero-actions .btn-outline { background: transparent; border-color: #bdcbd0; color: #29465d; }
+.ys-hero-assurance { margin-top: 24px; color: #6d8190; font-size: 10px; }
+.ys-hero-figure {
+  position: relative; height: clamp(360px,39vw,490px);
+  overflow: visible; border-radius: 3px;
+  animation: ys-rise-in .75s cubic-bezier(.2,.7,.25,1) .08s both;
+}
+.ys-hero-figure::before {
+  position: absolute; z-index: -1; inset: 18px -17px -17px 18px;
+  border: 1px solid #a9c4bd; content: "";
+}
+.ys-hero-image {
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+  border: 8px solid #fff; border-radius: 3px;
+  box-shadow: 0 16px 38px rgba(16,43,67,.13);
+  animation: none;
+}
+.ys-hero-figure figcaption {
+  right: 8px; bottom: 8px; left: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 14px; border-radius: 0;
+  background: rgba(16,43,67,.9); color: #fff;
+}
+.ys-hero-figure figcaption span { font-size: 11px; font-weight: 700; }
+.ys-hero-figure figcaption small { color: #d0dce5; font-size: 8px; }
+.ys-photo-note {
+  top: 23px; right: -25px; padding: 12px 15px;
+  border: 0; border-radius: 3px; background: #fff;
+  box-shadow: 0 9px 24px rgba(16,43,67,.13);
+}
+.ys-photo-note-icon { border-radius: 4px; background: #e9f4f1; color: #218b78; }
+
+/* Activity panel: a functional summary rather than a floating promo card. */
+.ys-learning-overview {
+  grid-template-columns: minmax(220px,.7fr) minmax(0,1.3fr);
+  gap: 30px; margin-block: 0 48px; padding: 30px 0 25px;
+  border: 0; border-bottom: 1px solid #dce4e8; border-radius: 0;
+  background: transparent; box-shadow: none;
+}
+.ys-learning-overview-intro { padding-inline-end: 25px; border-inline-end: 1px solid #dce4e8; }
+.ys-learning-overview-intro h2 { color: #102b43; font-size: 22px; }
+.ys-learning-overview-intro p { color: #708292; font-size: 10px; }
+.ys-overview-link { color: #245fe5; font-size: 10px; }
+.ys-learning-overview-stats { gap: 9px; }
+.ys-learning-stat {
+  min-height: 78px; padding: 12px 14px; grid-template-columns: 39px minmax(0,1fr);
+  border: 1px solid #e0e7e8; border-radius: 5px; background: #fff;
+}
+.ys-learning-stat-icon { width: 37px; height: 37px; border-radius: 5px; }
+.ys-learning-stat-icon.is-blue { background: #eaf0ff; color: #245fe5; }
+.ys-learning-stat-icon.is-teal { background: #e8f4f0; color: #218b78; }
+.ys-learning-stat-icon.is-amber { background: #f8f1e4; color: #a67c32; }
+.ys-learning-stat > b { color: #102b43; font-size: 21px; }
+.ys-learning-stat > small { color: #718291; font-size: 9px; }
+.ys-learning-shortcuts { gap: 5px; margin-top: 12px; }
+.ys-learning-shortcuts > a { gap: 9px; padding: 9px; border-radius: 4px; }
+.ys-learning-shortcuts > a:hover { background: #edf3f2; color: #174e62; transform: none; }
+.ys-shortcut-number { border-radius: 3px; background: #edf1f2; color: #526b7e; }
+.ys-learning-shortcuts b { font-size: 10px; }
+.ys-learning-shortcuts small { font-size: 8px; }
+.ys-learning-local-note { color: #85939e; }
+
+/* Editorial section rhythm, clear type hierarchy and simpler cards. */
+.ys-search-section {
+  grid-template-columns: minmax(240px,.75fr) minmax(0,1.25fr);
+  padding-block: 38px; border-bottom: 1px solid #dce4e8;
+}
+.ys-search-section h2 { color: #102b43; font-size: 24px; }
+.ys-search-section p { color: #718291; font-size: 11px; }
+.ys-search-section .search-box { min-height: 58px; border-radius: 5px; box-shadow: none; }
+.ys-search-section .search-action { border-radius: 4px; background: #245fe5; }
+.ys-skills-section { padding-block: 66px 76px; }
+.ys-section-heading { gap: 24px; margin-bottom: 25px; }
+.ys-section-heading h2 { color: #102b43; font-size: clamp(24px,2.5vw,32px); letter-spacing: -.03em; }
+.ys-section-heading > p { color: #718291; font-size: 11px; }
+.ys-skill-grid { gap: 16px; }
+.ys-skill-card {
+  border: 1px solid #dfe6e7; border-radius: 5px; background: #fff;
+  box-shadow: none; transition: border-color 180ms ease, transform 180ms ease;
+}
+.ys-skill-card:hover { transform: translateY(-3px); border-color: #a8c5bd; box-shadow: none; }
+.ys-skill-image { height: 190px; }
+.ys-skill-image img { transition: transform 500ms ease; }
+.ys-skill-body { padding: 19px 20px 21px; }
+.ys-skill-body h3 { color: #102b43; font-size: 16px; }
+.ys-skill-body p { color: #728291; font-size: 10px; }
+.ys-skill-cta { color: #245fe5; }
+.ys-tools-band { background: #102b43; }
+.ys-tools-band::before { width: 28%; background: linear-gradient(90deg,rgba(255,255,255,.035),transparent); }
+.ys-tools-layout { gap: clamp(34px,5vw,76px); padding-block: 70px 76px; }
+.ys-tools-intro h2 { color: #fff; font-size: clamp(34px,3.4vw,46px); line-height: 1.35; }
+.ys-tools-intro p { color: #c4d0d8; }
+.ys-tools-intro .ys-inline-link { color: #b8e5db; }
+.ys-tools-total { padding-top: 18px; border-top: 1px solid rgba(255,255,255,.16); }
+.ys-tools-total b { color: #fff; font-size: 44px; }
+.ys-tool-list { column-gap: 22px; }
+.ys-tool-card {
+  min-height: 130px; padding: 17px 5px;
+  grid-template-columns: 32px 43px minmax(0,1fr) 25px;
+  column-gap: 10px; border-top: 1px solid rgba(221,235,242,.17);
+  border-radius: 0; background: transparent;
+}
+.ys-tool-card:hover { background: rgba(255,255,255,.045); border-top-color: rgba(221,235,242,.45); }
+.ys-tool-number { width: 27px; height: 27px; border-radius: 4px; color: #bed2df; }
+.ys-tool-card .tool-icon { width: 40px; height: 40px; border-radius: 5px; background: rgba(255,255,255,.08); color: #98d9cc; }
+.ys-tool-copy h3 { color: #fff; font-size: 13px; }
+.ys-tool-copy p { color: #bbcad5; font-size: 10px; }
+.ys-tool-tag { color: #9ed5c9; }
+.ys-tool-arrow { width: 26px; height: 26px; border-radius: 50%; color: #c0d4df; }
+
+.ys-grade-section { padding-block: 72px 78px; }
+.ys-stage-grid { gap: 13px; }
+.ys-stage-card {
+  min-height: 160px; padding: 21px;
+  border: 1px solid #dce5e7; border-radius: 5px;
+  background: #fff; box-shadow: none;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+.ys-stage-card::before { height: 2px; background: #2d9c88; opacity: 1; }
+.ys-stage-card:hover { transform: translateY(-2px); border-color: #9ebeb5; background: #fbfdfc; box-shadow: none; }
+.ys-stage-icon { border: 1px solid #d9e8e3; border-radius: 5px; background: #edf5f2; color: #228b78; }
+.ys-stage-card-copy > b { color: #102b43; font-size: 15px; }
+.ys-stage-card-copy > small { color: #718291; }
+.ys-stage-range { color: #245fe5; }
+.ys-stage-arrow { border-radius: 4px; }
+.ys-featured-section { padding-bottom: 80px; }
+.ys-featured-course { border-radius: 5px; box-shadow: none; }
+.ys-featured-course:hover { transform: translateY(-2px); box-shadow: none; }
+.ys-featured-overlay { background: linear-gradient(90deg,rgba(16,43,67,.92),rgba(16,43,67,.15)); }
+.ys-bottom-cta { padding-block: 68px; background: #eaf1ee; border-top: 1px solid #dce7e2; }
+.ys-bottom-cta h2 { color: #102b43; font-size: clamp(25px,3vw,36px); }
+.ys-bottom-cta p { color: #637a78; }
+.ys-bottom-cta .eyebrow { color: #238d79; }
+.ys-bottom-cta .btn-light { min-height: 48px; border-radius: 5px; background: #102b43; color: #fff; }
+.ys-photo-credits { background: #f5f7f5; color: #7b8b95; }
+
+/* Shared surfaces: the same editorial language continues beyond the homepage. */
+main.page, main.container.page { background: rgba(250,252,251,.9); }
+.page-title-row h1, .course-heading h1, .tool-page-intro h1, .admin-page-heading h1 { color: #102b43; }
+.page-title-row p, .tool-page-intro p, .lesson-lead { color: #617587; }
+.btn, .filter-pill, .save-button { border-radius: 5px; }
+.btn-primary, .filter-pill.active { background: #245fe5; border-color: #245fe5; box-shadow: none; }
+.btn-primary:hover:not(:disabled), .filter-pill.active:hover { background: #1746b6; }
+.ys-curriculum-page .page-title-row, .ys-grade-page .page-title-row {
+  border: 0; border-bottom: 1px solid #dce4e8; border-radius: 0;
+  background: #eef3f2; box-shadow: none;
+}
+.ys-curriculum-page .grade-card, .ys-grade-page .subject-tile {
+  border-radius: 5px; box-shadow: none;
+}
+.ys-subject-page .course-heading { border-radius: 5px; background: #102b43; }
+.ys-subject-page .course-main, .ys-subject-page .course-sidebar { border-radius: 5px; box-shadow: none; }
+.ys-dashboard-page .dashboard-stats article,
+.ys-performance-panel, .dashboard-panel { border-radius: 5px; box-shadow: none; }
+.ys-accuracy-track i { background: #2f9b87; }
+.lesson-row { border-radius: 5px; }
+.tool-workspace, .mock-workspace, .plan-card, .plan-side, .login-card, .admin-form, .admin-list {
+  border-radius: 6px; box-shadow: none;
+}
+.site-footer { background: #f9fbfa; }
+
+/* Motion is subtle by default and removed for users who request reduced motion. */
+@keyframes ys-editorial-enter {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ys-learning-overview, .ys-search-section, .ys-section-heading { animation: ys-editorial-enter .55s ease both; }
+.ys-skill-card, .ys-stage-card, .ys-tool-card { transition-duration: 180ms; }
+:where(a,button).btn:active, .ys-learning-shortcuts > a:active { transform: translateY(1px); }
+
+@media (max-width: 1100px) {
+  .ys-hero-grid { min-height: 560px; gap: 34px; }
+  .ys-hero-copy h1 { font-size: clamp(43px,5.6vw,62px); }
+  .ys-learning-overview { grid-template-columns: 1fr; gap: 18px; }
+  .ys-learning-overview-intro { padding: 0 0 16px; border-inline-end: 0; border-bottom: 1px solid #dce4e8; }
+}
+@media (max-width: 820px) {
+  .site-header.ys-site-header, .ys-site-header .header-inner { min-height: 70px; }
+  .ys-site-header .mobile-menu { display: grid; width: 42px; height: 42px; }
+  .ys-site-header .main-nav { background: #fbfcfb; border-color: #dce4e8; box-shadow: 0 12px 28px rgba(16,43,67,.1); }
+  .ys-hero-grid { min-height: 0; grid-template-columns: 1fr; gap: 30px; padding-block: 44px 52px; }
+  .ys-hero-copy { max-width: 720px; }
+  .ys-hero-copy h1 { font-size: clamp(42px,8vw,60px); }
+  .ys-hero-figure { height: clamp(280px,52vw,420px); margin-inline: 9px 18px; }
+  .ys-hero-figure::before { inset: 12px -10px -10px 10px; }
+  .ys-photo-note { right: -9px; }
+  .ys-search-section { grid-template-columns: 1fr; gap: 15px; }
+  .ys-tools-layout { grid-template-columns: 1fr; }
+  .ys-tools-intro { position: static; }
+  .ys-tool-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ys-stage-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .ys-hero-grid { padding-block: 36px 46px; }
+  .ys-hero-copy h1 { margin-top: 20px; font-size: clamp(39px,10vw,51px); }
+  .ys-hero-copy > p { font-size: 12px; }
+  .ys-hero-actions { flex-wrap: wrap; }
+  .ys-hero-actions .btn { min-height: 47px; }
+  .ys-hero-figure { height: 280px; }
+  .ys-hero-figure figcaption small { display: none; }
+  .ys-photo-note { top: 13px; padding: 9px 11px; }
+  .ys-learning-overview { margin-bottom: 24px; padding-block: 22px; }
+  .ys-learning-overview-stats { grid-template-columns: 1fr; }
+  .ys-learning-stat { min-height: 62px; }
+  .ys-learning-shortcuts { grid-template-columns: 1fr; }
+  .ys-learning-shortcuts > a { min-height: 43px; }
+  .ys-skills-section, .ys-grade-section { padding-block: 48px; }
+  .ys-skill-grid, .ys-stage-grid, .ys-tool-list { grid-template-columns: 1fr; }
+  .ys-skill-image { height: 205px; }
+  .ys-tools-layout { padding-block: 49px; }
+  .ys-tool-card { min-height: 108px; }
+  .ys-section-heading { flex-direction: column; align-items: flex-start; }
+  .ys-bottom-cta { padding-block: 50px; }
+}
+@media (max-width: 420px) {
+  .ys-site-header .brand-copy b { font-size: 16px; }
+  .ys-brand-mark { width: 42px; height: 42px; flex-basis: 42px; }
+  .ys-hero-copy h1 { font-size: 38px; }
+  .ys-hero-actions .btn { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ys-editorial-enter, .ys-learning-overview, .ys-search-section, .ys-section-heading { animation: none !important; }
+  .ys-skill-card, .ys-stage-card, .ys-tool-card, .ys-hero-copy, .ys-hero-figure, .ys-photo-note { transition: none !important; animation: none !important; }
+}
