@@ -83,8 +83,17 @@ export function patchTool(role, allowedPaths) {
     async execute({ patch }) {
       const paths = new Set();
       for (const line of patch.split(/\r?\n/)) {
+        if (line.startsWith("diff --git ")) {
+          const header = line.match(/^diff --git a\/(.+) b\/(.+)$/);
+          if (!header) throw new Error("Unrecognized diff header; only simple file patches are accepted.");
+          paths.add(safePath(header[1]));
+          paths.add(safePath(header[2]));
+        }
         if (line.startsWith("+++ b/")) paths.add(safePath(line.slice(6).split("\t")[0]));
         if (line.startsWith("--- a/")) paths.add(safePath(line.slice(6).split("\t")[0]));
+        if (line.startsWith("rename from ") || line.startsWith("rename to ")) {
+          throw new Error("File renames are not allowed.");
+        }
         if (line.includes("/dev/null")) throw new Error("Adding or deleting files is not allowed.");
       }
       const files = [...paths];
