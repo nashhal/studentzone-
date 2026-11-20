@@ -102,11 +102,13 @@ function SitePhotoBackground() {
     <div className="ys-photo-background" aria-hidden="true">
       {previousPhoto !== null && (
         <div
+          key={`previous-${previousPhoto}`}
           className="ys-photo-background-layer is-previous"
           style={{ backgroundImage: `url("${studyBackgroundPhotos[previousPhoto]}")` }}
         />
       )}
       <div
+        key={`active-${activePhoto}`}
         className="ys-photo-background-layer is-active"
         style={{ backgroundImage: `url("${studyBackgroundPhotos[activePhoto]}")` }}
       />
