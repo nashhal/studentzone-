@@ -3,9 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Yemen Study public learning journey", () => {
   test("home page clearly leads into the curriculum", async ({ page }) => {
     await page.goto("./");
-    await expect(page.locator(".ys-hero-copy h1")).toContainText("تعلّم بتركيز");
+    await expect(page.locator(".ys-hero-copy h1")).toContainText("كل ما تحتاجه للمراجعة");
 
-    const curriculumLink = page.getByRole("link", { name: /استكشف المنهج/ });
+    const curriculumLink = page.getByRole("link", { name: /تصفّح المنهج/ });
     await expect(curriculumLink).toBeVisible();
     await curriculumLink.click();
     await expect(page.getByRole("heading", { level: 1, name: /اختر مرحلتك الدراسية/ })).toBeVisible();
@@ -79,17 +79,14 @@ test.describe("Yemen Study public learning journey", () => {
   });
 
 
-  test("homepage photography and learning-skill pathways render", async ({ page }) => {
+  test("homepage presents a revision-first learning journey", async ({ page }) => {
     await page.goto("./");
-    await expect(page.locator(".ys-hero-image")).toBeVisible();
-    await expect(page.locator(".ys-skill-card")).toHaveCount(3);
+    await expect(page.locator(".sme-hero-search input")).toBeVisible();
+    await expect(page.locator(".sme-how-card")).toHaveCount(3);
+    await expect(page.locator(".ys-stage-grid .ys-stage-card")).toHaveCount(3);
     await expect(page.locator(".ys-tool-list .ys-tool-card")).toHaveCount(11);
-    const images = await page.locator(".ys-hero-image, .ys-skill-image img").evaluateAll((nodes) =>
-      nodes.map((node) => ({ alt: node.getAttribute("alt"), src: node.getAttribute("src") }))
-    );
-    expect(images.every((item) => item.alt && item.src?.includes("images.pexels.com"))).toBeTruthy();
+    await expect(page.locator(".sme-featured-course")).toBeVisible();
   });
-
 
   test("home tool icons use distinct Lucide symbols and consistent icon wells", async ({ page }) => {
     await page.goto("./");
@@ -132,8 +129,9 @@ test.describe("Yemen Study public learning journey", () => {
 
   test("subject overview includes a course photo and learning sequence", async ({ page }) => {
     await page.goto("./#/subject/grade-12/scientific/physics");
-    await expect(page.locator(".ys-subject-feature")).toBeVisible();
-    await expect(page.locator(".ys-subject-skill-tags")).toContainText("01 الفهم");
+    await expect(page.locator(".sme-course-overview")).toBeVisible();
+    await expect(page.locator(".sme-course-stat")).toHaveCount(3);
+    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مسار المراجعة");
   });
 
   test("content remains visible when reduced motion is requested", async ({ page }) => {
