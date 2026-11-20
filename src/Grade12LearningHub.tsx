@@ -3105,7 +3105,7 @@ export default function Grade12LearningHubPage() {
             </div>
             <div className="g12-learning-summary-quick"><h4>خلاصة سريعة للحفظ</h4><ol>{current.summary.map((item) => <li key={item}>{item}</li>)}</ol></div>
           </div>
-          <footer className="g12-learning-source"><ShieldCheck size={17}/><div><b>مراجع الوحدة والشرح</b><a href={current.curriculumSource.url} target="_blank" rel="noreferrer">{current.curriculumSource.title}</a><a href={current.source.url} target="_blank" rel="noreferrer">{current.source.title}</a><small>فهرس الكتاب يُستخدم لمطابقة ترتيب الموضوعات. الشرح والأمثلة والأسئلة صيغت من جديد، والمرجع العلمي للتحقق من المفاهيم.</small></div></footer>
+          <footer className="g12-learning-source"><ShieldCheck size={17}/><div><b>مراجع الوحدة والشرح</b>{current.sourceNote && <small>{current.sourceNote}</small>}<a href={current.curriculumSource.url} target="_blank" rel="noreferrer">{current.curriculumSource.title}</a><a href={current.source.url} target="_blank" rel="noreferrer">{current.source.title}</a><small>فهرس الكتاب يُستخدم لمطابقة ترتيب الموضوعات. الشرح والأمثلة والأسئلة صيغت من جديد، والمرجع العلمي للتحقق من المفاهيم.</small></div></footer>
         </section>
 
         <section className="g12-learning-panel g12-learning-quiz">
