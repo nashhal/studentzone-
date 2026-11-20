@@ -143,7 +143,7 @@ async function main() {
 
   const sourceFiles = changedFiles().filter((file) => SOURCE_FILES.has(file));
   const allSucceeded = reports.length === 8 && reports.every((report) => !report.error);
-  const safeFiles = validateChanges(changedFiles(), REPORT_ROOT);
+  const safeFiles = await validateChanges(changedFiles(), REPORT_ROOT);
   await writeFile(path.join(ROOT, REPORT_ROOT, "final-summary.md"),
     summary(issue, reports, buildResult, qa, release, sourceFiles), "utf8");
   const pathsToAdd = [...new Set([...safeFiles, REPORT_ROOT])];
