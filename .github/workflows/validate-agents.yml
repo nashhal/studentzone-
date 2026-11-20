@@ -1,0 +1,37 @@
+name: Yemen Study — validate academic agents
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agents/**"
+      - ".github/workflows/academic-agents.yml"
+      - ".github/workflows/validate-agents.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "agents/**"
+      - ".github/workflows/academic-agents.yml"
+      - ".github/workflows/validate-agents.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-agent-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install agent runtime
+        run: npm install --prefix agents --no-audit --no-fund --package-lock=false
+      - name: Check JavaScript syntax
+        run: |
+          node --check agents/lib/agent-tools.mjs
+          node --check agents/agents.mjs
+          node --check agents/run.mjs
+      - name: Validate eight separate agent definitions
+        run: node agents/run.mjs --check
