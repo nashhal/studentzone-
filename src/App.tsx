@@ -19,6 +19,7 @@ const GuidedPracticePage = lazy(() => import("./StudyTools").then(({ GuidedPract
 const SmartMarkPage = lazy(() => import("./StudyTools").then(({ SmartMarkPage }) => ({ default: SmartMarkPage })));
 const TestBuilderPage = lazy(() => import("./StudyTools").then(({ TestBuilderPage }) => ({ default: TestBuilderPage })));
 import "./study-tools.css";
+import "./lesson-buttons.css";
 const Grade12PhysicsStudyPage = lazy(() => import("./Grade12Study").then(({ default: Page }) => ({ default: Page })));
 const Grade12BooksPage = lazy(() => import("./Grade12Books").then(({ default: Page }) => ({ default: Page })));
 const Grade12LearningHubPage = lazy(() => import("./Grade12LearningHub").then(({ default: Page }) => ({ default: Page })));
@@ -397,10 +398,10 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           {expanded && <div className="sidebar-tree">
             {isDemo ? <>
               <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
-              <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span>{lessonDone && <Check size={15}/>}</Link>
+              <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span><span className="tree-lesson-open">فتح</span></Link>
             </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
               <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
-              {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span>{progress.completed.includes(lesson.id) && <Check size={15}/>}</Link>)}
+              {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span><span className="tree-lesson-open">فتح</span></Link>)}
             </div>) : <div className="tree-placeholder">لا توجد وحدات منشورة لهذه المادة بعد.</div>}
           </div>}
         </div>
@@ -421,7 +422,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
               {unit.lessons.map((lesson) => <Link className="lesson-row" key={lesson.id} to={`/library-lesson/${lesson.id}`}>
                 <span className="lesson-row-icon"><FileText size={19}/></span>
                 <span className="lesson-row-copy"><b>{lesson.title}</b><small>{lesson.estimated_minutes} دقيقة{lesson.summary ? " · " + lesson.summary : ""}</small></span>
-                <span className="lesson-row-state">{progress.completed.includes(lesson.id) ? <><CheckCircle2 size={15}/> مكتمل</> : "افتح الدرس"}</span><ChevronLeft size={17}/>
+                <span className={progress.completed.includes(lesson.id) ? "lesson-row-cta is-complete" : "lesson-row-cta"}>{progress.completed.includes(lesson.id) ? <><CheckCircle2 size={14}/> مراجعة الدرس</> : <>افتح الشرح <ArrowLeft size={14}/></>}</span><ChevronLeft size={17}/>
               </Link>)}
             </section>) : <div className="content-coming"><span className="content-icon"><BookOpen size={26}/></span><span className="content-status">لا توجد دروس منشورة بعد</span><h2>ستجد شروحات المادة هنا.</h2><p>سيظهر كل شرح وأمثلة ومسائل وتدريبات داخل هذه الصفحة. لا نعتمد على روابط خارجية كبديل عن الدرس.</p><div className="coming-feature-grid"><span><BookOpen/> شرح كامل</span><span><Target/> مسائل محلولة</span><span><Layers3/> بطاقات مراجعة</span><span><Timer/> اختبارات داخلية</span></div></div>}
           </div>}
@@ -432,7 +433,7 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
         </> : <>
           {activeTab === "notes" && <div className="resource-list">
             <div className="resource-toolbar"><div><span className="content-status">نموذج تفاعلي</span><h2>ملاحظات المراجعة</h2><p>ملاحظات تعليمية منظمة مع أمثلة وتلخيص سريع.</p></div><button className={progress.saved.includes(demoLesson.slug) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(demoLesson.slug)}><Bookmark size={16}/>{progress.saved.includes(demoLesson.slug) ? "محفوظ" : "احفظ الدرس"}</button></div>
-            <Link className="lesson-row" to="/lesson/scalars-and-vectors"><span className="lesson-row-icon"><FileText size={19}/></span><span className="lesson-row-copy"><b>{demoLesson.title}</b><small>{demoLesson.duration} دقيقة · {demoLesson.sections.length} أقسام · مثال محلول</small></span><span className="lesson-row-state">{lessonDone ? <><CheckCircle2 size={15}/> مكتمل</> : "ابدأ الدرس"}</span><ChevronLeft size={17}/></Link>
+            <Link className="lesson-row" to="/lesson/scalars-and-vectors"><span className="lesson-row-icon"><FileText size={19}/></span><span className="lesson-row-copy"><b>{demoLesson.title}</b><small>{demoLesson.duration} دقيقة · {demoLesson.sections.length} أقسام · مثال محلول</small></span><span className={lessonDone ? "lesson-row-cta is-complete" : "lesson-row-cta"}>{lessonDone ? <><CheckCircle2 size={14}/> مراجعة الدرس</> : <>ابدأ الدرس <ArrowLeft size={14}/></>}</span><ChevronLeft size={17}/></Link>
             <div className="resource-disclaimer"><ShieldCheck size={16}/> هذا نموذج أولي لعرض تجربة المنصة، وليس محتوى وزارياً معتمداً بعد.</div>
           </div>}
           {activeTab === "questions" && <PracticePanel questions={demoLesson.questions}/>}
