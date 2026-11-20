@@ -293,6 +293,7 @@ function ToolCard({ icon: Icon, title, description, to, tag }: { icon: typeof Bo
 }
 
 function HomePage({ progress }: { progress: Progress }) {
+  const registeredQuizCount = readAttemptSummaries().length + progress.quizScores.length;
   const demoGrade = getGrade("grade-12");
   const demoTrack = demoGrade?.tracks.find((item) => item.slug === "scientific");
   const demoPhysics = demoTrack?.subjects.find((item) => item.slug === "physics");
@@ -351,7 +352,7 @@ function HomePage({ progress }: { progress: Progress }) {
           </article>
           <article className="ys-learning-stat">
             <span className="ys-learning-stat-icon is-amber"><Trophy size={19}/></span>
-            <b>{progress.quizScores.length}</b>
+            <b>{registeredQuizCount}</b>
             <small>نتائج اختبارات</small>
           </article>
         </div>
