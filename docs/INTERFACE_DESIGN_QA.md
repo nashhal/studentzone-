@@ -20,3 +20,12 @@ The Playwright workflow runs on pull requests and on main. It builds the product
 - Keyboard focus remains clearly visible.
 - Primary action controls use touch-friendly dimensions.
 - Responsive tests include 320, 390, 768, 1024, and 1440 CSS-pixel widths.
+
+
+## Visual redesign with photography and learning metrics
+- Replaced the decorative hero panel with real editorial study photography and accessible alt text.
+- Added three image-led learning-skill pathways: scientific understanding, problem solving, and study planning.
+- Added photography to subject landing pages and featured course discovery.
+- Added a student performance panel based on locally recorded completed lessons, attempts, saved items, and answer accuracy.
+- Accuracy is explicitly labelled as an aggregate attempt metric, not a per-skill mastery score.
+- Image credits and the Pexels licence are linked in the site footer area.
