@@ -42,7 +42,7 @@ jobs:
           node-version: 24
 
       - name: Install project dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --package-lock=false
 
       - name: Install the Agents SDK
         run: npm install --prefix agents --no-audit --no-fund
