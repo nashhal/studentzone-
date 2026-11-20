@@ -192,3 +192,190 @@ h1, h2, h3, h4, h5, h6 {
     transform: none !important;
   }
 }
+
+
+/* Education-stage chooser: show one clear entry point before listing individual grades. */
+.ys-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.ys-stage-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 15px;
+  min-height: 176px;
+  padding: 24px 20px;
+  overflow: hidden;
+  border: 1px solid #dce5ec;
+  border-radius: 8px;
+  background: #fff;
+  color: #172b43;
+  box-shadow: 0 5px 18px rgba(16,43,73,.035);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.ys-stage-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  content: "";
+  background: #286d9f;
+  opacity: .78;
+}
+
+.ys-stage-card:hover {
+  transform: translateY(-3px);
+  border-color: #abc2d3;
+  box-shadow: 0 12px 28px rgba(16,43,73,.085);
+}
+
+.ys-stage-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #dce7ef;
+  border-radius: 8px;
+  background: #edf4f9;
+  color: #245d86;
+}
+
+.ys-stage-index {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  color: #9aabba;
+  font: 600 11px "IBM Plex Sans", Arial, sans-serif;
+  letter-spacing: .12em;
+}
+
+.ys-stage-card-copy {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.ys-stage-card-copy > b {
+  color: #102b49;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.ys-stage-card-copy > small {
+  color: #52677c;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.ys-stage-range {
+  display: inline-flex;
+  align-items: center;
+  color: #28648f;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ys-stage-arrow {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dce5ec;
+  border-radius: 50%;
+  color: #58778f;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.ys-stage-card:hover .ys-stage-arrow {
+  border-color: #102b49;
+  background: #102b49;
+  color: #fff;
+}
+
+.ys-stage-grid-page {
+  margin-block: 26px 36px;
+}
+
+.ys-stage-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #52677c;
+  font-size: 12px;
+}
+
+.ys-stage-hint {
+  font-weight: 600;
+}
+
+.ys-stage-current {
+  color: #74899c;
+  font-size: 11px;
+}
+
+.ys-search-results-note {
+  margin: 20px 0 12px;
+  color: #52677c;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .ys-stage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .ys-stage-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 11px;
+    margin-top: 19px;
+  }
+
+  .ys-stage-card {
+    min-height: 138px;
+    grid-template-columns: 43px minmax(0, 1fr) 26px;
+    gap: 12px;
+    padding: 20px 15px;
+  }
+
+  .ys-stage-icon {
+    width: 43px;
+    height: 43px;
+  }
+
+  .ys-stage-card-copy > b {
+    font-size: 15px;
+  }
+
+  .ys-stage-card-copy > small {
+    font-size: 11px;
+  }
+
+  .ys-stage-range {
+    font-size: 10px;
+  }
+
+  .ys-stage-index {
+    top: 10px;
+    left: 12px;
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ys-stage-card,
+  .ys-stage-arrow {
+    transition: none !important;
+  }
+
+  .ys-stage-card:hover {
+    transform: none;
+  }
+}
