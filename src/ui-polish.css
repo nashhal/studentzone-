@@ -1,0 +1,424 @@
+/* Yemen Study — final interface review layer.
+   Keeps the existing editorial identity while normalising iconography,
+   controls, cards, hierarchy and responsive spacing across legacy pages. */
+:root {
+  --ys-ui-ink: #172b43;
+  --ys-ui-body: #40566c;
+  --ys-ui-muted: #62788d;
+  --ys-ui-line: #dce6ed;
+  --ys-ui-line-strong: #c7d5e0;
+  --ys-ui-surface: #ffffff;
+  --ys-ui-soft: #f3f7fa;
+  --ys-ui-blue: #285f89;
+  --ys-ui-blue-soft: #edf4f8;
+  --ys-ui-radius: 8px;
+  --ys-ui-radius-small: 6px;
+}
+
+/* A single Lucide drawing language: rounded strokes and aligned baselines. */
+svg.lucide {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+button svg.lucide,
+a svg.lucide {
+  pointer-events: none;
+}
+
+/* Header and primary navigation */
+.ys-site-header {
+  border-bottom: 1px solid rgba(207,220,231,.9);
+  box-shadow: 0 2px 10px rgba(16,43,73,.035);
+}
+
+.ys-site-header .brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 9px;
+}
+
+.ys-site-header .brand-mark svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+}
+
+.ys-site-header .main-nav > a,
+.ys-site-header .nav-dropdown-trigger {
+  min-height: 44px;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.ys-site-header .nav-dropdown-trigger {
+  padding-inline: 3px;
+}
+
+.ys-site-header .nav-dropdown-panel {
+  padding: 7px;
+  border: 1px solid var(--ys-ui-line);
+  border-radius: 9px;
+  box-shadow: 0 14px 34px rgba(16,43,73,.11);
+}
+
+.ys-site-header .nav-dropdown-panel a {
+  min-height: 43px;
+  gap: 10px;
+  padding-inline: 12px;
+  border-radius: 6px;
+  color: #405a70;
+}
+
+.ys-site-header .nav-dropdown-panel a svg {
+  width: 17px;
+  height: 17px;
+  color: var(--ys-ui-blue);
+}
+
+.ys-site-header .mobile-menu {
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--ys-ui-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.ys-site-header .mobile-menu svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Icon wells share dimensions and a restrained academic colour treatment. */
+.ys-tool-card .tool-icon,
+.tool-workspace-head .tool-icon,
+.next-revision .tool-icon,
+.paper-library-empty .tool-icon,
+.mock-start .tool-icon,
+.login-card > .tool-icon,
+.ys-photo-note-icon,
+.ys-stage-icon,
+.lesson-row-icon,
+.content-icon,
+.exam-card-icon,
+.dash-icon,
+.council-agent-icon,
+.g12-learning-nav-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid #e0e9ef;
+  border-radius: 9px;
+  background: var(--ys-ui-blue-soft);
+  color: var(--ys-ui-blue);
+}
+
+.ys-tool-card .tool-icon {
+  width: 44px;
+  height: 44px;
+}
+
+.ys-tool-card .tool-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.ys-stage-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+}
+
+.ys-stage-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.ys-photo-note-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.ys-photo-note-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.lesson-row-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+}
+
+.lesson-row-icon svg,
+.exam-card-icon svg,
+.content-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.content-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 11px;
+}
+
+.exam-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 9px;
+}
+
+.dash-icon {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+}
+
+.dash-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.council-agent-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+}
+
+.council-agent-icon svg,
+.g12-learning-nav-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.ys-stage-arrow {
+  width: 32px;
+  height: 32px;
+}
+
+.ys-stage-arrow svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Consistent inline icon sizing in navigation, lessons and tool tabs. */
+.course-nav-item {
+  min-height: 44px;
+  gap: 11px;
+}
+
+.course-nav-item svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: currentColor;
+}
+
+.course-nav-item.active {
+  border-inline-start: 2px solid #2e6e9e;
+  background: #f0f5f9;
+  color: #204e72;
+}
+
+.course-tabs .course-tab {
+  gap: 8px;
+}
+
+.course-tabs .course-tab svg {
+  width: 17px;
+  height: 17px;
+}
+
+.lesson-meta svg,
+.mock-meta svg,
+.g12-exam-meta svg,
+.resource-disclaimer svg,
+.data-note svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ys-tool-arrow svg,
+.ys-inline-link svg,
+.ys-skill-cta svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Sharpen layout hierarchy and make repeated learning surfaces feel related. */
+.ys-skill-card,
+.ys-stage-card,
+.ys-featured-course,
+.ys-subject-page .course-sidebar,
+.ys-subject-page .course-main,
+.ys-dashboard-page .dashboard-stats article,
+.ys-performance-panel {
+  border-radius: var(--ys-ui-radius);
+}
+
+.ys-skill-card {
+  border: 1px solid var(--ys-ui-line);
+  background: #fff;
+  box-shadow: 0 2px 9px rgba(16,43,73,.025);
+}
+
+.ys-skill-card:hover {
+  border-color: #b8cad8;
+  box-shadow: 0 9px 22px rgba(16,43,73,.065);
+}
+
+.ys-grade-page .subject-tile,
+.ys-curriculum-page .grade-card,
+.subject-page .lesson-row,
+.study-tool-layout-main .tool-workspace,
+.study-tool-layout-main .tool-workspace-head,
+.ys-dashboard-page .dashboard-panel {
+  border-color: var(--ys-ui-line);
+  border-radius: var(--ys-ui-radius);
+}
+
+.ys-curriculum-page .grade-card,
+.ys-grade-page .subject-tile {
+  min-height: 78px;
+}
+
+.page-title-row,
+.ys-section-heading {
+  gap: 24px;
+}
+
+.ys-section-heading h2,
+.ys-curriculum-page .page-title-row h1,
+.ys-grade-page .page-title-row h1 {
+  text-wrap: balance;
+}
+
+.ys-section-heading > p,
+.ys-curriculum-page .page-title-row p,
+.ys-grade-page .page-title-row p {
+  max-width: 62ch;
+  color: #526a80;
+  line-height: 1.95;
+}
+
+/* Controls use the same focus ring and comfortable hit area. */
+.btn,
+.header-dashboard,
+.header-upgrade,
+.nav-account,
+.filter-pill,
+.search-action,
+.save-button,
+.sidebar-show-button,
+.sidebar-hide-row button {
+  min-height: 44px;
+}
+
+.inline-search,
+.search-box {
+  min-height: 46px;
+  border-color: var(--ys-ui-line);
+  border-radius: 8px;
+}
+
+input,
+select,
+textarea {
+  accent-color: #285f89;
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid rgba(55,117,165,.28);
+  outline-offset: 3px;
+}
+
+:where(button, a, input, select, textarea) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ys-tool-card,
+.ys-stage-card,
+.ys-skill-card,
+.course-nav-item,
+.course-tab,
+.subject-tile,
+.lesson-row,
+.search-results a {
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+/* Touch-friendly layout and predictable page gutters. */
+@media (max-width: 760px) {
+  .ys-site-header .header-inner {
+    gap: 10px;
+  }
+
+  .ys-site-header .mobile-menu {
+    display: grid;
+    place-items: center;
+  }
+
+  .ys-site-header .main-nav.open {
+    padding: 10px 16px 16px;
+  }
+
+  .ys-site-header .main-nav.open > a,
+  .ys-site-header .main-nav.open .nav-dropdown-trigger {
+    min-height: 46px;
+    padding-inline: 10px;
+  }
+
+  .ys-site-header .nav-dropdown-panel {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    margin-block: 4px 8px;
+    box-shadow: none;
+  }
+
+  .ys-stage-card {
+    min-height: 132px;
+  }
+
+  .ys-tool-card .tool-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ys-tool-card .tool-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .course-nav-item {
+    min-height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ys-tool-card,
+  .ys-stage-card,
+  .ys-skill-card,
+  .course-nav-item,
+  .course-tab,
+  .subject-tile,
+  .lesson-row,
+  .search-results a {
+    transition: none !important;
+  }
+}

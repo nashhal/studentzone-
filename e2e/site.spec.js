@@ -90,6 +90,28 @@ test.describe("Yemen Study public learning journey", () => {
     expect(images.every((item) => item.alt && item.src?.includes("images.pexels.com"))).toBeTruthy();
   });
 
+
+  test("home tool icons use distinct Lucide symbols and consistent icon wells", async ({ page }) => {
+    await page.goto("./");
+    const iconAudit = await page.locator(".ys-tool-list .ys-tool-card .tool-icon").evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const icon = node.querySelector("svg.lucide");
+        const rect = node.getBoundingClientRect();
+        return {
+          iconClass: icon?.getAttribute("class") || "",
+          width: rect.width,
+          height: rect.height,
+          strokeWidth: icon ? getComputedStyle(icon).strokeWidth : "",
+        };
+      })
+    );
+    expect(iconAudit).toHaveLength(11);
+    expect(iconAudit.every((item) => item.iconClass.includes("lucide-"))).toBeTruthy();
+    expect(new Set(iconAudit.map((item) => item.iconClass)).size).toBeGreaterThanOrEqual(9);
+    expect(iconAudit.every((item) => item.width >= 40 && item.height >= 40)).toBeTruthy();
+    expect(iconAudit.every((item) => Number.parseFloat(item.strokeWidth) <= 2)).toBeTruthy();
+  });
+
   test("student dashboard exposes metrics derived from recorded activity", async ({ page }) => {
     await page.goto("./#/dashboard");
     await expect(page.locator(".ys-performance-panel")).toBeVisible();

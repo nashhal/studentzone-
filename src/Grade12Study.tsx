@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Download, FileText, RotateCcw, ShieldCheck, Target, Trophy } from "lucide-react";
+import { ArrowLeft, BookOpenCheck, CheckCircle2, Clock3, ClipboardCheck, Download, FileText, RotateCcw, ShieldCheck, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./grade12-study.css";
 
@@ -103,7 +103,7 @@ export default function Grade12PhysicsStudyPage() {
     <section className="g12-study-layout">
       <div className="g12-study-main">
         <section className="g12-panel g12-no-print">
-          <div className="g12-panel-title"><span><BookOpen size={19}/></span><div><h2>الشرح والملخص</h2><p>اقرأ الفكرة ثم راجع المثال المحلول.</p></div></div>
+          <div className="g12-panel-title"><span><BookOpenCheck size={19}/></span><div><h2>الشرح والملخص</h2><p>اقرأ الفكرة ثم راجع المثال المحلول.</p></div></div>
           <div className="g12-lesson-content">
             <section><h3>1. الكمية الفيزيائية</h3><p>هي خاصية يمكن قياسها والتعبير عنها بمقدار ووحدة قياس. وتنقسم الكميات من حيث الحاجة إلى الاتجاه إلى كميات قياسية وكميات متجهة.</p></section>
             <section><h3>2. الكميات القياسية</h3><p>تُحدَّد بمقدار عددي ووحدة قياس فقط، ولا يلزم ذكر اتجاه لها.</p><div className="g12-example-grid"><div><b>الكتلة</b><span>5 kg</span></div><div><b>الزمن</b><span>12 s</span></div><div><b>درجة الحرارة</b><span>25 °C</span></div><div><b>المسافة</b><span>3 m</span></div><div><b>الطاقة</b><span>40 J</span></div><div><b>الحجم</b><span>2 L</span></div></div></section>
@@ -118,7 +118,7 @@ export default function Grade12PhysicsStudyPage() {
         </section>
 
         <section className="g12-panel">
-          <div className="g12-panel-title"><span><Target size={19}/></span><div><h2>اختبارات بثلاثة مستويات</h2><p>اختر المستوى الذي يناسب استعدادك. لكل مستوى خمسة أسئلة مع تصحيح وتفسير.</p></div></div>
+          <div className="g12-panel-title"><span><ClipboardCheck size={19}/></span><div><h2>اختبارات بثلاثة مستويات</h2><p>اختر المستوى الذي يناسب استعدادك. لكل مستوى خمسة أسئلة مع تصحيح وتفسير.</p></div></div>
           <div className="g12-tier-switch" role="group" aria-label="مستوى الاختبار">
             {(["good", "hard", "hardest"] as Tier[]).map((value) => <button type="button" key={value} className={tier === value ? "active" : ""} onClick={() => chooseTier(value)}><b>{tierDetails[value].label}</b><small>{tierDetails[value].subtitle}</small></button>)}
           </div>

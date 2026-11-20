@@ -1,10 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
-  ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
-  Brain, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
-  CircleHelp, Clock3, FileText, GraduationCap, Layers3,
-  LogOut, Menu, Play, RotateCcw, Search, ShieldCheck, Sparkles,
-  Target, Timer, Trophy, X, Zap
+  Activity, ArrowLeft, Award, Bookmark, BookOpen, BookOpenCheck,
+  CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft,
+  CircleHelp, ClipboardCheck, ClipboardList, Clock3, FileCheck2, FileText,
+  GraduationCap, Layers3, ListChecks, LogOut, Menu, Play, RotateCcw,
+  Search, ShieldCheck, Sparkles, Target, Timer, Trophy, X, Zap
 } from "lucide-react";
 import { Link, NavLink, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "./lib/auth";
@@ -148,12 +148,12 @@ function Header() {
         <div className={toolsOpen ? "nav-dropdown open" : "nav-dropdown"}>
           <button type="button" className="nav-dropdown-trigger" aria-expanded={toolsOpen} onClick={() => setToolsOpen((open) => !open)}>أدوات الدراسة <ChevronDown size={17}/></button>
           {toolsOpen && <div className="nav-dropdown-panel">
-            <Link to="/target-test" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={17}/> الاختبار المستهدف</Link>
-            <Link to="/strengths-weaknesses" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Brain size={17}/> نقاط القوة والضعف</Link>
-            <Link to="/guided-study" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><BookOpen size={17}/> الدراسة الموجّهة</Link>
-            <Link to="/guided-practice" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Target size={17}/> التدريب الموجّه</Link>
-            <Link to="/smart-mark" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Sparkles size={17}/> مراجع الإجابة</Link>
-            <Link to="/teacher/test-builder" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><FileText size={17}/> محرر الاختبارات للمعلمين</Link>
+            <Link to="/target-test" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><ClipboardCheck size={17}/> الاختبار المستهدف</Link>
+            <Link to="/strengths-weaknesses" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><Activity size={17}/> نقاط القوة والضعف</Link>
+            <Link to="/guided-study" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><BookOpenCheck size={17}/> الدراسة الموجّهة</Link>
+            <Link to="/guided-practice" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><ListChecks size={17}/> التدريب الموجّه</Link>
+            <Link to="/smart-mark" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><FileCheck2 size={17}/> مراجع الإجابة</Link>
+            <Link to="/teacher/test-builder" onClick={() => { setToolsOpen(false); setMenuOpen(false); }}><ClipboardList size={17}/> محرر الاختبارات للمعلمين</Link>
           </div>}
         </div>
         <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>لوحة الطالب</NavLink>
@@ -205,7 +205,7 @@ const educationStages: EducationStageConfig[] = [
     range: "من الصف الأول إلى الصف السادس",
     from: 1,
     to: 6,
-    icon: BookOpen,
+    icon: BookOpenCheck,
   },
   {
     id: "basic",
@@ -354,17 +354,17 @@ function HomePage() {
           <div className="ys-tools-total"><b>11</b><span>أداة للتعلّم<br/>والمراجعة</span></div>
         </div>
         <div className="ys-tool-list">
-          <ToolCard icon={BookOpen} title="ملاحظات المراجعة" description="شروحات منظمة، مفاهيم أساسية، قوانين وأمثلة محلولة." to="/curriculum" tag="افهم"/>
-          <ToolCard icon={Target} title="أسئلة حسب الموضوع" description="تدرّب على أسئلة متدرجة وافهم سبب صحة الإجابة." to="/curriculum" tag="تدرّب"/>
-          <ToolCard icon={Brain} title="البطاقات التعليمية" description="راجع التعاريف والمفاهيم في جلسات قصيرة." to="/subject/grade-12/scientific/physics" tag="تذكّر"/>
-          <ToolCard icon={Timer} title="الاختبارات التجريبية" description="اختبر فهمك وتعرّف على الموضوعات التي تحتاج مراجعة." to="/mock-exam" tag="اختبر"/>
+          <ToolCard icon={BookOpenCheck} title="ملاحظات المراجعة" description="شروحات منظمة، مفاهيم أساسية، قوانين وأمثلة محلولة." to="/curriculum" tag="افهم"/>
+          <ToolCard icon={ClipboardList} title="أسئلة حسب الموضوع" description="تدرّب على أسئلة متدرجة وافهم سبب صحة الإجابة." to="/curriculum" tag="تدرّب"/>
+          <ToolCard icon={Layers3} title="البطاقات التعليمية" description="راجع التعاريف والمفاهيم في جلسات قصيرة." to="/subject/grade-12/scientific/physics" tag="تذكّر"/>
+          <ToolCard icon={ClipboardCheck} title="الاختبارات التجريبية" description="اختبر فهمك وتعرّف على الموضوعات التي تحتاج مراجعة." to="/mock-exam" tag="اختبر"/>
           <ToolCard icon={FileText} title="أوراق الامتحانات" description="نماذج وأوراق تدريبية ضمن مكتبة المنصة." to="/past-papers" tag="استعد"/>
           <ToolCard icon={CalendarDays} title="خطة المذاكرة" description="قسّم وقتك إلى مهام وتابع ما أنجزته." to="/study-plan" tag="نظّم"/>
           <ToolCard icon={Target} title="الاختبار المستهدف" description="اختر موضوعاً ومستوى صعوبة محدداً." to="/target-test" tag="ركّز"/>
-          <ToolCard icon={Brain} title="نقاط القوة والضعف" description="راجع أداءك وحدد ما يحتاج إلى تدريب إضافي." to="/strengths-weaknesses" tag="حلّل"/>
-          <ToolCard icon={BookOpen} title="الدراسة الموجّهة" description="تعلّم الموضوع خطوة بخطوة مع تلميحات." to="/guided-study" tag="تعلّم"/>
-          <ToolCard icon={Target} title="التدريب الموجّه" description="حل سؤالاً في كل مرة وتابع تفسير الإجابة." to="/guided-practice" tag="طبّق"/>
-          <ToolCard icon={Sparkles} title="مراجع الإجابة" description="قارن إجابتك بعناصر التقييم الأساسية." to="/smart-mark" tag="راجع"/>
+          <ToolCard icon={Activity} title="نقاط القوة والضعف" description="راجع أداءك وحدد ما يحتاج إلى تدريب إضافي." to="/strengths-weaknesses" tag="حلّل"/>
+          <ToolCard icon={BookOpenCheck} title="الدراسة الموجّهة" description="تعلّم الموضوع خطوة بخطوة مع تلميحات." to="/guided-study" tag="تعلّم"/>
+          <ToolCard icon={ListChecks} title="التدريب الموجّه" description="حل سؤالاً في كل مرة وتابع تفسير الإجابة." to="/guided-practice" tag="طبّق"/>
+          <ToolCard icon={FileCheck2} title="مراجع الإجابة" description="قارن إجابتك بعناصر التقييم الأساسية." to="/smart-mark" tag="راجع"/>
         </div>
       </div>
     </section>
@@ -594,13 +594,13 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           <ChevronDown size={17}/>
         </Link>
         <div className="sidebar-section-label">موارد المقرر</div>
-        <button type="button" className={activeTab === "notes" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("notes")}><BookOpen size={20}/><span>موارد المادة</span></button>
-        <Link className="course-nav-item" to="/strengths-weaknesses"><Brain size={20}/><span>نقاط القوة والضعف</span></Link>
+        <button type="button" className={activeTab === "notes" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("notes")}><BookOpenCheck size={20}/><span>موارد المادة</span></button>
+        <Link className="course-nav-item" to="/strengths-weaknesses"><Activity size={20}/><span>نقاط القوة والضعف</span></Link>
         <div className="sidebar-section-label">المراجعة</div>
         <button type="button" className={activeTab === "notes" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("notes")}><Bookmark size={20}/><span>ملاحظات المراجعة</span></button>
         <button type="button" className={activeTab === "flashcards" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("flashcards")}><Layers3 size={20}/><span>البطاقات التعليمية</span></button>
         <div className="sidebar-section-label">الاختبارات والتدريب</div>
-        <button type="button" className={activeTab === "questions" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("questions")}><CircleHelp size={20}/><span>أسئلة الامتحان</span></button>
+        <button type="button" className={activeTab === "questions" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("questions")}><ClipboardList size={20}/><span>أسئلة الامتحان</span></button>
         <Link className="course-nav-item" to="/target-test"><Target size={20}/><span>الاختبار المستهدف</span></Link>
         <button type="button" className={activeTab === "papers" ? "course-nav-item active" : "course-nav-item"} onClick={() => setActiveTab("papers")}><FileText size={20}/><span>أوراق الامتحانات</span></button>
         <Link className="course-nav-item" to="/mock-exam"><Timer size={20}/><span>الاختبارات التجريبية</span></Link>
