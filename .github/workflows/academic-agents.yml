@@ -45,7 +45,7 @@ jobs:
         run: npm install --no-audit --no-fund --package-lock=false
 
       - name: Install the Agents SDK
-        run: npm install --prefix agents --no-audit --no-fund
+        run: npm install --prefix agents --no-audit --no-fund --package-lock=false
 
       - name: Validate the eight-agent configuration
         run: node agents/run.mjs --check
