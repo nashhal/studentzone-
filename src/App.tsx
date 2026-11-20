@@ -105,7 +105,7 @@ function Header() {
         </div>
         <NavLink to="/dashboard" onClick={() => setMenuOpen(false)}>لوحة الطالب</NavLink>
         {(role === "admin" || role === "editor") && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>إدارة المحتوى</NavLink>}
-        {(role === "admin" || role === "editor") && <NavLink to="/academy-council" onClick={() => setMenuOpen(false)}>مجلس البوتات الأكاديمي</NavLink>}
+        {(!isSupabaseConfigured || role === "admin" || role === "editor") && <NavLink to="/academy-council" onClick={() => setMenuOpen(false)}>مجلس البوتات الأكاديمي</NavLink>}
       </nav>
       <div className="header-search-wrap"><SearchBox header/></div>
       <div className="header-actions">
