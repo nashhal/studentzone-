@@ -143,10 +143,15 @@ function GradeCard({ grade }: { grade: GradeEntry }) {
 }
 
 function ToolCard({ icon: Icon, title, description, to, tag }: { icon: typeof BookOpen; title: string; description: string; to: string; tag?: string }) {
-  return <Link className="tool-card" to={to}>
-    <span className="tool-icon"><Icon size={22}/></span>
-    {tag && <small className="tool-tag">{tag}</small>}
-    <h3>{title}</h3><p>{description}</p><span className="tool-link">ابدأ الآن <ArrowLeft size={15}/></span>
+  return <Link className="tool-card ys-tool-card" to={to}>
+    <span className="ys-tool-number" aria-hidden="true"/>
+    <span className="tool-icon"><Icon size={21}/></span>
+    <span className="ys-tool-copy">
+      {tag && <small className="ys-tool-tag">{tag}</small>}
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </span>
+    <span className="ys-tool-arrow" aria-hidden="true"><ArrowLeft size={17}/></span>
   </Link>;
 }
 
