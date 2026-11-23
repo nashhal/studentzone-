@@ -134,10 +134,11 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مسار المراجعة");
   });
 
-  test("content remains visible when reduced motion is requested", async ({ page }) => {
+  test("revision hero remains usable when reduced motion is requested", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("./");
     await expect(page.locator(".ys-hero-copy h1")).toBeVisible();
-    await expect(page.locator(".ys-hero-image")).toBeVisible();
+    await expect(page.locator(".sme-hero-search input")).toBeVisible();
+    await expect(page.getByRole("link", { name: /تصفّح المنهج/ })).toBeVisible();
   });
 });
