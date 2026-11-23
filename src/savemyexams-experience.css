@@ -1081,16 +1081,57 @@ textarea:focus-visible {
 }
 @media (max-width: 900px) {
   .sme-site-header .header-inner { display: flex; flex-wrap: wrap; }
+  /* The legacy tablet rule absolutely positions and hides .main-nav at 980px.
+     Restore an in-flow, wrapping navigation row for the 701–900px tablet range. */
   .sme-site-header .main-nav {
+    display: flex;
+    position: static;
+    inset: auto;
+    z-index: auto;
     order: 5;
+    flex: 1 0 100%;
     flex-basis: 100%;
     width: 100%;
     min-width: 0;
     max-width: 100%;
+    flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: flex-start;
+    gap: 5px;
     row-gap: 2px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     overflow: visible;
+  }
+  .sme-site-header .main-nav > a,
+  .sme-site-header .nav-dropdown-trigger {
+    width: auto;
+    min-width: 0;
+    min-height: 40px;
+    flex: 0 0 auto;
+    justify-content: center;
+    padding-inline: 9px;
+  }
+  .sme-site-header .nav-dropdown {
+    display: block;
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+  }
+  .sme-site-header .nav-dropdown.open {
+    flex: 1 0 100%;
+    width: 100%;
+  }
+  .sme-site-header .nav-dropdown-panel {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    box-shadow: none;
   }
   .sme-site-header .header-search-wrap { flex: 1 1 180px; max-width: 280px; }
   .sme-home-page .ys-learning-overview { grid-template-columns: 1fr; gap: 14px; }
