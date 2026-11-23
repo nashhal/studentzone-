@@ -69,12 +69,39 @@ test.describe("Yemen Study public learning journey", () => {
     for (const width of [1440, 1024, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 860 });
       await page.goto("./");
-      const dimensions = await page.evaluate(() => ({
-        clientWidth: document.documentElement.clientWidth,
-        scrollWidth: document.documentElement.scrollWidth,
-      }));
-      expect(dimensions.scrollWidth, "Unexpected horizontal overflow at " + width + "px")
-        .toBeLessThanOrEqual(dimensions.clientWidth + 1);
+      const dimensions = await page.evaluate(() => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const offenders = Array.from(document.querySelectorAll("body *"))
+          .map((element) => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              tag: element.tagName.toLowerCase(),
+              id: element.id || "",
+              className: typeof element.className === "string" ? element.className : "",
+              left: Math.round(rect.left * 10) / 10,
+              right: Math.round(rect.right * 10) / 10,
+              width: Math.round(rect.width * 10) / 10,
+              position: style.position,
+              display: style.display,
+              minWidth: style.minWidth,
+              flexBasis: style.flexBasis,
+              html: element.outerHTML.slice(0, 220),
+            };
+          })
+          .filter((element) => element.width > 0 && (element.right > viewportWidth + 1 || element.left < -1))
+          .sort((a, b) => b.right - a.right)
+          .slice(0, 18);
+        return {
+          clientWidth: viewportWidth,
+          scrollWidth: document.documentElement.scrollWidth,
+          offenders,
+        };
+      });
+      expect(
+        dimensions.scrollWidth,
+        "Unexpected horizontal overflow at " + width + "px. Offenders: " + JSON.stringify(dimensions.offenders)
+      ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
     }
   });
 
