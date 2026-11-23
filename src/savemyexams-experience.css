@@ -1081,7 +1081,17 @@ textarea:focus-visible {
 }
 @media (max-width: 900px) {
   .sme-site-header .header-inner { display: flex; flex-wrap: wrap; }
-  .sme-site-header .main-nav { order: 5; flex-basis: 100%; justify-content: flex-start; overflow: visible; }
+  .sme-site-header .main-nav {
+    order: 5;
+    flex-basis: 100%;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 2px;
+    overflow: visible;
+  }
   .sme-site-header .header-search-wrap { flex: 1 1 180px; max-width: 280px; }
   .sme-home-page .ys-learning-overview { grid-template-columns: 1fr; gap: 14px; }
   .sme-home-page .ys-learning-overview-intro { padding: 0 0 12px; border-inline-end: 0; border-bottom: 1px solid #edf1f5; }
@@ -1193,7 +1203,21 @@ textarea:focus-visible {
   .sme-subject-page .course-tab { min-width: max-content; padding-inline: 10px; font-size: 9px; }
   .sme-subject-page .resource-list { padding: 12px; }
   .sme-subject-page .resource-toolbar { align-items: flex-start; flex-direction: column; }
-  .sme-subject-page .lesson-row-cta { display: none; }
+  .sme-subject-page .lesson-row-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex: 0 0 auto;
+    padding: 6px 8px;
+    border: 1px solid #e4ebf5;
+    border-radius: 6px;
+    background: #f6f9fd;
+    color: #3268d8;
+    font-size: 9px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
   .sme-lesson-page .lesson-layout { grid-template-columns: 1fr; }
   .sme-lesson-page .lesson-main { padding: 18px 15px 21px; }
   .sme-lesson-page .lesson-main > h1 { font-size: 24px; }
