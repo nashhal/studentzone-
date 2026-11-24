@@ -11,7 +11,7 @@ import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
-import { demoLesson, type Question } from "./data/learning";
+import { demoLesson } from "./data/learning";
 const TargetTestPage = lazy(() => import("./StudyTools").then(({ TargetTestPage }) => ({ default: TargetTestPage })));
 const StrengthsWeaknessesPage = lazy(() => import("./StudyTools").then(({ StrengthsWeaknessesPage }) => ({ default: StrengthsWeaknessesPage })));
 const GuidedStudyPage = lazy(() => import("./StudyTools").then(({ GuidedStudyPage }) => ({ default: GuidedStudyPage })));
@@ -532,7 +532,7 @@ const grade12LearningSubjectMap: Record<string, string> = {
   "map-science": "map-science",
 };
 
-function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSaved: (id: string) => void }) {
+function SubjectPage({ progress }: { progress: Progress }) {
   const { gradeSlug = "", trackSlug = "", subjectSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
   const track = grade?.tracks.find((item) => item.slug === trackSlug);
@@ -915,78 +915,6 @@ function PublishedLessonPage({ progress, complete, toggleSaved }: { progress: Pr
       <div className="lesson-next"><div><span className="eyebrow">انتهيت من القراءة؟</span><h2>راجع الأفكار وحل التدريب.</h2><p>تظهر الأنشطة المرتبطة بهذا الدرس ضمن مكتبة المادة.</p></div><Link className="btn btn-primary" to="/curriculum">العودة إلى المواد <ArrowLeft size={16}/></Link></div>
     </article>
   </main>;
-}
-
-function PracticePanel({ questions }: { questions: Question[] }) {
-  const [difficulty, setDifficulty] = useState("all");
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [checked, setChecked] = useState(false);
-  const visibleQuestions = useMemo(
-    () => questions.filter((question) => difficulty === "all" || question.difficulty === difficulty),
-    [questions, difficulty],
-  );
-  const score = visibleQuestions.filter((question) => answers[question.id] === question.correctIndex).length;
-  const answeredCount = visibleQuestions.filter((question) => answers[question.id] !== undefined).length;
-  const recordPractice = () => {
-    setChecked(true);
-    try {
-      const saved = JSON.parse(localStorage.getItem("yemen-study-attempts-v1") || "[]") as Array<Record<string, unknown>>;
-      const attempt = {
-        id: String(Date.now()), createdAt: new Date().toISOString(), score, total: visibleQuestions.length,
-        answers: visibleQuestions.map((question) => ({
-          questionId: question.id, correct: answers[question.id] === question.correctIndex,
-          difficulty: question.difficulty,
-        })),
-        source: "mock",
-      };
-      localStorage.setItem("yemen-study-attempts-v1", JSON.stringify([...saved, attempt]));
-    } catch { /* Local progress is best-effort when storage is unavailable. */ }
-  };
-  return <div className="practice-panel">
-    <div className="resource-toolbar">
-      <div><span className="content-status">تدريب حسب الموضوع</span><h2>اختبر فهمك</h2><p>{visibleQuestions.length} أسئلة · اختر مستوى الصعوبة ثم أجب وصحّح.</p></div>
-      <label className="practice-filter"><span>مستوى الصعوبة</span><select value={difficulty} onChange={(event) => { setDifficulty(event.target.value); setChecked(false); setAnswers({}); }}><option value="all">كل المستويات</option><option value="سهل">سهل</option><option value="متوسط">متوسط</option><option value="متقدم">متقدم</option></select></label>
-    </div>
-    {visibleQuestions.length === 0 ? <div className="empty-panel"><Target/><h3>لا توجد أسئلة بهذا المستوى</h3><p>اختر مستوى آخر لعرض الأسئلة المتاحة.</p></div> : visibleQuestions.map((question, index) => <article className="practice-question" key={question.id}>
-      <div className="question-top"><span>السؤال {index + 1} من {visibleQuestions.length}</span><span className="difficulty">{question.difficulty}</span></div>
-      <h3>{question.prompt}</h3>
-      <div className="answer-options">{question.options.map((option, optionIndex) => <button type="button" key={option} disabled={checked} className={checked && optionIndex === question.correctIndex ? "answer-option correct" : checked && answers[question.id] === optionIndex ? "answer-option incorrect" : answers[question.id] === optionIndex ? "answer-option chosen" : "answer-option"} onClick={() => setAnswers((old) => ({ ...old, [question.id]: optionIndex }))}><span>{["أ","ب","ج","د"][optionIndex]}</span>{option}{checked && optionIndex === question.correctIndex && <Check size={16}/>}</button>)}</div>
-      {checked && <div className={answers[question.id] === question.correctIndex ? "answer-explanation good" : "answer-explanation"}><b>{answers[question.id] === question.correctIndex ? "إجابة صحيحة" : "راجع هذه الفكرة"}</b><p>{question.explanation}</p></div>}
-    </article>)}
-    {visibleQuestions.length > 0 && (!checked ? <div className="practice-footer"><span>{answeredCount} من {visibleQuestions.length} تمت الإجابة عنها</span><button className="btn btn-primary" disabled={answeredCount !== visibleQuestions.length} onClick={recordPractice}>صحّح إجاباتي <CheckCircle2 size={17}/></button></div> : <div className="practice-result"><Trophy size={22}/><div><b>نتيجتك: {score} من {visibleQuestions.length}</b><p>راجع تفسيرات الإجابات ثم أعد المحاولة لتعزيز فهمك.</p></div><button className="btn btn-outline" onClick={() => { setAnswers({}); setChecked(false); }}>إعادة المحاولة</button></div>)}
-  </div>;
-}
-
-function FlashcardsPanel() {
-  const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [ratings, setRatings] = useState<Record<string, "known" | "review">>(() => {
-    try {
-      const saved = localStorage.getItem("yemen-study-flashcard-ratings-v1");
-      return saved ? JSON.parse(saved) as Record<string, "known" | "review"> : {};
-    } catch { return {}; }
-  });
-  const card = demoLesson.flashcards[index];
-  const knownCount = Object.values(ratings).filter((value) => value === "known").length;
-  const reviewCount = Object.values(ratings).filter((value) => value === "review").length;
-  useEffect(() => {
-    try { localStorage.setItem("yemen-study-flashcard-ratings-v1", JSON.stringify(ratings)); } catch { /* storage may be unavailable */ }
-  }, [ratings]);
-  const move = (next: number) => {
-    setIndex(next);
-    setFlipped(false);
-  };
-  const rate = (value: "known" | "review") => {
-    setRatings((old) => ({ ...old, [String(index)]: value }));
-    if (index < demoLesson.flashcards.length - 1) move(index + 1);
-  };
-  return <div className="flashcards-panel">
-    <div className="resource-toolbar"><div><span className="content-status">مراجعة نشطة</span><h2>البطاقات التعليمية</h2><p>حاول تذكّر الإجابة قبل قلب البطاقة، ثم صنّفها حسب مستوى إتقانك.</p></div><span className="flashcard-count">{index + 1} / {demoLesson.flashcards.length}</span></div>
-    <div className="flashcard-progress"><span>أتقنتها: <b>{knownCount}</b></span><span>تحتاج مراجعة: <b>{reviewCount}</b></span><span>لم تصنّف: <b>{demoLesson.flashcards.length - knownCount - reviewCount}</b></span></div>
-    <button type="button" className={flipped ? "flashcard flipped" : "flashcard"} onClick={() => setFlipped(!flipped)}><small>{flipped ? "الإجابة" : "السؤال"}</small><strong>{flipped ? card.back : card.front}</strong><span>{flipped ? "انقر لرؤية السؤال" : "انقر لقلب البطاقة"}</span></button>
-    {flipped && <div className="flashcard-rating"><button type="button" className="flash-rating review" onClick={() => rate("review")}>أحتاج إلى مراجعتها</button><button type="button" className="flash-rating mastered" onClick={() => rate("known")}>أعرفها جيداً <Check size={15}/></button></div>}
-    <div className="flashcard-controls"><button className="btn btn-outline" onClick={() => move((index - 1 + demoLesson.flashcards.length) % demoLesson.flashcards.length)}>السابق</button><div className="flashcard-dots">{demoLesson.flashcards.map((_, i) => <button key={i} aria-label={"البطاقة " + (i + 1)} className={i === index ? "active" : ""} onClick={() => move(i)}/>)}</div><button className="btn btn-primary" onClick={() => move((index + 1) % demoLesson.flashcards.length)}>التالي <ArrowLeft size={15}/></button></div>
-  </div>;
 }
 
 function LessonPage({ progress, complete, toggleSaved }: { progress: Progress; complete: (id: string) => void; toggleSaved: (id: string) => void }) {
@@ -1375,7 +1303,7 @@ export default function App() {
     <Route path="/" element={<HomePage progress={progress}/>}/>
     <Route path="/curriculum" element={<CurriculumPage/>}/>
     <Route path="/grade/:gradeSlug" element={<GradePage/>}/>
-    <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress} toggleSaved={toggleSaved}/>}/>
+    <Route path="/subject/:gradeSlug/:trackSlug/:subjectSlug" element={<SubjectPage progress={progress}/>}/>
     <Route path="/library-lesson/:lessonId" element={<PublishedLessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/lesson/:lessonSlug" element={<LessonPage progress={progress} complete={complete} toggleSaved={toggleSaved}/>}/>
     <Route path="/grade-12-study" element={<Grade12PhysicsStudyPage/>}/>
