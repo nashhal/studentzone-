@@ -1,0 +1,101 @@
+.ys-primary-learning-page{max-width:1320px}
+.ys-primary-course-header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:24px;padding:26px 28px;border:1px solid #e3e9f2;background:linear-gradient(120deg,#f7f9ff 0%,#fff 65%);border-radius:16px}
+.ys-primary-course-header h1{margin:5px 0 7px;color:#172e4b;font-size:clamp(24px,3vw,34px);line-height:1.4}
+.ys-primary-course-header p{max-width:760px;margin:0;color:#67788e;font-size:14px;line-height:1.9}
+.ys-primary-course-meta{display:flex;align-items:center;gap:9px;white-space:nowrap;color:#315b8c;font-size:12px;font-weight:700}
+.ys-primary-learning-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;align-items:start;direction:rtl}
+.ys-primary-outline{position:sticky;top:105px;padding:13px;border:1px solid #e5eaf1;border-radius:14px;background:#fff;box-shadow:0 9px 24px rgba(26,48,78,.04)}
+.ys-primary-outline-title{display:flex;justify-content:space-between;align-items:center;padding:7px 8px 12px;color:#213d5e;font-size:13px}
+.ys-primary-outline-title span{color:#8695a8;font-size:10px}
+.ys-primary-outline>button{width:100%;display:flex;align-items:flex-start;gap:10px;padding:11px 9px;margin:4px 0;border:1px solid transparent;border-radius:9px;background:#fff;text-align:right;color:#425a75;cursor:pointer}
+.ys-primary-outline>button:hover{background:#f6f8fc}
+.ys-primary-outline>button.active{border-color:#d9e4ff;background:#f0f4ff;color:#244de2}
+.ys-primary-outline>button>i{flex:0 0 28px;width:28px;height:28px;display:grid;place-items:center;border-radius:7px;background:#eef2f7;color:#526b8b;font-style:normal;font-size:10px;font-weight:700}
+.ys-primary-outline>button.active>i{background:#2f5bff;color:#fff}
+.ys-primary-outline>button>span{display:grid;gap:4px;min-width:0}
+.ys-primary-outline>button b{font-size:12px;line-height:1.6}
+.ys-primary-outline>button small{color:#8797a9;font-size:10px}
+.ys-primary-source-note{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:11px 8px;border-top:1px solid #edf0f4;color:#73869c;font-size:10px;line-height:1.8}
+.ys-primary-source-note svg{flex:0 0 auto;color:#4b9a89}
+.ys-primary-lesson{min-width:0;padding:24px;border:1px solid #e5eaf1;border-radius:16px;background:#fff;box-shadow:0 9px 26px rgba(26,48,78,.04)}
+.ys-primary-lesson-top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:17px}
+.ys-primary-lesson-top h2{margin:5px 0 0;color:#172e4b;font-size:clamp(21px,2.6vw,29px);line-height:1.5}
+.ys-primary-goals{margin:16px 0;padding:16px 18px;border:1px solid #e4ebf8;border-right:4px solid #2f5bff;background:#f7f9ff;border-radius:9px}
+.ys-primary-goals>b{color:#2b4f82;font-size:13px}
+.ys-primary-goals ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 20px;margin:10px 0 0;padding-right:19px}
+.ys-primary-goals li{color:#506783;font-size:12px;line-height:1.8}
+.ys-primary-illustration{margin:18px 0 24px;overflow:hidden;border:1px solid #e4ebf4;border-radius:14px;background:#f7f9ff}
+.ys-primary-illustration svg{display:block;width:100%;height:auto;max-height:320px}
+.ys-primary-illustration-caption{display:flex;justify-content:space-between;gap:10px;padding:10px 15px;border-top:1px solid #e4ebf4;background:#fff}
+.ys-primary-illustration-caption b{color:#274568;font-size:12px}
+.ys-primary-illustration-caption span{color:#73869b;font-size:11px}
+.ys-primary-explanation{margin:20px 0;padding-bottom:17px;border-bottom:1px solid #edf0f5}
+.ys-primary-explanation h3{display:flex;align-items:center;gap:9px;margin:0 0 9px;color:#203d60;font-size:17px}
+.ys-primary-explanation h3>span{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#eaf0ff;color:#2f5bff;font-size:11px}
+.ys-primary-explanation p,.ys-primary-explanation li{color:#40566f;font-size:14px;line-height:2}
+.ys-primary-explanation p{margin:0 0 8px}
+.ys-primary-explanation ul{margin:8px 0 0;padding-right:23px}
+.ys-primary-vocabulary{margin:20px 0}
+.ys-primary-vocabulary h3,.ys-primary-activities h3{margin:0 0 12px;color:#203d60;font-size:16px}
+.ys-primary-vocabulary>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.ys-primary-vocabulary article{padding:13px 14px;border:1px solid #e5eaf1;border-radius:9px;background:#fbfcfe}
+.ys-primary-vocabulary article b{color:#305b8c;font-size:13px}
+.ys-primary-vocabulary article p{margin:4px 0 0;color:#65788e;font-size:12px;line-height:1.8}
+.ys-primary-example{margin:20px 0;padding:17px 18px;border:1px solid #dce8e6;border-right:4px solid #39a28f;border-radius:10px;background:#f7fbfa}
+.ys-primary-example h3{margin:4px 0 10px;color:#1d5b53;font-size:17px}
+.ys-primary-example p,.ys-primary-example li{color:#405f63;font-size:13px;line-height:1.9}
+.ys-primary-example ol{margin:8px 0;padding-right:22px}
+.ys-primary-example>b{display:block;margin-top:9px;padding-top:9px;border-top:1px solid #dcebe7;color:#1f776c;font-size:13px}
+.ys-primary-practice{margin:20px 0;padding:18px;border:1px solid #e3eaf4;border-radius:12px;background:#fafcff}
+.ys-primary-practice h3{margin:5px 0 14px;color:#203d60;font-size:16px;line-height:1.8}
+.ys-primary-practice>div:first-of-type{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ys-primary-practice>div:first-of-type button{display:flex;align-items:center;gap:9px;min-height:45px;padding:10px;border:1px solid #dce5f0;border-radius:8px;background:#fff;color:#475d77;text-align:right;font-size:12px;cursor:pointer}
+.ys-primary-practice>div:first-of-type button i{flex:0 0 25px;height:25px;display:grid;place-items:center;border-radius:50%;background:#eef2f8;color:#516a8b;font-style:normal}
+.ys-primary-practice>div:first-of-type button.selected{border-color:#829be7;background:#f1f4ff}
+.ys-primary-practice>div:first-of-type button.correct{border-color:#82b9a7;background:#eff9f5;color:#206553}
+.ys-primary-practice>div:first-of-type button.wrong{border-color:#d6a19c;background:#fff4f2;color:#914a43}
+.ys-primary-practice>div:first-of-type button:disabled{cursor:default}
+.ys-primary-practice>.btn{margin-top:12px}
+.ys-primary-feedback{display:block!important;margin-top:12px;padding:13px;border-right:3px solid #40a18e;background:#eff9f5}
+.ys-primary-feedback b{color:#216f5e;font-size:13px}
+.ys-primary-feedback p{margin:5px 0;color:#486d65;font-size:12px;line-height:1.8}
+.ys-primary-feedback button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#2f5bff;font-size:11px;cursor:pointer}
+.ys-primary-activities{margin:20px 0;padding:15px 18px;border-radius:10px;background:#f7f8fa}
+.ys-primary-activities ol{margin:0;padding-right:22px}
+.ys-primary-activities li{padding:4px 0;color:#52677f;font-size:13px;line-height:1.8}
+.ys-primary-pager{display:flex;justify-content:space-between;gap:10px;margin-top:22px;padding-top:16px;border-top:1px solid #edf0f4}
+.ys-primary-pager button{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 13px;border:1px solid #dce4ed;border-radius:8px;background:#fff;color:#31577f;font-size:12px;cursor:pointer}
+.ys-primary-pager button:disabled{opacity:.4;cursor:not-allowed}
+.ys-primary-empty{max-width:760px;margin:45px auto;padding:35px;border:1px solid #e3eaf1;border-radius:16px;background:#fbfcff;text-align:center}
+.ys-primary-empty svg{color:#4b9a89}
+.ys-primary-empty h1{margin:9px 0;color:#203d60;font-size:28px}
+.ys-primary-empty p{color:#60758d;font-size:14px;line-height:2}
+.ys-primary-print-booklet{display:none}
+@media(max-width:900px){.ys-primary-learning-layout{grid-template-columns:235px minmax(0,1fr)}.ys-primary-lesson{padding:19px}}
+@media(max-width:700px){.ys-primary-course-header{align-items:flex-start;flex-direction:column}.ys-primary-learning-layout{grid-template-columns:1fr}.ys-primary-outline{position:static}.ys-primary-outline>button{display:inline-flex;width:calc(50% - 4px);vertical-align:top}.ys-primary-lesson-top{flex-direction:column}.ys-primary-print-button{width:100%}}
+@media(max-width:480px){.ys-primary-lesson{padding:14px}.ys-primary-goals ul,.ys-primary-vocabulary>div,.ys-primary-practice>div:first-of-type{grid-template-columns:1fr}.ys-primary-outline>button{width:100%}.ys-primary-illustration-caption{flex-direction:column}.ys-primary-practice{padding:13px}}
+@media print{
+  @page{size:A4;margin:13mm 15mm}
+  body[data-primary-learning-print="booklet"] *{visibility:hidden!important}
+  body[data-primary-learning-print="booklet"] .ys-primary-print-booklet,
+  body[data-primary-learning-print="booklet"] .ys-primary-print-booklet *{visibility:visible!important}
+  body[data-primary-learning-print="booklet"] .ys-primary-print-booklet{display:block!important;position:absolute!important;inset:0 auto auto 0!important;width:100%!important;color:#22364d!important;background:#fff!important;font-family:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif!important;direction:rtl!important}
+  .ys-primary-print-booklet>header{padding:9px 0 14px;border-top:5px solid #2f5bff;border-bottom:1px solid #dce5ef;margin-bottom:16px}
+  .ys-primary-print-brand{display:flex;align-items:center;gap:8px;direction:ltr;justify-content:flex-start}
+  .ys-primary-print-brand img{width:38px;height:38px;object-fit:contain}
+  .ys-primary-print-brand span{display:grid;gap:2px}
+  .ys-primary-print-brand b{font-family:Arial,sans-serif;color:#142b43;font-size:14pt}
+  .ys-primary-print-brand small{color:#64778d;font-size:8pt}
+  .ys-primary-print-booklet>header>span{float:left;color:#2f5bff;font-size:8pt;font-weight:700}
+  .ys-primary-print-booklet header h1{margin:13px 0 6px;color:#142b43;font-size:19pt}
+  .ys-primary-print-booklet header p{color:#566b83;font-size:10pt;line-height:1.8}
+  .ys-primary-print-lesson{margin:15px 0 19px;padding-bottom:12px;border-bottom:1px solid #dfe6ef;break-inside:auto}
+  .ys-primary-print-lesson h2{margin:0 0 8px;color:#244de2;font-size:14pt;break-after:avoid}
+  .ys-primary-print-lesson h3{margin:10px 0 5px;color:#294e79;font-size:11pt;break-after:avoid}
+  .ys-primary-print-lesson p,.ys-primary-print-lesson li{font-size:10pt;line-height:1.85;orphans:3;widows:3}
+  .ys-primary-print-lesson .ys-primary-illustration{max-width:470px;margin:9px auto}
+  .ys-primary-print-lesson .ys-primary-illustration svg{max-height:175px}
+  .ys-primary-print-lesson .ys-primary-illustration-caption{display:none}
+  .ys-primary-print-booklet footer{padding-top:10px;border-top:2px solid #142b43;text-align:center;color:#52708f;font-size:9pt}
+  .ys-primary-learning-page .ys-primary-lesson,.ys-primary-learning-page .ys-primary-outline,.ys-primary-learning-page .ys-primary-course-header{display:none!important}
+}
