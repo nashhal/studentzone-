@@ -21,7 +21,7 @@ html { scroll-behavior: smooth; }
 body {
   background: #f6f8fb !important;
   color: #26384b;
-  font-family: "Noto Sans Arabic", "IBM Plex Sans", Arial, sans-serif;
+  font-family: "Noto Naskh Arabic", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
   text-rendering: optimizeLegibility;
 }
 button, input, select, textarea { font: inherit; }
@@ -1282,4 +1282,32 @@ textarea:focus-visible {
   .site-header, .site-footer, .sme-lesson-actions, .lesson-aside, .published-lesson-actions, .lesson-next, .breadcrumbs { display: none !important; }
   .sme-lesson-page, .sme-lesson-page .lesson-main { max-width: none; border: 0; box-shadow: none; padding: 0; }
   .sme-lesson-page .lesson-layout { display: block; }
+}
+
+/* Arabic type system: Naskh for comfortable reading, Plex Arabic for clear headings. */
+:root,
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Noto Naskh Arabic", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "IBM Plex Sans Arabic", "Noto Naskh Arabic", Tahoma, Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+:lang(en),
+[dir="ltr"],
+.latin-text {
+  font-family: "IBM Plex Sans", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
