@@ -11,7 +11,7 @@ import { useAuth } from "./lib/auth";
 import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
-import { demoCourse, demoLesson, type Question } from "./data/learning";
+import { demoLesson, type Question } from "./data/learning";
 const TargetTestPage = lazy(() => import("./StudyTools").then(({ TargetTestPage }) => ({ default: TargetTestPage })));
 const StrengthsWeaknessesPage = lazy(() => import("./StudyTools").then(({ StrengthsWeaknessesPage }) => ({ default: StrengthsWeaknessesPage })));
 const GuidedStudyPage = lazy(() => import("./StudyTools").then(({ GuidedStudyPage }) => ({ default: GuidedStudyPage })));
@@ -510,6 +510,28 @@ type PublishedUnit = {
   lessons: PublishedLessonSummary[];
 };
 
+const grade12LearningSubjectMap: Record<string, string> = {
+  biology: "biology",
+  english: "english",
+  faith: "faith",
+  history: "history",
+  geography: "geography",
+  "hadith-fiqh": "hadith-fiqh",
+  "mathematics-scientific": "mathematics",
+  "mathematics-literary": "mathematics-literary-statistics",
+  "prophetic-biography": "seerah",
+  quran: "quran",
+  physics: "physics",
+  chemistry: "chemistry",
+  reading: "reading",
+  grammar: "grammar",
+  texts: "literature",
+  philosophy: "philosophy",
+  logic: "logic",
+  psychology: "psychology",
+  "map-science": "map-science",
+};
+
 function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSaved: (id: string) => void }) {
   const { gradeSlug = "", trackSlug = "", subjectSlug = "" } = useParams();
   const grade = getGrade(gradeSlug);
@@ -521,12 +543,17 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
   const [publishedUnits, setPublishedUnits] = useState<PublishedUnit[]>([]);
   const [contentLoading, setContentLoading] = useState(false);
   const [contentError, setContentError] = useState("");
-  const isDemo = gradeSlug === "grade-12" && trackSlug === "scientific" && subjectSlug === "physics";
+  const isGrade12 = gradeSlug === "grade-12";
+  const grade12LearningModuleSlug = grade12LearningSubjectMap[subjectSlug];
+  const grade12LearningHref = grade12LearningModuleSlug
+    ? `/grade-12-learning?subject=${encodeURIComponent(grade12LearningModuleSlug)}`
+    : "/grade-12-learning";
 
   useEffect(() => {
     let active = true;
     const loadPublishedContent = async () => {
-      if (isDemo) {
+      if (isGrade12) {
+        // Grade 12 lessons are maintained in the in-site learning hub, not in the optional Supabase library.
         setPublishedUnits([]);
         setContentError("");
         setContentLoading(false);
@@ -598,10 +625,9 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
     };
     void loadPublishedContent();
     return () => { active = false; };
-  }, [gradeSlug, trackSlug, subjectSlug, isDemo]);
+  }, [gradeSlug, trackSlug, subjectSlug, isGrade12]);
 
   if (!grade || !track || !subject) return <NotFound/>;
-  const lessonDone = progress.completed.includes(demoLesson.slug);
   const allPublishedLessons = publishedUnits.flatMap((unit) => unit.lessons);
   const completedPublishedCount = allPublishedLessons.filter((lesson) => progress.completed.includes(lesson.id)).length;
   const publishedProgress = allPublishedLessons.length ? Math.round(completedPublishedCount / allPublishedLessons.length * 100) : 0;
@@ -632,9 +658,9 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
         <div className="sidebar-course-outline">
           <div className="sidebar-title"><span>فهرس المادة</span><button onClick={() => setExpanded(!expanded)} aria-label="توسيع أو طي فهرس المادة"><ChevronDown className={expanded ? "" : "collapsed"} size={17}/></button></div>
           {expanded && <div className="sidebar-tree">
-            {isDemo ? <>
-              <div className="tree-unit"><span className="tree-unit-dot"/> {demoCourse.unitTitle}</div>
-              <Link className="tree-lesson active" to="/lesson/scalars-and-vectors"><span className="tree-lesson-dot"/><span>{demoLesson.title}</span><span className="tree-lesson-open">فتح</span></Link>
+            {isGrade12 ? <>
+              <div className="tree-unit"><span className="tree-unit-dot"/> مركز شرح ومراجعة الصف الثالث الثانوي</div>
+              {grade12LearningModuleSlug ? <Link className="tree-lesson active" to={grade12LearningHref}><span className="tree-lesson-dot"/><span>شرح {subject.name} والاختبارات</span><span className="tree-lesson-open">فتح</span></Link> : <div className="tree-placeholder">هذا المقرر لم يُربط بمحور تعليمي بعد.</div>}
             </> : contentLoading ? <div className="tree-placeholder">جارٍ تحميل الوحدات...</div> : publishedUnits.length ? publishedUnits.map((unit) => <div key={unit.id}>
               <div className="tree-unit"><span className="tree-unit-dot"/> {unit.title}</div>
               {unit.lessons.map((lesson) => <Link className="tree-lesson" key={lesson.id} to={`/library-lesson/${lesson.id}`}><span className="tree-lesson-dot"/><span>{lesson.title}</span><span className="tree-lesson-open">فتح</span></Link>)}
@@ -644,26 +670,62 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
       </aside>}
       <div className="subject-main-column">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div><div className="course-progress"><span>تقدّمك في المادة</span><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: (isDemo && lessonDone ? 100 : publishedProgress) + "%" }}/></div></div>{isDemo && <Link className="btn btn-primary g12-subject-cta" to="/grade-12-study">ملخصات واختبارات متدرجة <ArrowLeft size={15}/></Link>}</div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div>{isGrade12 ? <Link className="btn btn-primary g12-subject-cta" to={grade12LearningHref}>افتح شرح المادة والاختبارات <ArrowLeft size={15}/></Link> : <div className="course-progress"><span>تقدّمك في المادة</span><b>{publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: publishedProgress + "%" }}/></div></div>}</div>
 
 
-        <section className="sme-course-overview" aria-label="نظرة عامة على المقرر">
+        {isGrade12 ? <section className="sme-course-overview" aria-label="مركز شرح المادة">
+          <div className="sme-course-overview-copy">
+            <small>منهج عدن 2026 · {grade.name} · {track.name}</small>
+            <h2>مركز شرح ومراجعة {subject.name}</h2>
+            <p>تنتقل من هنا إلى شرح الموضوعات المرتبطة بالمادة، ثم المثال المحلول والملخص والأسئلة المتدرجة داخل الموقع.</p>
+          </div>
+          <div className="sme-course-stats">
+            <div className="sme-course-stat"><b>66</b><small>محوراً في المركز عبر المواد</small></div>
+            <div className="sme-course-stat"><b>3</b><small>مستويات لصعوبة الأسئلة</small></div>
+            <div className="sme-course-stat"><b>PDF</b><small>ملخصات واختبارات قابلة للحفظ</small></div>
+          </div>
+        </section> : <section className="sme-course-overview" aria-label="نظرة عامة على المقرر">
           <div className="sme-course-overview-copy">
             <small>المقرر الدراسي · {grade.name} · {track.name}</small>
             <h2>مسار المراجعة للمقرر</h2>
             <p>استخدم فهرس المادة للتنقل بين الوحدات، ثم افتح الملاحظات أو التدريب المرتبط بكل موضوع.</p>
           </div>
           <div className="sme-course-stats">
-            <div className="sme-course-stat"><b>{isDemo ? 1 : publishedUnits.length}</b><small>وحدات منشورة</small></div>
-            <div className="sme-course-stat"><b>{isDemo ? 1 : allPublishedLessons.length}</b><small>دروس متاحة</small></div>
-            <div className="sme-course-stat"><b>{isDemo && lessonDone ? "100%" : publishedProgress + "%"}</b><small>تقدمك</small></div>
+            <div className="sme-course-stat"><b>{publishedUnits.length}</b><small>وحدات منشورة</small></div>
+            <div className="sme-course-stat"><b>{allPublishedLessons.length}</b><small>دروس متاحة</small></div>
+            <div className="sme-course-stat"><b>{publishedProgress + "%"}</b><small>تقدمك</small></div>
           </div>
-        </section>
+        </section>}
+
         <div className="course-shell">
       <section className="course-main">
         {!sidebarOpen && <button type="button" className="sidebar-show-button" onClick={() => setSidebarOpen(true)}><Menu size={17}/> إظهار القائمة</button>}
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
-        {!isDemo ? <>
+        {isGrade12 ? <>
+          {activeTab === "notes" && <div className="content-coming">
+            <span className="content-icon"><BookOpen size={26}/></span>
+            <span className="content-status">مركز الشرح والمراجعة</span>
+            <h2>ابدأ شرح مادة {subject.name}</h2>
+            <p>افتح المحور المطابق لمادتك لقراءة الدرس مقسماً إلى موضوعات قصيرة، مع أهداف التعلم والقوانين أو المفاهيم المهمة، ومثال محلول ومذكرة مراجعة واختبار داخل الموقع.</p>
+            {grade12LearningModuleSlug ? <Link className="btn btn-primary" to={grade12LearningHref}>افتح الدروس والملخصات <ArrowLeft size={16}/></Link> : <p>لم يُربط هذا المقرر بمحور مستقل بعد؛ افتح المركز وابحث عن موضوع قريب.</p>}
+          </div>}
+          {activeTab === "questions" && <div className="content-coming">
+            <span className="content-status">بنك الأسئلة</span><h2>تدرّب على أسئلة {subject.name}</h2>
+            <p>الأسئلة مقسمة إلى مستويات جيد وصعب والأصعب، مع تفسير للإجابة وخطوات الحل.</p>
+            <Link className="btn btn-primary" to={grade12LearningHref}>افتح اختبارات المادة <ArrowLeft size={16}/></Link>
+          </div>}
+          {activeTab === "flashcards" && <div className="content-coming">
+            <span className="content-status">المراجعة النشطة</span><h2>مفاهيم وبطاقات {subject.name}</h2>
+            <p>راجع المصطلحات والقواعد الأساسية، ثم اختبر استدعاء المعلومات قبل الاطلاع على الحل.</p>
+            <Link className="btn btn-primary" to={grade12LearningHref}>افتح ملخص المادة <ArrowLeft size={16}/></Link>
+          </div>}
+          {activeTab === "exams" && <div className="content-coming">
+            <span className="content-status">اختبارات داخل الموقع</span><h2>اختبارات متدرجة في {subject.name}</h2>
+            <p>اختر مستوى الصعوبة، أجب عن الأسئلة، ثم راجع تفسير الإجابات والأخطاء التي تحتاج إلى تثبيت.</p>
+            <Link className="btn btn-primary" to={grade12LearningHref}>ابدأ الاختبار <ArrowLeft size={16}/></Link>
+          </div>}
+          {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>ستُعرض أوراق الامتحانات التي يسمح باستخدامها داخل المكتبة، أو تُبنى اختبارات تدريبية أصلية داخل الموقع.</p><Link to="/past-papers" className="text-link">عرض مكتبة الأوراق <ArrowLeft size={15}/></Link></div>}
+        </> : <>
           {activeTab === "notes" && <div className="resource-list">
             <div className="resource-toolbar"><div><span className="content-status">مكتبة المادة</span><h2>الدروس والمراجعة</h2><p>تظهر هنا الدروس المنشورة بعد مراجعتها. افتح الدرس واقرأ الشرح وحل أمثلته داخل الموقع.</p></div></div>
             {contentLoading ? <div className="content-loading" role="status">جارٍ تحميل الدروس المنشورة...</div> : contentError ? <div className="content-coming"><span className="content-status">المكتبة الداخلية</span><h2>محتوى المادة داخل Yemen Study</h2><p>{contentError}</p></div> : publishedUnits.length ? publishedUnits.map((unit) => <section className="published-unit" key={unit.id}>
@@ -679,16 +741,6 @@ function SubjectPage({ progress, toggleSaved }: { progress: Progress; toggleSave
           {activeTab === "flashcards" && <div className="content-coming"><span className="content-status">مراجعة داخل الموقع</span><h2>بطاقات المادة</h2><p>ستُنشأ البطاقات من مفاهيم الدروس المنشورة وتظهر داخل هذه الصفحة.</p></div>}
           {activeTab === "exams" && <div className="content-coming"><span className="content-status">اختبارات داخل الموقع</span><h2>اختبارات المادة</h2><p>سيُبنى الاختبار من بنك الأسئلة المعتمد، وتظهر النتيجة والتفسيرات داخل Yemen Study.</p></div>}
           {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>ستُعرض أوراق الامتحانات التي يسمح باستخدامها داخل المكتبة، أو تُبنى اختبارات تدريبية أصلية داخل الموقع.</p></div>}
-        </> : <>
-          {activeTab === "notes" && <div className="resource-list">
-            <div className="resource-toolbar"><div><span className="content-status">نموذج تفاعلي</span><h2>ملاحظات المراجعة</h2><p>ملاحظات تعليمية منظمة مع أمثلة وتلخيص سريع.</p></div><button className={progress.saved.includes(demoLesson.slug) ? "save-button saved" : "save-button"} onClick={() => toggleSaved(demoLesson.slug)}><Bookmark size={16}/>{progress.saved.includes(demoLesson.slug) ? "محفوظ" : "احفظ الدرس"}</button></div>
-            <Link className="lesson-row" to="/lesson/scalars-and-vectors" aria-label={lessonDone ? `مراجعة الدرس: ${demoLesson.title}` : `ابدأ الدرس: ${demoLesson.title}`}><span className="lesson-row-icon"><FileText size={19}/></span><span className="lesson-row-copy"><b>{demoLesson.title}</b><small>{demoLesson.duration} دقيقة · {demoLesson.sections.length} أقسام · مثال محلول</small></span><span className={lessonDone ? "lesson-row-cta is-complete" : "lesson-row-cta"}>{lessonDone ? <><CheckCircle2 size={14}/> مراجعة الدرس</> : <>ابدأ الدرس <ArrowLeft size={14}/></>}</span><ChevronLeft size={17}/></Link>
-            <div className="resource-disclaimer"><ShieldCheck size={16}/> هذا نموذج أولي لعرض تجربة المنصة، وليس محتوى وزارياً معتمداً بعد.</div>
-          </div>}
-          {activeTab === "questions" && <PracticePanel questions={demoLesson.questions}/>}
-          {activeTab === "flashcards" && <FlashcardsPanel/>}
-          {activeTab === "exams" && <div className="exam-card"><span className="exam-card-icon"><Timer size={24}/></span><div><span className="content-status">ثلاثة مستويات · 15 سؤالاً</span><h2>اختبارات متدرجة للكميات القياسية والمتجهة</h2><p>ابدأ بالمستوى الجيد، ثم انتقل إلى الصعب والأصعب. لكل سؤال تفسير، ويمكن حفظ ورقة المستوى المحدد بصيغة PDF.</p><Link className="btn btn-primary" to="/grade-12-study">فتح الملخص والاختبارات <ArrowLeft size={16}/></Link></div></div>}
-          {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>أوراق الامتحانات</h2><p>لن نعرض أوراقاً غير موثقة. ستضاف نماذج الامتحانات السابقة مع سنة الامتحان ومصدرها ومفتاح الإجابة بعد مراجعة حقوق استخدامها.</p><Link to="/past-papers" className="text-link">عرض مكتبة الأوراق <ArrowLeft size={15}/></Link></div>}
         </>}
       </section>
         </div>
