@@ -210,3 +210,19 @@
   .g12-learning-question-heading{align-items:flex-start;flex-direction:column;gap:4px}
   .g12-learning-question-kind{white-space:normal}
 }
+
+/* Immediate comprehension check for each selected lesson */
+.g12-learning-lesson-practice{margin:8px 0 16px;padding:15px 16px;border:1px solid #dce7ee;background:#f7fafc}
+.g12-learning-lesson-practice-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.g12-learning-lesson-practice-head>div{display:grid;gap:4px}
+.g12-learning-lesson-practice-head b{color:#355671;font-size:12px}
+.g12-learning-lesson-practice-head small{color:#7e91a2;font-size:9px;line-height:1.6}
+.g12-learning-lesson-practice-head>span{flex:0 0 auto;padding:5px 8px;border:1px solid #dce6ed;background:#fff;color:#66849c;font-size:9px}
+.g12-learning-lesson-practice h4{margin:0 0 11px;color:#3c5871;font-size:12px;line-height:1.9}
+.g12-learning-lesson-practice .g12-learning-options{margin-bottom:10px}
+.g12-learning-lesson-practice .g12-learning-explanation{margin-top:10px}
+.g12-learning-lesson-practice .g12-learning-check{min-height:36px;padding:8px 12px}
+@media(max-width:560px){
+  .g12-learning-lesson-practice{padding:12px}
+  .g12-learning-lesson-practice-head{align-items:flex-start}
+}
