@@ -680,7 +680,7 @@ function SubjectPage({ progress }: { progress: Progress }) {
             <p>تنتقل من هنا إلى شرح الموضوعات المرتبطة بالمادة، ثم المثال المحلول والملخص والأسئلة المتدرجة داخل الموقع.</p>
           </div>
           <div className="sme-course-stats">
-            <div className="sme-course-stat"><b>66</b><small>محوراً في المركز عبر المواد</small></div>
+            <div className="sme-course-stat"><b>71</b><small>محوراً تعليمياً في المركز</small></div>
             <div className="sme-course-stat"><b>3</b><small>مستويات لصعوبة الأسئلة</small></div>
             <div className="sme-course-stat"><b>PDF</b><small>ملخصات واختبارات قابلة للحفظ</small></div>
           </div>
