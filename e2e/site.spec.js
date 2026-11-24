@@ -46,7 +46,7 @@ test.describe("Yemen Study public learning journey", () => {
 
     await expect(page.getByRole("heading", { level: 2, name: "الفيزياء: كمية التحرك والمقذوفات" })).toBeVisible();
     await expect(page.getByText("أهداف التعلم", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "مذكرة مراجعة الوحدة" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /حفظ الملخص PDF/ })).toBeVisible();
   });
 
   test("the mobile menu opens and navigates to the curriculum", async ({ page }) => {
