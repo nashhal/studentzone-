@@ -3568,7 +3568,7 @@ export default function Grade12LearningHubPage() {
       <header className="g12-print-lesson-header">
         <div className="g12-print-brand-row">
           <div className="g12-print-brand-lockup">
-            <img src="/yemen-study-mark.svg" alt="Yemen Study" />
+            <img src={`${import.meta.env.BASE_URL}yemen-study-mark.svg`} alt="Yemen Study" />
             <span><b>Yemen Study</b><small>منصة يمن ستدي التعليمية</small></span>
           </div>
           <span className="g12-print-edition">دفتر الدروس · نسخة تعليمية</span>
