@@ -1,6 +1,6 @@
 # Yemen Study — curriculum coverage and delivery register
 
-Last reviewed: 20 November 2026
+Last reviewed: 24 November 2026
 
 ## Scope
 
@@ -26,6 +26,10 @@ These are official-looking Ministry planning documents with course/subject distr
 - The current index and older Grade 12 sample modules are not automatically certified against the newly supplied 2026–2027 plans. Match each lesson and any deletions/exclusions before marking it aligned.
 - There is one full interactive Physics demonstration lesson (Scalars and Vectors). It is a product/content-format demonstration only; it is **not** confirmed against a named 2026–2027 plan item and must not be counted as an approved curriculum lesson until matched and reviewed.
 - No grade currently has a complete, verified unit/lesson library.
+- A first authored primary-grade batch now contains **21 draft lessons**: Grade 1 Mathematics and Science; Grade 2 Mathematics and Science; Grade 3 Mathematics, Science and Social Studies. Each lesson includes original Arabic teaching text, learning objectives, vocabulary, a worked example, a formative question and an activity.
+- The Grade 1–3 lessons are connected to a first-party reader with original SVG diagrams and a printable unit booklet. This is a **draft content release**, not a teacher-approved or fully mapped syllabus; the batch covers selected subjects only and does not make Grades 1–3 complete.
+- The 71 Grade 12 hubs remain provisional topic modules. They are not a count of official lesson records and do not establish complete coverage.
+
 - The current front end also contains **71 provisional Grade 12 learning hubs**. This is a count of authored topic hubs, not a count of all verified textbook lessons; it must not be interpreted as proof that the full Grade 12 syllabus is covered.
 - International explanation sources have been registered in [INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md](./INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md). They are used to improve Arabic explanations and check facts, not to alter the Yemeni curriculum sequence or copy/translate protected content.
 
@@ -33,9 +37,9 @@ These are official-looking Ministry planning documents with course/subject distr
 
 | Grade | Stage | Track structure | 2026–2027 plan received | Lesson-map status | Published verified lessons |
 |---|---|---|---|---|---:|
-| 1 | Basic | General | Yes | Pending full extraction | 0 |
-| 2 | Basic | General | Yes | Pending full extraction | 0 |
-| 3 | Basic | General | Yes | Pending full extraction | 0 |
+| 1 | Basic | General | Yes | Partial draft: Mathematics and Science topics; other subjects and full topic crosswalk pending | 0 |
+| 2 | Basic | General | Yes | Partial draft: Mathematics and Science topics; other subjects and full topic crosswalk pending | 0 |
+| 3 | Basic | General | Yes | Partial draft: Mathematics, Science and Social Studies topics; other subjects and full topic crosswalk pending | 0 |
 | 4 | Basic | General | Yes | Pending full extraction | 0 |
 | 5 | Basic | General | Yes | Pending full extraction | 0 |
 | 6 | Basic | General | Yes | Pending full extraction | 0 |

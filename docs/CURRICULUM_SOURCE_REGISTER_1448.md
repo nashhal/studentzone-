@@ -1,6 +1,6 @@
 # Yemen Study — 2026–2027 curriculum evidence register
 
-Last checked: 20 November 2026
+Last checked: 24 November 2026
 
 ## Newly received primary curriculum documents
 
@@ -71,6 +71,9 @@ A lesson is counted as published only after all fields below are satisfied:
 - The newly supplied 2026–2027 planning PDFs are now the project's primary planning sources, but the full page-by-page grade/subject maps have not yet all been extracted.
 - Existing Grade 12 sample modules and test banks are not automatically certified against these PDFs. Each module must be matched to the exact topic and exclusions before being labelled aligned.
 - No grade currently has a complete, verified lesson library.
+- First in-site lesson draft batch: 21 original lessons for selected Grade 1–3 Mathematics, Science and Grade 3 Social Studies topics. The source-page anchors are Grade 1–3 plan PDF pages 26–27 (Mathematics), 29–30 (Social Studies), and 31–32 (Science). The reader uses newly drawn SVG educational diagrams and does not reuse textbook artwork.
+- The new lessons are marked as authored draft, not verified/published. Their titles and sequencing still require a full unit-by-unit comparison with the official source pages and a subject-teacher review.
+
 - The editorial schema and in-site reader exist, but the production content backend is not fully configured. Newly authored database lessons cannot be assumed live until the backend and deployment are verified.
 
 ## Required delivery sequence

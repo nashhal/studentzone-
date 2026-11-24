@@ -12,6 +12,7 @@ import { StudyToolLayout } from "./StudyToolLayout";
 import { isSupabaseConfigured, supabase } from "./lib/supabase";
 import { countAllSubjectEntries, findSubjects, getGrade, getSubjectCount, grades, type GradeEntry } from "./data/catalog";
 import { demoLesson } from "./data/learning";
+import { primaryLessonCountFor } from "./data/primary-lessons";
 const TargetTestPage = lazy(() => import("./StudyTools").then(({ TargetTestPage }) => ({ default: TargetTestPage })));
 const StrengthsWeaknessesPage = lazy(() => import("./StudyTools").then(({ StrengthsWeaknessesPage }) => ({ default: StrengthsWeaknessesPage })));
 const GuidedStudyPage = lazy(() => import("./StudyTools").then(({ GuidedStudyPage }) => ({ default: GuidedStudyPage })));
@@ -23,6 +24,7 @@ import "./lesson-buttons.css";
 const Grade12PhysicsStudyPage = lazy(() => import("./Grade12Study").then(({ default: Page }) => ({ default: Page })));
 const Grade12BooksPage = lazy(() => import("./Grade12Books").then(({ default: Page }) => ({ default: Page })));
 const Grade12LearningHubPage = lazy(() => import("./Grade12LearningHub").then(({ default: Page }) => ({ default: Page })));
+const PrimaryLearningHubPage = lazy(() => import("./PrimaryLearningHub").then(({ default: Page }) => ({ default: Page })));
 const AcademyCouncilPage = lazy(() => import("./AcademyCouncil").then(({ default: Page }) => ({ default: Page })));
 
 type Progress = { completed: string[]; saved: string[]; quizScores: number[] };
@@ -479,9 +481,12 @@ function GradePage() {
     {grade.slug === "grade-12" && <div className="subject-list-heading"><span>مكتبة الكتب ومركز الشرح والاختبارات — منهج عدن</span><div className="g12-grade-actions"><Link className="btn btn-outline" to="/grade-12-books"><BookOpen size={16}/> مكتبة الكتب</Link><Link className="btn btn-primary" to="/grade-12-learning"><BookOpenCheck size={16}/> الشرح والاختبارات <ArrowLeft size={15}/></Link></div></div>}
     {grade.tracks.length > 1 && <div className="filter-pills track-pills">{grade.tracks.map((item) => <button key={item.slug} className={track.slug === item.slug ? "filter-pill active" : "filter-pill"} onClick={() => setTrackSlug(item.slug)}>{item.name}</button>)}</div>}
     <div className="subject-list-heading"><h2>المواد الدراسية</h2><span>{track.name}</span></div>
-    <div className="subject-grid">{track.subjects.map((subject, index) => <Link className="subject-tile" key={subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
-      <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p className="subject-tile-status">{grade.slug === "grade-12" && track.slug === "scientific" && subject.slug === "physics" ? "شرح تجريبي لموضوع واحد متاح" : "صفحة المادة متاحة · إعداد الدروس مستمر"}</p></div><ChevronLeft size={18}/>
-    </Link>)}</div>
+    <div className="subject-grid">{track.subjects.map((subject, index) => {
+      const primaryCount = primaryLessonCountFor(grade.slug, track.slug, subject.slug);
+      return <Link className="subject-tile" key={subject.slug} to={"/subject/" + grade.slug + "/" + track.slug + "/" + subject.slug}>
+        <span className="subject-number">{String(index + 1).padStart(2, "0")}</span><div><h3>{subject.name}</h3><p className="subject-tile-status">{primaryCount > 0 ? primaryCount + " دروس تعليمية مصورة" : grade.slug === "grade-12" && track.slug === "scientific" && subject.slug === "physics" ? "شرح تجريبي متاح" : "فهرس المادة متاح · إعداد الدروس مستمر"}</p></div><ChevronLeft size={18}/>
+      </Link>;
+    })}</div>
   </main>;
 }
 
@@ -544,6 +549,9 @@ function SubjectPage({ progress }: { progress: Progress }) {
   const [contentLoading, setContentLoading] = useState(false);
   const [contentError, setContentError] = useState("");
   const isGrade12 = gradeSlug === "grade-12";
+  const primaryLessonCount = primaryLessonCountFor(gradeSlug, trackSlug, subjectSlug);
+  const isPrimaryLearningModule = primaryLessonCount > 0;
+  const primaryLearningHref = `/primary-learning/${gradeSlug}/${trackSlug}/${subjectSlug}`;
   const grade12LearningModuleSlug = grade12LearningSubjectMap[subjectSlug];
   const grade12LearningHref = grade12LearningModuleSlug
     ? `/grade-12-learning?subject=${encodeURIComponent(grade12LearningModuleSlug)}`
@@ -552,8 +560,8 @@ function SubjectPage({ progress }: { progress: Progress }) {
   useEffect(() => {
     let active = true;
     const loadPublishedContent = async () => {
-      if (isGrade12) {
-        // Grade 12 lessons are maintained in the in-site learning hub, not in the optional Supabase library.
+      if (isGrade12 || isPrimaryLearningModule) {
+        // These first-party lesson hubs are maintained as reviewed in-site content, not in the optional Supabase library.
         setPublishedUnits([]);
         setContentError("");
         setContentLoading(false);
@@ -625,7 +633,7 @@ function SubjectPage({ progress }: { progress: Progress }) {
     };
     void loadPublishedContent();
     return () => { active = false; };
-  }, [gradeSlug, trackSlug, subjectSlug, isGrade12]);
+  }, [gradeSlug, trackSlug, subjectSlug, isGrade12, isPrimaryLearningModule]);
 
   if (!grade || !track || !subject) return <NotFound/>;
   const allPublishedLessons = publishedUnits.flatMap((unit) => unit.lessons);
@@ -670,10 +678,21 @@ function SubjectPage({ progress }: { progress: Progress }) {
       </aside>}
       <div className="subject-main-column">
     <div className="breadcrumbs"><Link to="/">الرئيسية</Link><ChevronLeft size={14}/><Link to={`/grade/${grade.slug}`}>{grade.name}</Link><ChevronLeft size={14}/><b>{subject.name}</b></div>
-    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد المراجعة والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div>{isGrade12 ? <Link className="btn btn-primary g12-subject-cta" to={grade12LearningHref}>افتح شرح المادة والاختبارات <ArrowLeft size={15}/></Link> : <div className="course-progress"><span>تقدّمك في المادة</span><b>{publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: publishedProgress + "%" }}/></div></div>}</div>
+    <div className="course-heading"><div><span className="eyebrow">{grade.name} · {track.name}</span><h1>{subject.name}</h1><p>موارد التعلّم والشرح والتدريب الخاصة بالمادة، داخل Yemen Study.</p></div>{isPrimaryLearningModule ? <Link className="btn btn-primary" to={primaryLearningHref}>ابدأ الدروس المصوّرة <ArrowLeft size={15}/></Link> : isGrade12 ? <Link className="btn btn-primary g12-subject-cta" to={grade12LearningHref}>افتح شرح المادة والاختبارات <ArrowLeft size={15}/></Link> : <div className="course-progress"><span>تقدّمك في المادة</span><b>{publishedProgress + "%"}</b><div className="progress-track"><i style={{ width: publishedProgress + "%" }}/></div></div>}</div>
 
 
-        {isGrade12 ? <section className="sme-course-overview" aria-label="مركز شرح المادة">
+        {isPrimaryLearningModule ? <section className="sme-course-overview" aria-label="مركز دروس المادة">
+          <div className="sme-course-overview-copy">
+            <small>خطة الوزارة 2026–2027 · {grade.name} · {track.name}</small>
+            <h2>دروس {subject.name} المصوّرة</h2>
+            <p>شرح بلغة مناسبة للمرحلة، ورسومات أصلية، وأمثلة خطوة بخطوة، وتطبيق قصير للتحقق من الفهم.</p>
+          </div>
+          <div className="sme-course-stats">
+            <div className="sme-course-stat"><b>{primaryLessonCount}</b><small>دروس منشورة في هذه الدفعة</small></div>
+            <div className="sme-course-stat"><b>SVG</b><small>رسومات تعليمية أصلية</small></div>
+            <div className="sme-course-stat"><b>A4</b><small>كراسة قابلة للطباعة</small></div>
+          </div>
+        </section> : isGrade12 ? <section className="sme-course-overview" aria-label="مركز شرح المادة">
           <div className="sme-course-overview-copy">
             <small>منهج عدن 2026 · {grade.name} · {track.name}</small>
             <h2>مركز شرح ومراجعة {subject.name}</h2>
@@ -701,7 +720,19 @@ function SubjectPage({ progress }: { progress: Progress }) {
       <section className="course-main">
         {!sidebarOpen && <button type="button" className="sidebar-show-button" onClick={() => setSidebarOpen(true)}><Menu size={17}/> إظهار القائمة</button>}
         <div className="course-tabs" role="tablist">{tabs.map(({ id, label, icon: Icon }) => <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "course-tab active" : "course-tab"} onClick={() => setActiveTab(id)}><Icon size={16}/><span>{label}</span></button>)}</div>
-        {isGrade12 ? <>
+        {isPrimaryLearningModule ? <>
+          {activeTab === "notes" && <div className="content-coming">
+            <span className="content-icon"><BookOpen size={26}/></span>
+            <span className="content-status">دروس داخل Yemen Study</span>
+            <h2>ابدأ دروس {subject.name}</h2>
+            <p>كل درس له أهداف واضحة وشرح مصوّر ومفردات ومثال محلول وأنشطة وسؤال لفحص الفهم.</p>
+            <Link className="btn btn-primary" to={primaryLearningHref}>افتح الدروس المصوّرة <ArrowLeft size={16}/></Link>
+          </div>}
+          {activeTab === "questions" && <div className="content-coming"><span className="content-status">تدريبات الدروس</span><h2>أسئلة {subject.name}</h2><p>افتح الدرس ثم أجب عن السؤال التطبيقي وراجع التفسير.</p><Link className="btn btn-primary" to={primaryLearningHref}>ابدأ التدريب <ArrowLeft size={16}/></Link></div>}
+          {activeTab === "flashcards" && <div className="content-coming"><span className="content-status">مصطلحات ومفاهيم</span><h2>راجع مفاهيم {subject.name}</h2><p>تظهر الكلمات المهمة داخل كل درس مع تعريفاتها وأمثلتها.</p><Link className="btn btn-primary" to={primaryLearningHref}>افتح الدروس <ArrowLeft size={16}/></Link></div>}
+          {activeTab === "exams" && <div className="content-coming"><span className="content-status">تحقق من الفهم</span><h2>تدريبات متدرجة</h2><p>تدرب داخل الدرس مع تصحيح فوري وتفسير للإجابة.</p><Link className="btn btn-primary" to={primaryLearningHref}>ابدأ التدريب <ArrowLeft size={16}/></Link></div>}
+          {activeTab === "papers" && <div className="paper-empty"><FileText size={25}/><h2>كراسة دروس المادة</h2><p>اطبع كراسة الدروس كاملة من صفحة الشرح.</p><Link to={primaryLearningHref} className="text-link">فتح كراسة الدروس <ArrowLeft size={15}/></Link></div>}
+        </> : isGrade12 ? <>
           {activeTab === "notes" && <div className="content-coming">
             <span className="content-icon"><BookOpen size={26}/></span>
             <span className="content-status">مركز الشرح والمراجعة</span>
@@ -1309,6 +1340,7 @@ export default function App() {
     <Route path="/grade-12-study" element={<Grade12PhysicsStudyPage/>}/>
     <Route path="/grade-12-books" element={<Grade12BooksPage/>}/>
     <Route path="/grade-12-learning" element={<Grade12LearningHubPage/>}/>
+    <Route path="/primary-learning/:gradeSlug/:trackSlug/:subjectSlug" element={<PrimaryLearningHubPage/>}/>
     <Route path="/mock-exam" element={<StudyToolLayout><MockExamPage addScore={addScore}/></StudyToolLayout>}/>
     <Route path="/target-test" element={<StudyToolLayout><TargetTestPage/></StudyToolLayout>}/>
     <Route path="/strengths-weaknesses" element={<StudyToolLayout><StrengthsWeaknessesPage/></StudyToolLayout>}/>

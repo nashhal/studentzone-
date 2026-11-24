@@ -49,6 +49,50 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.getByRole("button", { name: /طباعة الوحدة كاملة/ })).toBeVisible();
   });
 
+  test("primary curriculum lessons open with original diagrams, examples and answer feedback", async ({ page }) => {
+    await page.goto("./#/subject/grade-1/general/mathematics");
+    await expect(page.getByRole("heading", { level: 1, name: "الرياضيات" })).toBeVisible();
+    await page.getByRole("link", { name: /ابدأ الدروس المصوّرة/ }).click();
+
+    await expect(page.getByRole("heading", { level: 1, name: "الصف الأول الأساسي · الرياضيات" })).toBeVisible();
+    await expect(page.locator(".ys-primary-outline > button")).toHaveCount(3);
+    await expect(page.locator(".ys-primary-illustration svg").first()).toBeVisible();
+    await expect(page.locator(".ys-primary-example")).toContainText("مثال محلول");
+    await expect(page.locator(".ys-primary-practice")).toBeVisible();
+
+    const choices = page.locator(".ys-primary-practice > div:first-of-type button");
+    await choices.nth(0).click();
+    const check = page.getByRole("button", { name: "تحقق من الإجابة" });
+    await expect(check).toBeEnabled();
+    await check.click();
+    await expect(page.locator(".ys-primary-feedback")).toBeVisible();
+
+    await page.locator(".ys-primary-outline > button").nth(1).click();
+    await expect(page.getByRole("heading", { level: 2, name: "الأعداد من 0 إلى 10" })).toBeVisible();
+    await expect(page.locator(".ys-primary-illustration").first()).toHaveAttribute("aria-label", /العدد والكمية/);
+    await expect(page.getByRole("button", { name: "طباعة كراسة المادة" })).toBeVisible();
+  });
+
+  test("published primary social-studies lessons open from the Grade 3 subject page", async ({ page }) => {
+    await page.goto("./#/subject/grade-3/general/social-studies");
+    await page.getByRole("link", { name: /ابدأ الدروس المصوّرة/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "الصف الثالث الأساسي · الاجتماعيات" })).toBeVisible();
+    await expect(page.locator(".ys-primary-outline > button")).toHaveCount(3);
+  });
+
+  test("primary lesson layouts remain usable on narrow screens", async ({ page }) => {
+    for (const width of [390, 320]) {
+      await page.setViewportSize({ width, height: 850 });
+      await page.goto("./#/primary-learning/grade-2/general/science");
+      await expect(page.getByRole("heading", { level: 1, name: "الصف الثاني الأساسي · العلوم" })).toBeVisible();
+      const dimensions = await page.evaluate(() => ({
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+      expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+    }
+  });
+
   test("the mobile menu opens and navigates to the curriculum", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("./");
