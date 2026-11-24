@@ -115,6 +115,50 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.locator(".sme-featured-course")).toBeVisible();
   });
 
+  test("home tool cards keep all four elements in a readable grid", async ({ page }) => {
+    for (const width of [1440, 1024, 768, 390]) {
+      await page.setViewportSize({ width, height: 860 });
+      await page.goto("./");
+      const sectionSpacing = await page.evaluate(() => {
+        const intro = document.querySelector(".ys-tools-intro").getBoundingClientRect();
+        const list = document.querySelector(".ys-tool-list").getBoundingClientRect();
+        return { introBottom: intro.bottom, listTop: list.top };
+      });
+      expect(
+        sectionSpacing.listTop,
+        "Tool cards overlap the section heading at " + width + "px"
+      ).toBeGreaterThanOrEqual(sectionSpacing.introBottom);
+
+      const audit = await page.locator(".ys-tool-list .ys-tool-card").evaluateAll((cards) =>
+        cards.map((card) => {
+          const copy = card.querySelector(".ys-tool-copy");
+          const arrow = card.querySelector(".ys-tool-arrow");
+          const rect = (element) => {
+            const box = element.getBoundingClientRect();
+            return { left: box.left, right: box.right, top: box.top, bottom: box.bottom, width: box.width };
+          };
+          return {
+            columns: getComputedStyle(card).gridTemplateColumns.split(" ").length,
+            card: rect(card),
+            number: rect(card.querySelector(".ys-tool-number")),
+            icon: rect(card.querySelector(".tool-icon")),
+            copy: rect(copy),
+            arrow: rect(arrow),
+          };
+        })
+      );
+      expect(audit).toHaveLength(11);
+      for (const card of audit) {
+        expect(card.columns, "Expected four grid tracks at " + width + "px").toBe(4);
+        expect(card.copy.width, "Tool copy is too narrow at " + width + "px: " + JSON.stringify(card)).toBeGreaterThan(100);
+        for (const item of [card.number, card.icon, card.copy, card.arrow]) {
+          expect(item.left, "Card child extends beyond left edge at " + width + "px").toBeGreaterThanOrEqual(card.card.left - 1);
+          expect(item.right, "Card child extends beyond right edge at " + width + "px").toBeLessThanOrEqual(card.card.right + 1);
+        }
+      }
+    }
+  });
+
   test("home tool icons use distinct Lucide symbols and consistent icon wells", async ({ page }) => {
     await page.goto("./");
     const iconAudit = await page.locator(".ys-tool-list .ys-tool-card .tool-icon").evaluateAll((nodes) =>
