@@ -680,9 +680,9 @@ function SubjectPage({ progress }: { progress: Progress }) {
             <p>تنتقل من هنا إلى شرح الموضوعات المرتبطة بالمادة، مع شرح الموضوع وأمثلته وتدريباته وأسئلته المتدرجة داخل الموقع.</p>
           </div>
           <div className="sme-course-stats">
-            <div className="sme-course-stat"><b>71</b><small>محوراً تعليمياً في المركز</small></div>
+            <div className="sme-course-stat"><b>71</b><small>محوراً تعليمياً مبدئياً</small></div>
             <div className="sme-course-stat"><b>3</b><small>مستويات لصعوبة الأسئلة</small></div>
-            <div className="sme-course-stat"><b>PDF</b><small>كراسات دروس كاملة واختبارات قابلة للطباعة</small></div>
+            <div className="sme-course-stat"><b>PDF</b><small>كراسات وحدات كاملة واختبارات قابلة للطباعة</small></div>
           </div>
         </section> : <section className="sme-course-overview" aria-label="نظرة عامة على المقرر">
           <div className="sme-course-overview-copy">
@@ -706,7 +706,7 @@ function SubjectPage({ progress }: { progress: Progress }) {
             <span className="content-icon"><BookOpen size={26}/></span>
             <span className="content-status">مركز الشرح والمراجعة</span>
             <h2>ابدأ شرح مادة {subject.name}</h2>
-            <p>افتح المحور المطابق لمادتك لقراءة الدرس مقسماً إلى موضوعات قصيرة، مع أهداف التعلم والقوانين أو المفاهيم المهمة، ومثال محلول وتدريبات واختبار داخل الموقع.</p>
+            <p>افتح المحور المطابق لمادتك لقراءة شرح الموضوع بالتفصيل، مع أهداف التعلّم والقوانين والمفاهيم والأمثلة المحلولة والتدريبات والاختبارات داخل الموقع.</p>
             {grade12LearningModuleSlug ? <Link className="btn btn-primary" to={grade12LearningHref}>افتح شرح المادة <ArrowLeft size={16}/></Link> : <p>لم يُربط هذا المقرر بمحور مستقل بعد؛ افتح المركز وابحث عن موضوع قريب.</p>}
           </div>}
           {activeTab === "questions" && <div className="content-coming">
