@@ -1,69 +1,40 @@
-# Aden Grade 12 learning release — Yemen Study
+# Aden Grade 12 learning hub — current content and print release
 
-Release candidate: 20 November 2026
+Reviewed: 24 November 2026
 
-## Curriculum basis
+## Curriculum basis and verification boundary
 
-This release uses the **Aden 2026 Grade 12 book records** where the independent 2026 catalogue explicitly identifies Aden, and uses books labelled "Sana'a and Aden" only for subjects the index lists as shared. Separate Sana'a-only Arabic books are not used as the learning basis for the Aden modules.
+This learning area is arranged around Aden Grade 12 book records and available contents indexes. The catalogue used during authoring is an independent index, not the Ministry's official repository. The exact subject edition and every page of the 2026–2027 school copy must be checked before any module is labelled as an officially verified lesson.
 
-The source catalogue is an independent index, not the Ministry's official repository. The Ministry's 1448 AH announcement links to the national e-learning portal, but the exact Grade 12 Aden PDFs were not individually validated from that portal during this release. Accordingly, the app labels its subject arrangement as an Aden 2026-aligned first batch based on available contents pages, not as a final Ministry certification.
+The hub currently contains **71 provisional topic modules**. The number reflects authored topic hubs in the front end; it does **not** certify full coverage of the official Grade 12 curriculum. The wider curriculum register still shows all Grades 1–12 as pending complete extraction and lesson-map verification.
 
-## Initial in-site learning modules
+## Current learning experience
 
-Each published module has an original Arabic explanation, learning outcomes, worked example, revision summary, 3 difficulty levels (جيد / صعب / الأصعب), 3 questions per level, answer feedback, and a print-to-PDF action for the summary and exam.
+The in-site Grade 12 hub contains original Arabic teaching content arranged by topic, with a mix of detailed lesson sections and broad topic introductions. Depending on the module, students may find learning outcomes, formulae, worked examples, lesson-level comprehension checks, and tiered practice questions with explanations.
 
-| Subject | First unit/topic used for this release | Source record |
-|---|---|---|
-| Physics | Unit 1: Linear momentum and projectiles | https://yembooks.com/item/physics-grade-12 |
-| Chemistry | Unit 1: Transition elements | https://yembooks.com/item/chemistry-grade-12 |
-| Biology | Unit 1: Nervous system | https://yembooks.com/item/biology-grade-12 |
-| Scientific Mathematics | Unit 1: Complex numbers | https://yembooks.com/item/math-scientific-grade-12 |
-| Arabic Grammar and Morphology | Absolute object, object of purpose, adverbial object, object with waw of accompaniment | https://yembooks.com/item/grammar-grade-12-aden |
-| Literature, Texts and Criticism | Mamluk/Ottoman literature and introductory literary criticism | https://yembooks.com/item/literature-grade-12-aden |
-| History | Unit 1: Modern historical landmarks / European Renaissance | https://yembooks.com/item/history-grade-12 |
-| Geography | Unit 1: Political geography and its importance | https://yembooks.com/item/geography-grade-12 |
+The current content batch includes topic hubs in Physics, Chemistry, Biology, Scientific and Literary Mathematics, English, Reading, Arabic Grammar, Literature, History, Geography, Quran, Faith, Seerah, Hadith/Fiqh, Philosophy, Logic, Psychology and Cartography. Presence of a topic hub is not evidence that every lesson in that subject book has been authored.
+
+## A4 lesson booklet and printing
+
+The learning hub's print action now creates a **complete unit booklet from the content currently authored in the selected hub**, not a one-paragraph lesson summary. The booklet carries the Yemen Study mark and visual identity and includes the unit heading, student fields, introduction, learning outcomes, every lesson section in the module, lesson-linked practice prompts, the worked example, supporting terminology and rules, and source references.
+
+Students can choose Save as PDF or a printer in the browser print dialog. A separate exam paper remains available. A booklet is complete only relative to the authored content in that particular module; it is not a claim that the entire official textbook is complete.
+
+## Required completion gates
+
+1. Extract and verify every Grade 12 subject, unit and lesson title against the correct Aden 2026–2027 ministry plan and printed textbook.
+2. Compare the 71 current hubs with the verified map; split merged topics, add missing lessons, and remove topics not present in the syllabus where necessary.
+3. Author original full explanations, worked examples, diagrams where needed, practice questions and worked answers for every lesson.
+4. Check scientific content and calculations against authoritative academic sources; have language, history, literature and Islamic-studies content checked by relevant subject reviewers.
+5. Run accuracy, answer-key, copyright, readability, mobile and print-layout checks before a subject can be labelled complete.
 
 ## Source roles
 
-### Curriculum contents indexes
-- YemBooks Grade 12 index: https://yembooks.com/explorer/stage-secondary/sec-3
-- Aden Grammar book contents: https://yembooks.com/item/grammar-grade-12-aden
-- Aden Reading book contents: https://yembooks.com/item/reading-grade-12-aden
-- Aden Literature and Texts book contents: https://yembooks.com/item/literature-grade-12-aden
-- Physics contents: https://yembooks.com/item/physics-grade-12
-- Chemistry contents: https://yembooks.com/item/chemistry-grade-12
-- Biology contents: https://yembooks.com/item/biology-grade-12
-- Scientific Mathematics contents: https://yembooks.com/item/math-scientific-grade-12
-- History contents: https://yembooks.com/item/history-grade-12
-- Geography contents: https://yembooks.com/item/geography-grade-12
-
-### Academic concept-checking references
-- OpenStax University Physics Vol. 1: https://openstax.org/books/university-physics-volume-1/pages/9-introduction
-- OpenStax Chemistry 2e, transition metals: https://openstax.org/books/chemistry-2e/pages/19-1-properties-of-transition-metals-and-their-compounds
-- OpenStax Biology 2e, neurons and glial cells: https://openstax.org/books/biology-2e/pages/35-1-neurons-and-glial-cells
-- OpenStax Algebra and Trigonometry 2e, complex numbers: https://openstax.org/books/algebra-and-trigonometry-2e/pages/3-5-complex-numbers
-- Encyclopaedia Britannica, Renaissance: https://www.britannica.com/event/Renaissance
-- Encyclopaedia Britannica, Political Geography: https://www.britannica.com/topic/political-geography
-
-## PDF export
-
-The learning hub and supplementary Physics page provide separate buttons for:
-- Save lesson summary as PDF.
-- Save the selected difficulty-level exam as PDF.
-
-The browser print dialog is used: students choose **Save as PDF**. The output is generated from the local in-site content; no external PDF service is required.
-
-## Content scope and limitations
-
-This is an initial module batch, not the complete Aden Grade 12 syllabus. One opening topic is currently prepared for each of the eight subjects above. The remaining units and subjects still need their contents pages checked and their original explanations, worked examples, summaries and graded question banks written.
-
-Subjects still awaiting a complete in-site module include English, Reading, Quran, Faith, Hadith/Fiqh, Seerah, Literary Mathematics, Philosophy, Logic, Psychology and Cartography. The Aden Reading contents page has been located, but the reading texts themselves have not yet been written into the platform. The separate scalar/vector Physics page is clearly labelled as supplementary revision rather than the first Aden Physics unit.
+Curriculum contents indexes identify the subject/edition and help establish unit order. Academic references are used to check concepts and are linked on the relevant modules. Neither type of source substitutes for a complete page-by-page crosswalk with the student's actual school edition.
 
 ## Copyright and authorship
 
-- Textbook prose, exercises and protected poems/passages are not copied into the app.
-- Explanations, worked examples, questions and answer explanations are newly authored.
-- The 2026 index is used to identify the subject/edition and unit order; academic references are used to verify scientific concepts.
-- Book PDFs remain with their source hosts; this release does not re-host copyrighted books.
-
-No subject should be marked "complete" until all its verified units are covered and checked against the printed Aden edition used by the student's school.
+- Explanations, examples, questions and answer explanations are independently authored.
+- Textbook prose, full copyrighted poems and protected exam passages are not copied into the learning hub.
+- Book listings and source links help identify the correct edition; they do not mean the platform has reproduced or completed the book.
+- The hub must not claim Ministry certification or full curriculum completion without documentary verification and specialist review.

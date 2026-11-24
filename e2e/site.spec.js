@@ -46,7 +46,7 @@ test.describe("Yemen Study public learning journey", () => {
 
     await expect(page.getByRole("heading", { level: 2, name: "الفيزياء: كمية التحرك والمقذوفات" })).toBeVisible();
     await expect(page.getByText("أهداف التعلم", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: /حفظ الملخص PDF/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /طباعة الوحدة كاملة/ })).toBeVisible();
   });
 
   test("the mobile menu opens and navigates to the curriculum", async ({ page }) => {
@@ -244,6 +244,28 @@ test.describe("Yemen Study public learning journey", () => {
       await expect(page.locator(".g12-learning-lesson-practice")).toBeVisible();
       await expect(page.locator(".g12-learning-lesson-practice h4")).toBeVisible();
     }
+  });
+
+  test("unit printing contains all lesson content and Yemen Study identity", async ({ page }) => {
+    await page.goto("./#/grade-12-learning?subject=physics-nuclear");
+
+    const lessonNavigation = page.locator(".g12-learning-lesson-picker");
+    await expect(lessonNavigation.locator("button")).toHaveCount(6);
+    await expect(lessonNavigation).not.toContainText("OpenStax");
+    await expect(lessonNavigation).not.toContainText("مثال محلول");
+
+    const booklet = page.locator(".g12-learning-print-lesson");
+    await expect(booklet).toContainText("Yemen Study");
+    await expect(booklet).toContainText("منصة يمن ستدي التعليمية");
+    await expect(booklet).toContainText("الدروس المشروحة في هذه الوحدة");
+    await expect(booklet.locator(".g12-print-lesson-entry")).toHaveCount(6);
+    await expect(booklet).toContainText("مثال محلول من الوحدة");
+    await expect(booklet).toContainText("مصطلحات وقواعد مساندة");
+    await expect(page.getByRole("button", { name: "طباعة الوحدة كاملة" })).toBeVisible();
+
+    await page.evaluate(() => { window.print = () => {}; });
+    await page.getByRole("button", { name: "طباعة الوحدة كاملة" }).click();
+    await expect(page.locator("body")).toHaveAttribute("data-g12-learning-print", "lesson");
   });
 
   test("each selected lesson offers an answerable comprehension check with feedback", async ({ page }) => {

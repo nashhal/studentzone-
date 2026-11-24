@@ -26,6 +26,7 @@ These are official-looking Ministry planning documents with course/subject distr
 - The current index and older Grade 12 sample modules are not automatically certified against the newly supplied 2026–2027 plans. Match each lesson and any deletions/exclusions before marking it aligned.
 - There is one full interactive Physics demonstration lesson (Scalars and Vectors). It is a product/content-format demonstration only; it is **not** confirmed against a named 2026–2027 plan item and must not be counted as an approved curriculum lesson until matched and reviewed.
 - No grade currently has a complete, verified unit/lesson library.
+- The current front end also contains **71 provisional Grade 12 learning hubs**. This is a count of authored topic hubs, not a count of all verified textbook lessons; it must not be interpreted as proof that the full Grade 12 syllabus is covered.
 - International explanation sources have been registered in [INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md](./INTERNATIONAL_EXPLANATION_REFERENCE_LIBRARY.md). They are used to improve Arabic explanations and check facts, not to alter the Yemeni curriculum sequence or copy/translate protected content.
 
 ## Grade-level register
