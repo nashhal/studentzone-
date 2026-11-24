@@ -36,16 +36,17 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.locator(".curriculum-grid")).not.toContainText("الصف التاسع الأساسي");
   });
 
-  test("a dedicated in-site lesson action opens the lesson", async ({ page }) => {
+  test("the physics subject CTA opens its complete in-site learning module", async ({ page }) => {
     await page.goto("./#/subject/grade-12/scientific/physics");
     await expect(page.getByRole("heading", { level: 1, name: "الفيزياء" })).toBeVisible();
 
-    const openLesson = page.getByRole("link", { name: /ابدأ الدرس/ }).first();
+    const openLesson = page.getByRole("link", { name: "افتح شرح المادة والاختبارات" });
     await expect(openLesson).toBeVisible();
     await openLesson.click();
 
-    await expect(page.getByRole("heading", { level: 1, name: "الكميات القياسية والمتجهة" })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: "أهداف التعلّم" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "الفيزياء: كمية التحرك والمقذوفات" })).toBeVisible();
+    await expect(page.getByText("أهداف التعلم", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "مذكرة مراجعة الوحدة" })).toHaveCount(0);
   });
 
   test("the mobile menu opens and navigates to the curriculum", async ({ page }) => {
@@ -247,7 +248,7 @@ test.describe("Yemen Study public learning journey", () => {
     await page.goto("./#/subject/grade-12/scientific/physics");
     await expect(page.locator(".sme-course-overview")).toBeVisible();
     await expect(page.locator(".sme-course-stat")).toHaveCount(3);
-    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مسار المراجعة");
+    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مركز شرح ومراجعة");
   });
 
   test("revision hero remains usable when reduced motion is requested", async ({ page }) => {
