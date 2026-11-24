@@ -228,6 +228,43 @@ test.describe("Yemen Study public learning journey", () => {
     }
   });
 
+  test("all missing Grade 12 units are available as independent explained modules", async ({ page }) => {
+    const modules = [
+      { slug: "physics-nuclear", heading: "الفيزياء: الفيزياء النووية" },
+      { slug: "physics-solar", heading: "الفيزياء: الطاقة الشمسية" },
+      { slug: "physics-cosmology", heading: "الفيزياء: الفيزياء الكونية" },
+      { slug: "biology-human-nutrition", heading: "الأحياء: التغذية في الإنسان" },
+      { slug: "chemistry-environment", heading: "الكيمياء: الكيمياء والبيئة" },
+    ];
+
+    for (const item of modules) {
+      await page.goto("./#/grade-12-learning?subject=" + item.slug);
+      await expect(page.getByRole("heading", { level: 2, name: item.heading })).toBeVisible();
+      await expect(page.locator(".g12-learning-lesson-picker button").first()).toBeVisible();
+      await expect(page.locator(".g12-learning-lesson-practice")).toBeVisible();
+      await expect(page.locator(".g12-learning-lesson-practice h4")).toBeVisible();
+    }
+  });
+
+  test("each selected lesson offers an answerable comprehension check with feedback", async ({ page }) => {
+    await page.goto("./#/grade-12-learning?subject=physics-solar");
+    const quickCheck = page.locator(".g12-learning-lesson-practice");
+    await expect(quickCheck).toBeVisible();
+    const firstOption = quickCheck.locator(".g12-learning-options button").first();
+    await firstOption.click();
+    const checkButton = quickCheck.getByRole("button", { name: "تحقق من الإجابة" });
+    await expect(checkButton).toBeEnabled();
+    await checkButton.click();
+    await expect(quickCheck.locator(".g12-learning-explanation")).toBeVisible();
+    await expect(quickCheck.getByRole("button", { name: "أعد المحاولة" })).toBeVisible();
+  });
+
+  test("the learning hub catalogue reflects the expanded 71-module curriculum", async ({ page }) => {
+    await page.goto("./#/grade-12-learning?subject=physics-nuclear");
+    await expect(page.locator(".g12-learning-header-meta")).toContainText("71 محوراً");
+    await expect(page.locator(".g12-learning-nav-count")).toContainText("71");
+  });
+
   test("grade 12 learning hub avoids horizontal overflow on desktop, tablet and mobile", async ({ page }) => {
     for (const width of [1440, 1024, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 900 });
