@@ -36,16 +36,17 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.locator(".curriculum-grid")).not.toContainText("الصف التاسع الأساسي");
   });
 
-  test("a dedicated in-site lesson action opens the lesson", async ({ page }) => {
+  test("the physics subject CTA opens its complete in-site learning module", async ({ page }) => {
     await page.goto("./#/subject/grade-12/scientific/physics");
     await expect(page.getByRole("heading", { level: 1, name: "الفيزياء" })).toBeVisible();
 
-    const openLesson = page.getByRole("link", { name: /ابدأ الدرس/ }).first();
+    const openLesson = page.getByRole("link", { name: "افتح شرح المادة والاختبارات" });
     await expect(openLesson).toBeVisible();
     await openLesson.click();
 
-    await expect(page.getByRole("heading", { level: 1, name: "الكميات القياسية والمتجهة" })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: "أهداف التعلّم" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "الفيزياء: كمية التحرك والمقذوفات" })).toBeVisible();
+    await expect(page.getByText("أهداف التعلم", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: /حفظ الملخص PDF/ })).toBeVisible();
   });
 
   test("the mobile menu opens and navigates to the curriculum", async ({ page }) => {
@@ -198,11 +199,56 @@ test.describe("Yemen Study public learning journey", () => {
     await expect(page.locator(".ys-accuracy-track[role='progressbar']")).toBeVisible();
   });
 
+  test("grade 12 subject pages open the matching in-site learning module", async ({ page }) => {
+    const cases = [
+      {
+        path: "./#/subject/grade-12/scientific/physics",
+        subject: "الفيزياء",
+        moduleHeading: "الفيزياء: كمية التحرك والمقذوفات",
+      },
+      {
+        path: "./#/subject/grade-12/scientific/chemistry",
+        subject: "الكيمياء",
+        moduleHeading: "الكيمياء: العناصر الانتقالية",
+      },
+      {
+        path: "./#/subject/grade-12/literary/mathematics-literary",
+        subject: "الرياضيات — أدبي",
+        moduleHeading: "الرياضيات: الإحصاء: الارتباط والانحدار",
+      },
+    ];
+
+    for (const item of cases) {
+      await page.goto(item.path);
+      await expect(page.getByRole("heading", { level: 1, name: item.subject })).toBeVisible();
+      const openHub = page.getByRole("link", { name: "افتح شرح المادة والاختبارات" });
+      await expect(openHub).toBeVisible();
+      await openHub.click();
+      await expect(page.getByRole("heading", { level: 2, name: item.moduleHeading })).toBeVisible();
+    }
+  });
+
+  test("grade 12 learning hub avoids horizontal overflow on desktop, tablet and mobile", async ({ page }) => {
+    for (const width of [1440, 1024, 768, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("./#/grade-12-learning?subject=chemistry");
+      await expect(page.getByRole("heading", { level: 2, name: "الكيمياء: العناصر الانتقالية" })).toBeVisible();
+      const dimensions = await page.evaluate(() => ({
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+      expect(
+        dimensions.scrollWidth,
+        "Learning hub horizontal overflow at " + width + "px"
+      ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+    }
+  });
+
   test("subject overview includes a course photo and learning sequence", async ({ page }) => {
     await page.goto("./#/subject/grade-12/scientific/physics");
     await expect(page.locator(".sme-course-overview")).toBeVisible();
     await expect(page.locator(".sme-course-stat")).toHaveCount(3);
-    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مسار المراجعة");
+    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مركز شرح ومراجعة");
   });
 
   test("revision hero remains usable when reduced motion is requested", async ({ page }) => {
