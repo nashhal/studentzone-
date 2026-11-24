@@ -56,7 +56,7 @@ test.describe("Yemen Study public learning journey", () => {
 
     await expect(page.getByRole("heading", { level: 1, name: "الصف الأول الأساسي · الرياضيات" })).toBeVisible();
     await expect(page.locator(".ys-primary-outline > button")).toHaveCount(3);
-    await expect(page.locator(".ys-primary-illustration svg")).toBeVisible();
+    await expect(page.locator(".ys-primary-illustration svg").first()).toBeVisible();
     await expect(page.locator(".ys-primary-example")).toContainText("مثال محلول");
     await expect(page.locator(".ys-primary-practice")).toBeVisible();
 
@@ -69,7 +69,7 @@ test.describe("Yemen Study public learning journey", () => {
 
     await page.locator(".ys-primary-outline > button").nth(1).click();
     await expect(page.getByRole("heading", { level: 2, name: "الأعداد من 0 إلى 10" })).toBeVisible();
-    await expect(page.locator(".ys-primary-illustration")).toContainText("العدد والكمية");
+    await expect(page.locator(".ys-primary-illustration").first()).toHaveAttribute("aria-label", /العدد والكمية/);
     await expect(page.getByRole("button", { name: "طباعة كراسة المادة" })).toBeVisible();
   });
 
