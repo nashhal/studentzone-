@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, BookOpen, CheckCircle2, ChevronLeft, Clock3, Printer, RotateCcw, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronLeft, Printer, RotateCcw, ShieldCheck } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { getGrade } from "./data/catalog";
-import { getPrimaryModule, type PrimaryLesson, type PrimaryVisual } from "./data/primary-lessons";
+import { getPrimaryModule, type PrimaryVisual } from "./data/primary-lessons";
 import "./primary-learning.css";
 
 const visualCopy: Record<PrimaryVisual, { title: string; caption: string }> = {
