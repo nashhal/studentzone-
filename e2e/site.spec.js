@@ -119,6 +119,16 @@ test.describe("Yemen Study public learning journey", () => {
     for (const width of [1440, 1024, 768, 390]) {
       await page.setViewportSize({ width, height: 860 });
       await page.goto("./");
+      const sectionSpacing = await page.evaluate(() => {
+        const intro = document.querySelector(".ys-tools-intro").getBoundingClientRect();
+        const list = document.querySelector(".ys-tool-list").getBoundingClientRect();
+        return { introBottom: intro.bottom, listTop: list.top };
+      });
+      expect(
+        sectionSpacing.listTop,
+        "Tool cards overlap the section heading at " + width + "px"
+      ).toBeGreaterThanOrEqual(sectionSpacing.introBottom);
+
       const audit = await page.locator(".ys-tool-list .ys-tool-card").evaluateAll((cards) =>
         cards.map((card) => {
           const copy = card.querySelector(".ys-tool-copy");
