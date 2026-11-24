@@ -3,9 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Yemen Study public learning journey", () => {
   test("home page clearly leads into the curriculum", async ({ page }) => {
     await page.goto("./");
-    await expect(page.locator(".ys-hero-copy h1")).toContainText("تعلّم بتركيز");
+    await expect(page.locator(".ys-hero-copy h1")).toContainText("كل ما تحتاجه للمراجعة");
 
-    const curriculumLink = page.getByRole("link", { name: /استكشف المنهج/ });
+    const curriculumLink = page.getByRole("link", { name: /تصفّح المنهج/ });
     await expect(curriculumLink).toBeVisible();
     await curriculumLink.click();
     await expect(page.getByRole("heading", { level: 1, name: /اختر مرحلتك الدراسية/ })).toBeVisible();
@@ -69,27 +69,51 @@ test.describe("Yemen Study public learning journey", () => {
     for (const width of [1440, 1024, 768, 390, 320]) {
       await page.setViewportSize({ width, height: 860 });
       await page.goto("./");
-      const dimensions = await page.evaluate(() => ({
-        clientWidth: document.documentElement.clientWidth,
-        scrollWidth: document.documentElement.scrollWidth,
-      }));
-      expect(dimensions.scrollWidth, "Unexpected horizontal overflow at " + width + "px")
-        .toBeLessThanOrEqual(dimensions.clientWidth + 1);
+      const dimensions = await page.evaluate(() => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const offenders = Array.from(document.querySelectorAll("body *"))
+          .map((element) => {
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              tag: element.tagName.toLowerCase(),
+              id: element.id || "",
+              className: typeof element.className === "string" ? element.className : "",
+              left: Math.round(rect.left * 10) / 10,
+              right: Math.round(rect.right * 10) / 10,
+              width: Math.round(rect.width * 10) / 10,
+              position: style.position,
+              display: style.display,
+              minWidth: style.minWidth,
+              flexBasis: style.flexBasis,
+              html: element.outerHTML.slice(0, 220),
+            };
+          })
+          .filter((element) => element.width > 0 && (element.right > viewportWidth + 1 || element.left < -1))
+          .sort((a, b) => b.right - a.right)
+          .slice(0, 18);
+        return {
+          clientWidth: viewportWidth,
+          scrollWidth: document.documentElement.scrollWidth,
+          offenders,
+        };
+      });
+      expect(
+        dimensions.scrollWidth,
+        "Unexpected horizontal overflow at " + width + "px. Offenders: " + JSON.stringify(dimensions.offenders)
+      ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
     }
   });
 
 
-  test("homepage photography and learning-skill pathways render", async ({ page }) => {
+  test("homepage presents a revision-first learning journey", async ({ page }) => {
     await page.goto("./");
-    await expect(page.locator(".ys-hero-image")).toBeVisible();
-    await expect(page.locator(".ys-skill-card")).toHaveCount(3);
+    await expect(page.locator(".sme-hero-search input")).toBeVisible();
+    await expect(page.locator(".sme-how-card")).toHaveCount(3);
+    await expect(page.locator(".ys-stage-grid .ys-stage-card")).toHaveCount(3);
     await expect(page.locator(".ys-tool-list .ys-tool-card")).toHaveCount(11);
-    const images = await page.locator(".ys-hero-image, .ys-skill-image img").evaluateAll((nodes) =>
-      nodes.map((node) => ({ alt: node.getAttribute("alt"), src: node.getAttribute("src") }))
-    );
-    expect(images.every((item) => item.alt && item.src?.includes("images.pexels.com"))).toBeTruthy();
+    await expect(page.locator(".sme-featured-course")).toBeVisible();
   });
-
 
   test("home tool icons use distinct Lucide symbols and consistent icon wells", async ({ page }) => {
     await page.goto("./");
@@ -132,14 +156,16 @@ test.describe("Yemen Study public learning journey", () => {
 
   test("subject overview includes a course photo and learning sequence", async ({ page }) => {
     await page.goto("./#/subject/grade-12/scientific/physics");
-    await expect(page.locator(".ys-subject-feature")).toBeVisible();
-    await expect(page.locator(".ys-subject-skill-tags")).toContainText("01 الفهم");
+    await expect(page.locator(".sme-course-overview")).toBeVisible();
+    await expect(page.locator(".sme-course-stat")).toHaveCount(3);
+    await expect(page.locator(".sme-course-overview-copy h2")).toContainText("مسار المراجعة");
   });
 
-  test("content remains visible when reduced motion is requested", async ({ page }) => {
+  test("revision hero remains usable when reduced motion is requested", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("./");
     await expect(page.locator(".ys-hero-copy h1")).toBeVisible();
-    await expect(page.locator(".ys-hero-image")).toBeVisible();
+    await expect(page.locator(".sme-hero-search input")).toBeVisible();
+    await expect(page.getByRole("link", { name: /تصفّح المنهج/ })).toBeVisible();
   });
 });
